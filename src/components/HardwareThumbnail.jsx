@@ -4,18 +4,22 @@ import React from 'react';
  * Real Photo + Vector Thumbnail Renderer for Hardware Catalog Sidebar + Modal
  */
 
+// Dùng BASE_URL của Vite thay vì path tuyệt đối "/assets/..." để ảnh không vỡ
+// khi app được deploy dưới 1 subpath (vd: GitHub Pages project site)
+const ASSET_BASE = `${import.meta.env.BASE_URL}assets/components/`;
+
 const REAL_IMAGES = {
-  ESP32: '/assets/components/esp32.png',
-  ESP32_V4: '/assets/components/esp32.png',
-  ARDUINO_UNO: '/assets/components/arduino_uno.png',
-  DHT11: '/assets/components/dht11.png',
-  HC_SR04: '/assets/components/hc_sr04.png',
-  OLED_SSD1306: '/assets/components/oled.png',
-  SERVO: '/assets/components/servo.png',
-  DS18B20: '/assets/components/ds18b20.png',
-  BMP280: '/assets/components/bmp280.png',
-  DS3231: '/assets/components/ds3231.png',
-  ACS712: '/assets/components/acs712.png',
+  ESP32: `${ASSET_BASE}esp32.png`,
+  ESP32_V4: `${ASSET_BASE}esp32.png`,
+  ARDUINO_UNO: `${ASSET_BASE}arduino_uno.png`,
+  DHT11: `${ASSET_BASE}dht11.png`,
+  HC_SR04: `${ASSET_BASE}hc_sr04.png`,
+  OLED_SSD1306: `${ASSET_BASE}oled.png`,
+  SERVO: `${ASSET_BASE}servo.png`,
+  DS18B20: `${ASSET_BASE}ds18b20.png`,
+  BMP280: `${ASSET_BASE}bmp280.png`,
+  DS3231: `${ASSET_BASE}ds3231.png`,
+  ACS712: `${ASSET_BASE}acs712.png`,
 };
 
 export default function HardwareThumbnail({ type }) {
