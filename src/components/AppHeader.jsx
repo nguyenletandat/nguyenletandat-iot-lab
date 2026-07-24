@@ -33,7 +33,7 @@ export default function AppHeader({
             </div>
             <div>
               <h1 className={`text-base font-bold tracking-tight m-0 leading-none ${ui.isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-                IoT Labs Maker
+                Nguyen Le Tan Dat - IOT Lab
               </h1>
               <p className={`text-[9px] mt-0.5 ${ui.isDarkMode ? 'text-gray-400' : 'text-slate-500'}`}>
                 Virtual Simulator — <span className="text-emerald-600 font-semibold">{Object.keys(COMPONENT_TYPES).length} linh kiện</span>

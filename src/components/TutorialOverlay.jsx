@@ -3,7 +3,7 @@ import { X, ChevronRight, ChevronLeft, Sparkles, MousePointer, Cable, Play, Save
 
 const TUTORIAL_STEPS = [
   {
-    title: '🎉 Chào mừng đến IoT Labs Maker!',
+    title: '🎉 Chào mừng đến Nguyen Le Tan Dat - IOT Lab!',
     desc: 'Đây là công cụ thiết kế mạch điện tử và lập trình Arduino/ESP32 trực tuyến. Hãy cùng khám phá các tính năng chính.',
     icon: Sparkles,
     color: 'emerald',
