@@ -315,10 +315,10 @@ export default function App() {
             <svg className="w-full h-full">
               <g transform={`translate(${canvas.pan.x}, ${canvas.pan.y}) scale(${canvas.zoom})`}>
                 {/* Wires & Waypoints */}
-                {canvas.wires.map(w => {
+                {canvas.wires.map((w, index) => {
                   const start = getPortCanvasCoords(w.from.componentId, w.from.portId);
                   const end = getPortCanvasCoords(w.to.componentId, w.to.portId);
-                  const pathData = generateWirePath(start, end, w.waypoints);
+                  const pathData = generateWirePath(start, end, w.waypoints, index);
                   const isSelected = canvas.selectedWireIds.includes(w.id);
                   const handles = getWireHandles(w, start, end);
 
@@ -347,6 +347,34 @@ export default function App() {
                           <circle cx={end.x} cy={end.y} r="3" fill="#64748B" />
                         </g>
                       )}
+
+                      {/* Wire Port Badges (Labels) */}
+                      {(() => {
+                        const renderBadge = (c, color) => {
+                          if (!c.name) return null;
+                          const bw = Math.max(18, c.name.length * 5.5 + 6);
+                          const bh = 12;
+                          let bx = c.x - bw / 2;
+                          let by = c.y - bh / 2;
+                          if (c.side === 'left') bx -= bw / 2 + 10;
+                          else if (c.side === 'right') bx += bw / 2 + 10;
+                          else if (c.side === 'top') by -= 12;
+                          else if (c.side === 'bottom') by += 12;
+                          
+                          return (
+                            <g className="pointer-events-none">
+                              <rect x={bx} y={by} width={bw} height={bh} rx="3" fill={color} />
+                              <text x={bx + bw / 2} y={by + 8.5} fill="#FFFFFF" fontSize="6.5" fontWeight="bold" fontFamily="monospace" textAnchor="middle">{c.name}</text>
+                            </g>
+                          );
+                        };
+                        return (
+                          <g>
+                            {renderBadge(start, w.color)}
+                            {renderBadge(end, w.color)}
+                          </g>
+                        );
+                      })()}
 
                       {!sim.isSimulating && (isSelected || (w.waypoints && w.waypoints.length > 0)) && handles.map((h, idx) => {
                         const isCustom = h.isCustom;

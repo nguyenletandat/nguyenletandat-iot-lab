@@ -231,11 +231,11 @@ export function useCanvasInteractions({ canvas, sim }) {
 
   const getPortCanvasCoords = (componentId, portId) => {
     const comp = canvas.components.find(c => c.id === componentId);
-    if (!comp) return { x: 0, y: 0 };
+    if (!comp) return { x: 0, y: 0, side: 'left', name: portId };
     const proto = COMPONENT_TYPES[comp.type];
     const port = proto?.ports.find(p => p.id === portId);
-    if (!port) return { x: 0, y: 0 };
-    return { x: comp.x + port.x, y: comp.y + port.y, side: port.side };
+    if (!port) return { x: 0, y: 0, side: 'left', name: portId };
+    return { x: comp.x + port.x, y: comp.y + port.y, side: port.side, name: port.name || port.id };
   };
 
   const handlePortClick = (e, componentId, portId, portType) => {
@@ -281,10 +281,29 @@ export function useCanvasInteractions({ canvas, sim }) {
     canvas.removeWireWaypoint(wireId, index);
   };
 
-  const generateWirePath = (start, end, waypoints = []) => {
+  const generateWirePath = (start, end, waypoints = [], wireIndex = 0) => {
     if (!waypoints || waypoints.length === 0) {
-      const midX = Math.round((start.x + end.x) / 2 / 10) * 10;
-      return `M ${start.x} ${start.y} H ${midX} V ${end.y} H ${end.x}`;
+      // Calculate a pseudo-random offset based on wire index to prevent overlap
+      const offset = 20 + ((wireIndex * 15) % 80);
+      const dirStart = start.side === 'right' ? 1 : start.side === 'left' ? -1 : 0;
+      const dirEnd = end.side === 'right' ? 1 : end.side === 'left' ? -1 : 0;
+
+      const pt1x = start.x + (dirStart !== 0 ? dirStart * offset : 0);
+      const pt1y = start.y + (start.side === 'top' ? -offset : start.side === 'bottom' ? offset : 0);
+
+      const pt2x = end.x + (dirEnd !== 0 ? dirEnd * offset : 0);
+      const pt2y = end.y + (end.side === 'top' ? -offset : end.side === 'bottom' ? offset : 0);
+
+      // If going from left to left, or right to right, we can just do a C-shape
+      if (start.side === end.side && start.side !== 'top' && start.side !== 'bottom') {
+        const maxOffset = Math.max(Math.abs(pt1x - start.x), Math.abs(pt2x - end.x));
+        const outX = start.side === 'left' ? Math.min(start.x, end.x) - maxOffset : Math.max(start.x, end.x) + maxOffset;
+        return `M ${start.x} ${start.y} H ${outX} V ${end.y} H ${end.x}`;
+      }
+
+      // Default S-shape with 5 segments
+      const midY = (pt1y + pt2y) / 2 + ((wireIndex * 10) % 40) - 20;
+      return `M ${start.x} ${start.y} L ${pt1x} ${pt1y} L ${pt1x} ${midY} L ${pt2x} ${midY} L ${pt2x} ${pt2y} L ${end.x} ${end.y}`;
     }
 
     let d = `M ${start.x} ${start.y}`;
