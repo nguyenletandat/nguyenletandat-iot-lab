@@ -2,11 +2,21 @@
  * Global keyboard shortcuts cho khu vực làm việc: undo/redo, lưu nhanh, xoá,
  * nhân bản, chạy/dừng mô phỏng, zoom, escape.
  */
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export function useKeyboardShortcuts({ canvas, sim, startSimulation, stopSimulation, deleteSelected, handleQuickSave }) {
+  // Luôn giữ tham chiếu MỚI NHẤT của canvas/sim/... — listener bên dưới chỉ gắn 1 lần lúc mount
+  // nhưng đọc qua ref nên không bao giờ dùng closure cũ (tránh lỗi Ctrl+S lưu nhầm dữ liệu cũ/rỗng
+  // vì trước đây effect chỉ re-subscribe khi canvas.zoom/sim.isSimulating đổi, không phải mỗi lần
+  // canvas.components/code thay đổi).
+  const latest = useRef({ canvas, sim, startSimulation, stopSimulation, deleteSelected, handleQuickSave });
+  useEffect(() => {
+    latest.current = { canvas, sim, startSimulation, stopSimulation, deleteSelected, handleQuickSave };
+  });
+
   useEffect(() => {
     const handleKeyDown = (e) => {
+      const { canvas, sim, startSimulation, stopSimulation, deleteSelected, handleQuickSave } = latest.current;
       const isMod = e.ctrlKey || e.metaKey;
       const isEditableTarget = () =>
         document.activeElement?.tagName === 'TEXTAREA' || !!document.activeElement?.closest('.monaco-editor');
@@ -65,5 +75,5 @@ export function useKeyboardShortcuts({ canvas, sim, startSimulation, stopSimulat
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [canvas.zoom, sim.isSimulating]);
+  }, []);
 }

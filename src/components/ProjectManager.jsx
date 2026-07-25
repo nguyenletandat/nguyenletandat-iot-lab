@@ -4,7 +4,7 @@ import { X, Save, FolderOpen, Trash2, Download, Upload, FileCode, Clock, Package
 /**
  * Project Manager Modal — Save, Load, Export, Import IoT Projects
  */
-export default function ProjectManager({ isOpen, onClose, onSave, onLoad, onExportJSON, onImportJSON, onExportIno, savedProjects, currentProjectName }) {
+export default function ProjectManager({ isOpen, onClose, onSave, onLoad, onExportJSON, onImportJSON, onExportIno, onDeleteProject, savedProjects, currentProjectName }) {
   const [newName, setNewName] = useState(currentProjectName);
   const [activeTab, setActiveTab] = useState('save');
   const fileInputRef = useRef(null);
@@ -128,9 +128,7 @@ export default function ProjectManager({ isOpen, onClose, onSave, onLoad, onExpo
                       onClick={(e) => {
                         e.stopPropagation();
                         if (confirm(`Xóa project "${proj.name}"?`)) {
-                          // Trigger delete from parent
-                          const event = new CustomEvent('delete-project', { detail: proj.name });
-                          window.dispatchEvent(event);
+                          onDeleteProject(proj.name);
                         }
                       }}
                       className="p-1.5 rounded-lg text-slate-300 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"

@@ -116,14 +116,22 @@ export default function App() {
   }, [sim.consoleLogs]);
 
   // ─── Project Management ──────────────────────
-  const handleQuickSave = () => {
-    const name = ui.currentProjectName || 'Untitled Project';
+  // nameOverride: cho phép Quản lý Project truyền tên mới khi "Lưu" (trước đây bị bỏ qua,
+  // luôn ghi đè lên project hiện tại bất kể người dùng gõ tên gì). Ctrl+S / nút Lưu nhanh
+  // gọi không truyền tham số nên vẫn dùng tên project hiện tại như cũ.
+  const handleQuickSave = (nameOverride) => {
+    const name = (typeof nameOverride === 'string' && nameOverride.trim()) || ui.currentProjectName || 'Untitled Project';
     ui.saveProject(name, {
       code,
       components: canvas.components,
       wires: canvas.wires,
     });
     sim.logToConsole('💾 Đã lưu project: ' + name);
+  };
+
+  const handleDeleteProject = (name) => {
+    ui.deleteProject(name);
+    sim.logToConsole('🗑️ Đã xóa project: ' + name);
   };
 
   const handleLoadProject = (proj) => {
@@ -645,6 +653,7 @@ export default function App() {
         onExportJSON={handleExportJSON}
         onImportJSON={handleImportJSON}
         onExportIno={handleExportIno}
+        onDeleteProject={handleDeleteProject}
         savedProjects={ui.savedProjects.length ? ui.savedProjects : ui.loadAllProjects()}
         currentProjectName={ui.currentProjectName}
       />
