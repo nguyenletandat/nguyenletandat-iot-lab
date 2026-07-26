@@ -24,6 +24,58 @@ import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useIntegrityGuard } from './hooks/useIntegrityGuard';
 import { toPng } from 'html-to-image';
 
+const CONTROL_BOARD_TYPES = ['ESP32', 'ESP32_V4', 'ARDUINO_UNO', 'ARDUINO_NANO', 'ARDUINO_MEGA', 'ESP8266'];
+
+const getWireFlowDirection = (w, start, end, components) => {
+  const fromComp = components.find(c => c.id === w.from.componentId);
+  const toComp = components.find(c => c.id === w.to.componentId);
+  if (!fromComp || !toComp) return { start, end, waypoints: w.waypoints || [] };
+
+  const isBoard = (type) => CONTROL_BOARD_TYPES.includes(type);
+  const fromIsBoard = isBoard(fromComp.type);
+  const toIsBoard = isBoard(toComp.type);
+  const fromPortId = w.from.portId.toUpperCase();
+  const toPortId = w.to.portId.toUpperCase();
+
+  let reverse = false;
+
+  // 1. Power (VCC/VIN/3V3/5V) -> flows board to sensor
+  const isPowerPort = (portId) => ['VCC', 'VDD', 'VIN', '3V3', '5V', '3.3V'].some(p => portId.includes(p));
+  if (isPowerPort(fromPortId) || isPowerPort(toPortId)) {
+    if (fromIsBoard && !toIsBoard) reverse = false;
+    else if (!fromIsBoard && toIsBoard) reverse = true;
+  }
+  // 2. Ground (GND/VSS) -> flows sensor to board
+  else if (fromPortId.includes('GND') || toPortId.includes('GND') || fromPortId.includes('VSS') || toPortId.includes('VSS')) {
+    if (fromIsBoard && !toIsBoard) reverse = true;
+    else if (!fromIsBoard && toIsBoard) reverse = false;
+  }
+  // 3. Signals (Data/GPIO)
+  else {
+    if (fromIsBoard && !toIsBoard) {
+      // Sensor input: flows sensor -> board (reverse)
+      if (['DHT11', 'DHT22', 'HC_SR04', 'SOIL_MOISTURE', 'MQ2', 'LDR', 'DS18B20', 'BMP280', 'BUTTON'].includes(toComp.type)) {
+        reverse = true;
+      } else {
+        reverse = false;
+      }
+    } else if (!fromIsBoard && toIsBoard) {
+      // Sensor input: flows sensor -> board (correct)
+      if (['DHT11', 'DHT22', 'HC_SR04', 'SOIL_MOISTURE', 'MQ2', 'LDR', 'DS18B20', 'BMP280', 'BUTTON'].includes(fromComp.type)) {
+        reverse = false;
+      } else {
+        reverse = true;
+      }
+    }
+  }
+
+  if (reverse) {
+    const reversedWaypoints = w.waypoints ? [...w.waypoints].reverse() : [];
+    return { start: end, end: start, waypoints: reversedWaypoints };
+  }
+  return { start, end, waypoints: w.waypoints || [] };
+};
+
 const DEFAULT_PRESET_KEY = Object.keys(PROJECT_PRESETS)[0] || 'env_lab1';
 const DEFAULT_PRESET = PROJECT_PRESETS[DEFAULT_PRESET_KEY] || { code: '', components: [], wires: [] };
 
@@ -326,11 +378,14 @@ export default function App() {
                   const isSelected = canvas.selectedWireIds.includes(w.id);
                   const handles = getWireHandles(w, start, end);
 
+                  const flow = getWireFlowDirection(w, start, end, canvas.components);
+                  const flowPathData = generateWirePath(flow.start, flow.end, flow.waypoints, index);
+
                   return (
                     <g key={w.id} onClick={(e) => selectWire(e, w.id)} onDoubleClick={(e) => handleDoubleClickWire(e, w.id)}>
                       <path d={pathData} fill="none" stroke="transparent" strokeWidth="16" className="cursor-pointer" />
                       <path d={pathData} fill="none" stroke={isSelected ? '#2563EB' : w.color} strokeWidth={isSelected ? '4' : '2.5'} strokeLinejoin="round" strokeLinecap="round" className="wire-path" />
-                      {sim.isSimulating && <path d={pathData} fill="none" stroke="#FFFFFF" strokeWidth="1.5" className="wire-current opacity-80" />}
+                      {sim.isSimulating && <path d={flowPathData} fill="none" stroke="#FFFFFF" strokeWidth="1.5" className="wire-current opacity-80" />}
 
                       {/* Hookup Jumper Caps */}
                       {w.wireType === 'hookup' && (

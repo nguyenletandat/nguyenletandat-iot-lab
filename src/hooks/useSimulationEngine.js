@@ -59,13 +59,17 @@ export function useSimulationEngine(code) {
       if (connWire) {
         const targetRef = connWire.from.componentId === board.id ? connWire.to : connWire.from;
         const targetComp = comps.find(c => c.id === targetRef.componentId);
-        if (targetComp && targetComp.config?.[configKey] !== undefined) {
-          return targetComp.config[configKey];
+        if (targetComp) {
+          if (targetComp.type === sensorType && targetComp.config?.[configKey] !== undefined) {
+            return targetComp.config[configKey];
+          }
+          // Nếu chân pin này có nối dây nhưng không phải là loại cảm biến đang kiểm tra, chặn không cho fallback sang cảm biến loại đó trên canvas
+          return null;
         }
       }
     }
 
-    // Fallback: đọc trực tiếp cảm biến cùng loại trên canvas
+    // Fallback: chỉ đọc trực tiếp cảm biến cùng loại trên canvas nếu không có dây nối trên chân pin đó
     const fallback = comps.find(c => c.type === sensorType);
     return fallback?.config?.[configKey] !== undefined ? fallback.config[configKey] : defaultValue;
   };
@@ -152,22 +156,45 @@ export function useSimulationEngine(code) {
       }
     },
     LiquidCrystal: class {
-      constructor() { this.row = 0; }
-      begin() {}
-      clear() {
-        useCanvasStore.getState().components.forEach(c => {
-          if (c.type === 'LCD1602') {
-            useCanvasStore.getState().updateComponentConfig(c.id, 'textLine1', '');
-            useCanvasStore.getState().updateComponentConfig(c.id, 'textLine2', '');
-          }
-        });
+      constructor() {
+        this.col = 0;
+        this.row = 0;
+        this.buffer = [
+          Array(16).fill(' '),
+          Array(16).fill(' ')
+        ];
       }
-      setCursor(col, row) { this.row = row; }
+      begin() { this.clear(); }
+      clear() {
+        this.buffer = [
+          Array(16).fill(' '),
+          Array(16).fill(' ')
+        ];
+        this.col = 0;
+        this.row = 0;
+        this.updateLCD();
+      }
+      setCursor(col, row) {
+        this.col = Math.max(0, Math.min(15, col));
+        this.row = Math.max(0, Math.min(1, row));
+      }
       print(text) {
+        const str = String(text);
+        for (let i = 0; i < str.length; i++) {
+          if (this.col < 16) {
+            this.buffer[this.row][this.col] = str[i];
+            this.col++;
+          }
+        }
+        this.updateLCD();
+      }
+      updateLCD() {
+        const line1 = this.buffer[0].join('');
+        const line2 = this.buffer[1].join('');
         useCanvasStore.getState().components.forEach(c => {
           if (c.type === 'LCD1602') {
-            const key = this.row === 1 ? 'textLine2' : 'textLine1';
-            useCanvasStore.getState().updateComponentConfig(c.id, key, String(text));
+            useCanvasStore.getState().updateComponentConfig(c.id, 'textLine1', line1);
+            useCanvasStore.getState().updateComponentConfig(c.id, 'textLine2', line2);
           }
         });
       }
