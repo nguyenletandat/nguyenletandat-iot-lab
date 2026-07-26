@@ -278,25 +278,28 @@ void loop() {
   delay(600);
 }`,
     components: [
-      { id: 'esp1', type: 'ESP32', x: 60, y: 60, config: {} },
-      { id: 'mq2_1', type: 'MQ2', x: 420, y: 40, config: { gasLevel: 650 } },
-      { id: 'buzzer1', type: 'BUZZER', x: 420, y: 200, config: {} },
-      { id: 'relay1', type: 'RELAY', x: 680, y: 200, config: {} },
-      { id: 'lcd1', type: 'LCD1602', x: 420, y: 360, config: { textLine1: 'Gas PPM: 650', textLine2: 'DANGER! FAN: ON' } }
+      { id: 'esp1',    type: 'ESP32',   x: 60,  y: 60,  config: {} },
+      { id: 'mq2_1',  type: 'MQ2',     x: 420, y: 40,  config: { gasLevel: 650 } },
+      { id: 'buzzer1',type: 'BUZZER',  x: 420, y: 200, config: {} },
+      { id: 'relay1', type: 'RELAY',   x: 680, y: 200, config: {} },
+      { id: 'fan1',   type: 'DC_MOTOR',x: 680, y: 360, config: {} },
+      { id: 'lcd1',   type: 'LCD1602', x: 420, y: 360, config: { textLine1: 'Gas PPM: 650', textLine2: 'DANGER! FAN: ON' } }
     ],
     wires: [
-      { id: 'w1', from: { componentId: 'esp1', portId: 'VIN' }, to: { componentId: 'mq2_1', portId: 'VCC' }, color: '#EF4444' },
-      { id: 'w2', from: { componentId: 'esp1', portId: 'GND1' }, to: { componentId: 'mq2_1', portId: 'GND' }, color: '#10B981' },
-      { id: 'w3', from: { componentId: 'esp1', portId: 'D35' }, to: { componentId: 'mq2_1', portId: 'AO' }, color: '#F59E0B' },
-      { id: 'w4', from: { componentId: 'esp1', portId: 'D27' }, to: { componentId: 'buzzer1', portId: 'VCC' }, color: '#EF4444' },
-      { id: 'w5', from: { componentId: 'esp1', portId: 'GND2' }, to: { componentId: 'buzzer1', portId: 'GND' }, color: '#10B981' },
-      { id: 'w6', from: { componentId: 'esp1', portId: 'VIN' }, to: { componentId: 'relay1', portId: 'VCC' }, color: '#EF4444' },
-      { id: 'w7', from: { componentId: 'esp1', portId: 'GND1' }, to: { componentId: 'relay1', portId: 'GND' }, color: '#10B981' },
-      { id: 'w8', from: { componentId: 'esp1', portId: 'D14' }, to: { componentId: 'relay1', portId: 'IN' }, color: '#3B82F6' },
-      { id: 'w9', from: { componentId: 'esp1', portId: 'VIN' }, to: { componentId: 'lcd1', portId: 'VCC' }, color: '#EF4444' },
-      { id: 'w10', from: { componentId: 'esp1', portId: 'GND1' }, to: { componentId: 'lcd1', portId: 'GND' }, color: '#10B981' },
-      { id: 'w11', from: { componentId: 'esp1', portId: 'D22' }, to: { componentId: 'lcd1', portId: 'SCL' }, color: '#3B82F6' },
-      { id: 'w12', from: { componentId: 'esp1', portId: 'D21' }, to: { componentId: 'lcd1', portId: 'SDA' }, color: '#8B5CF6' }
+      { id: 'w1',  from: { componentId: 'esp1',    portId: 'VIN'  }, to: { componentId: 'mq2_1',  portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w2',  from: { componentId: 'esp1',    portId: 'GND1' }, to: { componentId: 'mq2_1',  portId: 'GND' }, color: '#10B981' },
+      { id: 'w3',  from: { componentId: 'esp1',    portId: 'D35'  }, to: { componentId: 'mq2_1',  portId: 'AO'  }, color: '#F59E0B' },
+      { id: 'w4',  from: { componentId: 'esp1',    portId: 'D27'  }, to: { componentId: 'buzzer1',portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w5',  from: { componentId: 'esp1',    portId: 'GND2' }, to: { componentId: 'buzzer1',portId: 'GND' }, color: '#10B981' },
+      { id: 'w6',  from: { componentId: 'esp1',    portId: 'VIN'  }, to: { componentId: 'relay1', portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w7',  from: { componentId: 'esp1',    portId: 'GND1' }, to: { componentId: 'relay1', portId: 'GND' }, color: '#10B981' },
+      { id: 'w8',  from: { componentId: 'esp1',    portId: 'D14'  }, to: { componentId: 'relay1', portId: 'IN'  }, color: '#3B82F6' },
+      { id: 'w9',  from: { componentId: 'relay1',  portId: 'OUT'  }, to: { componentId: 'fan1',   portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w10', from: { componentId: 'esp1',    portId: 'GND1' }, to: { componentId: 'fan1',   portId: 'GND' }, color: '#10B981' },
+      { id: 'w11', from: { componentId: 'esp1',    portId: 'VIN'  }, to: { componentId: 'lcd1',   portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w12', from: { componentId: 'esp1',    portId: 'GND1' }, to: { componentId: 'lcd1',   portId: 'GND' }, color: '#10B981' },
+      { id: 'w13', from: { componentId: 'esp1',    portId: 'D22'  }, to: { componentId: 'lcd1',   portId: 'SCL' }, color: '#3B82F6' },
+      { id: 'w14', from: { componentId: 'esp1',    portId: 'D21'  }, to: { componentId: 'lcd1',   portId: 'SDA' }, color: '#8B5CF6' }
     ]
   },
 
