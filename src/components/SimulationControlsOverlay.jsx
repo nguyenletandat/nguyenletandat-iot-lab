@@ -294,6 +294,90 @@ export default function SimulationControlsOverlay({
                 </div>
               );
 
+            case 'DS18B20':
+              const waterTemp = comp.config.temp !== undefined ? comp.config.temp : 25;
+              return (
+                <div
+                  key={comp.id}
+                  style={{ left: `${x + 10}px`, top: `${y - 100}px` }}
+                  className="absolute pointer-events-auto flex flex-col items-center p-2.5 rounded-2xl bg-white/95 dark:bg-[#0F1423]/95 border-2 border-cyan-400 dark:border-cyan-500/60 shadow-2xl backdrop-blur-md transition-all z-30 min-w-[220px]"
+                >
+                  <div className="flex items-center justify-between w-full mb-1">
+                    <span className="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 flex items-center gap-1 uppercase tracking-wider">
+                      <Thermometer className="w-3.5 h-3.5" />
+                      Nhiệt độ Nguồn Nước
+                    </span>
+                    <span className="text-xs font-mono font-extrabold text-cyan-600 bg-cyan-50 dark:bg-cyan-950/60 px-2 py-0.5 rounded-full border border-cyan-200 dark:border-cyan-800">
+                      {waterTemp} °C
+                    </span>
+                  </div>
+
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={waterTemp}
+                    onChange={(e) => onUpdateConfig(comp.id, 'temp', parseInt(e.target.value))}
+                    className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-500 my-1"
+                  />
+
+                  <div className="flex items-center justify-between w-full text-[9px] font-mono text-slate-400">
+                    <span>❄️ Lạnh (0°C)</span>
+                    <span>🔥 Sôi (100°C)</span>
+                  </div>
+                </div>
+              );
+
+            case 'BMP280':
+              const bmpTemp = comp.config.temp !== undefined ? comp.config.temp : 26;
+              const bmpPress = comp.config.pressure !== undefined ? comp.config.pressure : 1013;
+              return (
+                <div
+                  key={comp.id}
+                  style={{ left: `${x + 5}px`, top: `${y - 145}px` }}
+                  className="absolute pointer-events-auto flex flex-col gap-2 p-2.5 rounded-2xl bg-white/95 dark:bg-[#0F1423]/95 border-2 border-teal-400 dark:border-teal-500/60 shadow-2xl backdrop-blur-md transition-all z-30 min-w-[230px]"
+                >
+                  <div>
+                    <div className="flex items-center justify-between w-full mb-0.5">
+                      <span className="text-[10px] font-bold text-teal-600 dark:text-teal-400 flex items-center gap-1 uppercase tracking-wider">
+                        <Thermometer className="w-3.5 h-3.5" />
+                        Nhiệt độ Khí quyển
+                      </span>
+                      <span className="text-xs font-mono font-extrabold text-teal-600 bg-teal-50 dark:bg-teal-950/60 px-2 py-0.5 rounded-full border border-teal-200 dark:border-teal-800">
+                        {bmpTemp} °C
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min="-10"
+                      max="60"
+                      value={bmpTemp}
+                      onChange={(e) => onUpdateConfig(comp.id, 'temp', parseInt(e.target.value))}
+                      className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-teal-500"
+                    />
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between w-full mb-0.5">
+                      <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1 uppercase tracking-wider">
+                        <Gauge className="w-3.5 h-3.5" />
+                        Áp suất Khí quyển
+                      </span>
+                      <span className="text-xs font-mono font-extrabold text-indigo-600 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded-full border border-indigo-200 dark:border-indigo-800">
+                        {bmpPress} hPa
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min="900"
+                      max="1100"
+                      value={bmpPress}
+                      onChange={(e) => onUpdateConfig(comp.id, 'pressure', parseInt(e.target.value))}
+                      className="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500"
+                    />
+                  </div>
+                </div>
+              );
+
             default:
               return null;
           }

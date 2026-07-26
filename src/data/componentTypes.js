@@ -5,9 +5,10 @@
 
 export const COMPONENT_CATEGORIES = [
   { id: 'ALL', name: 'Tất cả', icon: '📦' },
+  { id: 'EnvSensors', name: '🌱 CB Môi trường', icon: '🌱' },
   { id: 'Boards', name: 'Bo mạch', icon: '🔲' },
   { id: 'Sensors', name: 'Cảm biến', icon: '📡' },
-  { id: 'Actuators', name: 'Đầu ra', icon: '⚡' },
+  { id: 'Actuators', name: 'Đầu ra / Bơm', icon: '⚡' },
   { id: 'Displays', name: 'Hiển thị', icon: '🖥️' },
   { id: 'Passive', name: 'Thụ động', icon: '🔧' },
   { id: 'Comm', name: 'Truyền thông', icon: '📶' },
