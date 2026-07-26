@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   Code, Terminal, Sliders, ZoomIn, ZoomOut, Maximize2,
   ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Copy, FileCode, Lock,
+  BookOpen, FlaskConical,
 } from 'lucide-react';
 import { COMPONENT_TYPES } from './data/componentTypes';
 import { PROJECT_PRESETS } from './data/projectPresets';
@@ -18,6 +19,7 @@ import CodeEditor from './components/CodeEditor';
 import ProjectManager from './components/ProjectManager';
 import TutorialOverlay from './components/TutorialOverlay';
 import StudentModal from './components/StudentModal';
+import TheoryTab from './components/TheoryTab';
 import { useSimulationEngine } from './hooks/useSimulationEngine';
 import { useCanvasInteractions } from './hooks/useCanvasInteractions';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
@@ -80,6 +82,7 @@ const DEFAULT_PRESET_KEY = Object.keys(PROJECT_PRESETS)[0] || 'env_lab1';
 const DEFAULT_PRESET = PROJECT_PRESETS[DEFAULT_PRESET_KEY] || { code: '', components: [], wires: [] };
 
 export default function App() {
+  const [mainTab, setMainTab] = useState('practice'); // 'theory' | 'practice'
   const [code, setCode] = useState(DEFAULT_PRESET.code);
   const [selectedProjectId, setSelectedProjectId] = useState(DEFAULT_PRESET_KEY);
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleString('vi-VN'));
@@ -281,8 +284,53 @@ export default function App() {
         onAutoConnectI2C={handleAutoConnectI2C}
       />
 
-      {/* ═══ MAIN WORKSPACE ═══ */}
-      <div className="flex flex-1 overflow-hidden relative">
+      {/* ═══ MAIN TAB BAR ═══ */}
+      <div className={`flex items-center gap-0.5 px-4 pt-2 pb-0 shrink-0 border-b ${
+        ui.isDarkMode ? 'bg-[#0D1219] border-slate-700/50' : 'bg-slate-100 border-slate-200'
+      }`}>
+        <button
+          id="tab-theory"
+          onClick={() => setMainTab('theory')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-t-lg text-sm font-semibold transition-all border-b-2 ${
+            mainTab === 'theory'
+              ? ui.isDarkMode
+                ? 'bg-[#0B0F19] border-blue-500 text-blue-400'
+                : 'bg-white border-blue-500 text-blue-600'
+              : ui.isDarkMode
+                ? 'border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-600'
+                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+          }`}
+        >
+          <BookOpen className="w-4 h-4" />
+          Lý thuyết
+        </button>
+        <button
+          id="tab-practice"
+          onClick={() => setMainTab('practice')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-t-lg text-sm font-semibold transition-all border-b-2 ${
+            mainTab === 'practice'
+              ? ui.isDarkMode
+                ? 'bg-[#0B0F19] border-emerald-500 text-emerald-400'
+                : 'bg-white border-emerald-500 text-emerald-600'
+              : ui.isDarkMode
+                ? 'border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-600'
+                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+          }`}
+        >
+          <FlaskConical className="w-4 h-4" />
+          Thực hành trên mạch
+        </button>
+      </div>
+
+      {/* ═══ THEORY TAB ═══ */}
+      {mainTab === 'theory' && (
+        <div className="flex-1 overflow-hidden">
+          <TheoryTab isDarkMode={ui.isDarkMode} />
+        </div>
+      )}
+
+      {/* ═══ PRACTICE WORKSPACE ═══ */}
+      {mainTab === 'practice' && <div className="flex flex-1 overflow-hidden relative">
 
         {/* LEFT PANEL: HARDWARE CATALOG SIDEBAR WITH TWO-WAY COLLAPSE ARROW */}
         <HardwareCatalogSidebar
@@ -718,7 +766,7 @@ export default function App() {
             </div>
           </aside>
         )}
-      </div>
+      </div>}
 
       {/* ═══ MODALS ═══ */}
       <StudentModal
