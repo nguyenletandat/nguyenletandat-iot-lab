@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { BookOpen, Cpu, Zap, Droplets, Wind, Radio, BarChart3, ChevronDown, ChevronRight, Code2, Wrench, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { BookOpen, Cpu, Zap, Droplets, Wind, Radio, BarChart3, ChevronDown, ChevronRight, Code2, Wrench, AlertTriangle, CheckCircle2, Image as ImageIcon } from 'lucide-react';
+
+// Base path for theory images (served from /public)
+const IMG = '/theory-images';
 
 const SESSIONS = [
   {
@@ -11,73 +14,104 @@ const SESSIONS = [
     theory: [
       {
         title: '1.1 IoT trong Kỹ thuật Môi trường là gì?',
+        image: `${IMG}/iot_architecture.png`,
+        imageCaption: 'Kiến trúc hệ thống IoT Môi trường 4 lớp: Cảm biến → Mạng → Nền tảng → Ứng dụng',
         content: `Internet of Things (IoT) trong Kỹ thuật Môi trường là việc sử dụng mạng lưới các thiết bị cảm biến thông minh để đo lường, thu thập và truyền dữ liệu môi trường theo thời gian thực. Thay vì đo thủ công định kỳ, hệ thống IoT cho phép giám sát liên tục 24/7, cảnh báo tự động và phân tích xu hướng dài hạn.
 
-Ứng dụng thực tế:
-• Trạm quan trắc không khí tự động (AQI)
-• Hệ thống giám sát lũ lụt & mực nước
-• Quan trắc đất và tưới tiêu thông minh trong nông nghiệp
-• Phát hiện rò rỉ khí độc trong khu công nghiệp
-• Giám sát chất lượng nước mặt và nước thải`,
+🏗️ Kiến trúc hệ thống IoT Môi trường gồm 4 lớp:
+
+• Lớp 1 — Cảm biến (Perception): DHT11, MQ-2, HC-SR04, DS18B20 thu thập dữ liệu vật lý
+• Lớp 2 — Mạng (Network): ESP32 WiFi/Bluetooth kết nối và truyền dữ liệu
+• Lớp 3 — Nền tảng (Platform): Cloud server lưu trữ và xử lý dữ liệu (ThingSpeak, Firebase)
+• Lớp 4 — Ứng dụng (Application): Dashboard web/mobile, cảnh báo SMS/Email
+
+🌍 Ứng dụng thực tế tại Việt Nam:
+• Trạm quan trắc không khí AQI tại TP.HCM, Hà Nội
+• Hệ thống cảnh báo lũ lụt tự động ĐBSCL
+• Quan trắc chất lượng nước sông Sài Gòn
+• Giám sát nước thải khu công nghiệp
+• Hệ thống tưới tiêu thông minh nông nghiệp CNC`,
       },
       {
         title: '1.2 Vi điều khiển ESP32 — Trái tim của Trạm IoT',
-        content: `ESP32 là vi điều khiển 32-bit lưỡng nhân (Dual-Core) của Espressif Systems, tích hợp sẵn WiFi & Bluetooth, rất phổ biến trong các dự án IoT môi trường.
+        image: `${IMG}/esp32_pinout.png`,
+        imageCaption: 'Sơ đồ chân ESP32 DevKit V1 — các chân quan trọng cho IoT Môi trường',
+        content: `ESP32 là vi điều khiển 32-bit lưỡng nhân (Dual-Core) của Espressif Systems, tích hợp sẵn WiFi & Bluetooth — lý tưởng cho các dự án IoT môi trường.
 
-Thông số kỹ thuật chính:
+📋 Thông số kỹ thuật quan trọng:
 • CPU: Xtensa LX6 Dual-Core 240 MHz
-• RAM: 520 KB SRAM
-• Flash: 4 MB (tùy model)
+• RAM: 520 KB SRAM | Flash: 4 MB
 • GPIO: 38 chân (Digital + Analog)
 • ADC: 12-bit (0–4095), 18 kênh
 • Kết nối: WiFi 802.11 b/g/n, Bluetooth 4.2/5.0
-• Nguồn: 3.3V logic, cấp qua USB 5V
+• Nguồn điện: 3.3V logic, cấp nguồn qua USB 5V
 
-Sơ đồ chân quan trọng:
-• D21 (SDA) / D22 (SCL): Bus I²C cho LCD, BMP280
-• D4, D15: Cảm biến 1-Wire (DS18B20) & DHT11
-• D34–D39: Chân ADC chỉ đọc (cảm biến Analog)
-• VIN: 5V output khi cấp qua USB
-• 3V3: 3.3V output (cảm biến 3.3V)`,
+🔌 Sơ đồ chân quan trọng nhất:
+┌─────────────────────────────────────────┐
+│ VIN   → 5V output khi cắm USB           │
+│ 3V3   → 3.3V regulated output           │
+│ GND   → Mass/Ground                     │
+│ D21   → SDA (I²C Bus — LCD, BMP280)     │
+│ D22   → SCL (I²C Bus — LCD, BMP280)     │
+│ D15   → DHT11 Data (1-Wire)             │
+│ D4    → DS18B20 Data (1-Wire)           │
+│ D34–39 → CHỈ ĐỌC ADC (không ghi được)  │
+└─────────────────────────────────────────┘
+
+⚠️ Lưu ý quan trọng:
+Chân D34, D35, D36, D39 của ESP32 là INPUT ONLY — không dùng làm OUTPUT.
+Chỉ dùng các chân này để đọc tín hiệu Analog từ cảm biến (MQ-2, Soil Moisture...).`,
       },
       {
-        title: '1.3 Cảm biến DHT11 — Nhiệt ẩm không khí',
+        title: '1.3 Cảm biến DHT11 — Đo Nhiệt độ & Độ ẩm không khí',
+        image: `${IMG}/dht11_lcd1602_wiring.png`,
+        imageCaption: 'Sơ đồ đấu nối ESP32 + DHT11 + LCD1602 I²C cho Bài thực hành 1',
         content: `DHT11 là cảm biến tích hợp đo đồng thời Nhiệt độ và Độ ẩm không khí, giao tiếp qua giao thức 1-Wire đơn giản.
 
-Thông số kỹ thuật:
+📊 Thông số kỹ thuật:
 • Dải đo Nhiệt độ: 0°C – 50°C, độ chính xác ±2°C
 • Dải đo Độ ẩm: 20% – 95% RH, độ chính xác ±5%
-• Điện áp: 3.3V – 5V
-• Tần số lấy mẫu tối đa: 1 lần/giây
-• Chân kết nối: VCC, DATA, GND
+• Điện áp: 3.3V – 5V (thường dùng 5V cho ổn định)
+• Tần số lấy mẫu tối đa: 1 lần/giây (delay 1000ms tối thiểu)
+• Chân: VCC (nguồn), DATA (tín hiệu 1-wire), GND (mass)
 
-Sơ đồ đấu nối với ESP32:
-  DHT11.VCC  → ESP32.VIN (5V)
-  DHT11.DATA → ESP32.D15 (với điện trở kéo 10kΩ)
-  DHT11.GND  → ESP32.GND`,
+🔌 Cấu tạo bên trong DHT11:
+• Cảm biến nhiệt điện trở NTC đo nhiệt độ
+• Cảm biến điện dung polymer đo độ ẩm
+• Vi xử lý tích hợp số hóa và truyền dữ liệu
+
+💡 Cách đấu nối đúng:
+  DHT11.VCC  → ESP32.VIN (5V, dây đỏ)
+  DHT11.DATA → ESP32.D15 (+ điện trở kéo 10kΩ lên VCC)
+  DHT11.GND  → ESP32.GND (dây đen/xanh)
+
+📌 So sánh DHT11 vs DHT22 (nên biết):
+• DHT11: Rẻ hơn, độ chính xác thấp hơn, đo 0–50°C
+• DHT22: Đắt hơn, chính xác hơn (±0.5°C), đo -40°C – 80°C`,
       },
       {
-        title: '1.4 Màn hình LCD1602 I²C — Hiển thị tại chỗ',
-        content: `LCD1602 I²C là màn hình LCD 16 cột × 2 hàng sử dụng module giao tiếp I²C (PCF8574), giúp tiết kiệm chân GPIO.
+        title: '1.4 Màn hình LCD1602 I²C — Hiển thị dữ liệu tại chỗ',
+        content: `LCD1602 I²C là màn hình LCD 16 cột × 2 hàng, module giao tiếp I²C (PCF8574) giúp tiết kiệm chân GPIO — chỉ cần 2 dây SDA và SCL.
 
-Đặc điểm:
+📐 Đặc điểm kỹ thuật:
 • Hiển thị 32 ký tự ASCII (2 dòng × 16 ký tự)
-• Giao tiếp I²C, chỉ cần 2 dây SDA và SCL
-• Địa chỉ I²C mặc định: 0x27 hoặc 0x3F
-• Điện áp: 5V
-• Có đèn nền điều chỉnh được
+• Giao tiếp I²C (Inter-Integrated Circuit), tốc độ 100–400 kHz
+• Địa chỉ I²C: 0x27 (phổ biến) hoặc 0x3F
+• Điện áp: 5V (VCC), 3.3V logic tương thích
+• Đèn nền LED xanh, điều chỉnh được qua biến trở
 
-Sơ đồ đấu nối:
-  LCD.VCC → ESP32.VIN (5V)
-  LCD.GND → ESP32.GND
-  LCD.SDA → ESP32.D21
-  LCD.SCL → ESP32.D22
+⌨️ Lập trình LCD - Các lệnh quan trọng:
+  lcd.begin(16, 2);        // Khởi tạo 16 cột, 2 hàng
+  lcd.setCursor(0, 0);     // Di chuyển đến cột 0, hàng 0
+  lcd.print("Hello!");     // In chuỗi ký tự
+  lcd.clear();             // Xóa toàn bộ màn hình
+  lcd.setCursor(0, 1);     // Di chuyển xuống hàng 2
 
-Lệnh lập trình cơ bản:
-  lcd.begin(16, 2);       // Khởi tạo
-  lcd.setCursor(col, row); // Di chuyển con trỏ
-  lcd.print("Hello!");    // In chuỗi
-  lcd.clear();            // Xóa màn hình`,
+🎯 Kỹ thuật tránh nhấp nháy (quan trọng!):
+  ❌ Sai: lcd.clear() → gây nhấp nháy mỗi vòng loop
+  ✓ Đúng: Ghi đè với khoảng trắng cuối chuỗi
+  Ví dụ: lcd.print("Temp: " + temp + " C   ");
+  (khoảng trắng thừa cuối xóa ký tự cũ còn dư)`,
       },
     ],
     code: `#include <LiquidCrystal.h>
@@ -93,10 +127,10 @@ void setup() {
 }
 
 void loop() {
-  int temp = analogRead(DHT_PIN);       // Nhiệt độ (°C)
-  int humi = dhtReadHumidity(DHT_PIN);  // Độ ẩm (%)
+  int temp = analogRead(DHT_PIN);       // Nhiệt độ live (°C)
+  int humi = dhtReadHumidity(DHT_PIN);  // Độ ẩm live (%)
 
-  // Hiển thị lên Serial Monitor
+  // Gửi dữ liệu lên Serial Monitor
   Serial.print("Nhiet do: "); Serial.print(temp); Serial.print(" C | ");
   Serial.print("Do am: ");   Serial.print(humi); Serial.println(" %");
 
@@ -108,17 +142,18 @@ void loop() {
 
   delay(600);
 }`,
-    components: ['ESP32', 'DHT11', 'LCD1602 I²C'],
+    components: ['ESP32 DevKit V1', 'DHT11 Sensor', 'LCD1602 I²C (PCF8574)', 'Điện trở 10kΩ'],
     wiring: [
-      'DHT11.VCC → ESP32.VIN (5V đỏ)',
-      'DHT11.GND → ESP32.GND (đen)',
-      'DHT11.DATA → ESP32.D15 (vàng)',
-      'LCD.VCC → ESP32.VIN (đỏ)',
-      'LCD.GND → ESP32.GND (đen)',
-      'LCD.SDA → ESP32.D21 (tím)',
-      'LCD.SCL → ESP32.D22 (xanh dương)',
+      'DHT11.VCC  → ESP32.VIN (5V — dây đỏ)',
+      'DHT11.GND  → ESP32.GND (dây đen)',
+      'DHT11.DATA → ESP32.D15 (dây vàng + điện trở 10kΩ kéo lên VCC)',
+      'LCD.VCC    → ESP32.VIN (dây đỏ)',
+      'LCD.GND    → ESP32.GND (dây đen)',
+      'LCD.SDA    → ESP32.D21 (dây tím)',
+      'LCD.SCL    → ESP32.D22 (dây xanh dương)',
     ],
   },
+
   {
     id: 2,
     icon: <Droplets className="w-5 h-5" />,
@@ -127,57 +162,83 @@ void loop() {
     accent: '#0891B2',
     theory: [
       {
-        title: '2.1 Tầm quan trọng của quan trắc mực nước',
-        content: `Ngập lụt là một trong những thảm họa môi trường phổ biến nhất tại Việt Nam, đặc biệt tại vùng ĐBSCL và các đô thị lớn. Hệ thống cảnh báo ngập sớm tích hợp IoT có thể giảm thiệt hại đáng kể bằng cách:
+        title: '2.1 Bài toán Quan trắc Mực nước & Ngập lụt tại Việt Nam',
+        content: `Ngập lụt là thảm họa môi trường nghiêm trọng nhất tại Việt Nam — đặc biệt tại ĐBSCL và các đô thị lớn như TP.HCM, Cần Thơ, An Giang.
+
+🌊 Số liệu thực tế đáng lo ngại:
+• Mỗi năm, lũ lụt gây thiệt hại hơn 1 tỷ USD tại VN
+• Trên 20,000 km² ĐBSCL bị ngập theo mùa lũ
+• TP.HCM có hơn 40 điểm ngập kinh niên
+• Biến đổi khí hậu làm lũ về sớm hơn và kéo dài hơn
+
+📡 Hệ thống cảnh báo ngập lụt IoT có thể:
 • Phát hiện mực nước tăng trước 15–30 phút
-• Tự động phát cảnh báo qua SMS/loa phát thanh
+• Tự động phát cảnh báo qua SMS/loa phát thanh/app
 • Ghi lại dữ liệu lịch sử để phân tích mô hình lũ
-• Điều phối hệ thống bơm thoát nước tự động`,
+• Điều phối hệ thống bơm thoát nước tự động
+• Cảnh báo phân chia theo vùng địa lý`,
       },
       {
-        title: '2.2 Cảm biến siêu âm HC-SR04 — Đo khoảng cách & Mực nước',
-        content: `HC-SR04 sử dụng sóng siêu âm (40 kHz) để đo khoảng cách bằng cách tính thời gian sóng âm phản xạ trở về.
+        title: '2.2 Cảm biến Siêu âm HC-SR04 — Nguyên lý & Ứng dụng đo Mực nước',
+        image: `${IMG}/hcsr04_water_level.png`,
+        imageCaption: 'Nguyên lý hoạt động HC-SR04 đo mực nước theo phương pháp phản xạ sóng âm',
+        content: `HC-SR04 sử dụng sóng siêu âm (40 kHz) để đo khoảng cách không tiếp xúc — lý tưởng để đo mực nước mà không cần nhúng cảm biến vào nước.
 
-Thông số:
+⚙️ Nguyên lý hoạt động (5 bước):
+  1. ESP32 gửi xung điện 10µs vào chân TRIG (HIGH 10µs rồi LOW)
+  2. HC-SR04 tự động phát 8 xung siêu âm 40kHz
+  3. Sóng âm truyền đến bề mặt nước và phản xạ trở về
+  4. Chân ECHO giữ mức HIGH trong suốt thời gian sóng âm di chuyển
+  5. ESP32 đo thời gian ECHO HIGH → tính khoảng cách
+
+📐 Công thức tính khoảng cách:
+  distance_cm = duration × 0.034 / 2
+  Trong đó:
+    duration = thời gian ECHO HIGH (µs)
+    0.034 = tốc độ âm thanh ÷ 1000 (0.034 cm/µs)
+    ÷ 2 = chia đôi vì sóng đi và về
+
+📊 Thông số kỹ thuật:
 • Khoảng đo: 2 cm – 400 cm, độ chính xác ±3 mm
-• Góc phát: ~15°
-• Điện áp: 5V
+• Góc phát sóng: ~15° (cần hướng thẳng xuống mặt nước)
+• Điện áp: 5V, dòng tiêu thụ 15mA
 • Chân: VCC, TRIG, ECHO, GND
 
-Nguyên lý hoạt động:
-  1. ESP32 phát xung 10µs vào chân TRIG
-  2. HC-SR04 phát 8 xung siêu âm 40kHz
-  3. Sóng âm phản xạ từ bề mặt nước trở về
-  4. ECHO ở mức HIGH trong thời gian sóng âm di chuyển
-  5. Khoảng cách = (thời gian × tốc độ âm) / 2
-  6. Công thức: distance_cm = duration * 0.034 / 2
-
-Lắp đặt trong trạm quan trắc:
-  Gắn cảm biến hướng xuống phía trên mặt nước
-  → Đo khoảng cách từ cảm biến xuống mặt nước
-  → Mực nước = chiều cao lắp đặt − khoảng cách đo được`,
+🏗️ Lắp đặt trong trạm quan trắc:
+  • Gắn cảm biến TRÊN bề mặt nước, hướng xuống
+  • Khoảng cách đo = khoảng hở từ cảm biến đến mặt nước
+  • Mực nước thực = chiều cao lắp cảm biến − distance_cm`,
       },
       {
-        title: '2.3 Cảm biến Nhiệt độ DS18B20 — Đo nhiệt độ nước',
-        content: `DS18B20 là cảm biến nhiệt độ kỹ thuật số giao tiếp 1-Wire, chống thấm nước, lý tưởng để đo nhiệt độ nguồn nước, ao hồ, sông ngòi.
+        title: '2.3 Cảm biến DS18B20 — Nhiệt độ nước chống thấm',
+        content: `DS18B20 là cảm biến nhiệt độ kỹ thuật số 1-Wire, có phiên bản chống thấm nước (dạng đầu dò inox), lý tưởng đo nhiệt độ sông hồ, ao nuôi thủy sản.
 
-Thông số:
-• Dải đo: -55°C đến +125°C, độ chính xác ±0.5°C
-• Độ phân giải: 9–12 bit (có thể cấu hình)
-• Giao thức: 1-Wire (1 dây data, hỗ trợ nhiều cảm biến trên 1 bus)
+📋 Thông số kỹ thuật:
+• Dải đo: -55°C đến +125°C
+• Độ chính xác: ±0.5°C (tại -10°C đến +85°C)
+• Độ phân giải: 9–12 bit (cấu hình được)
+• Giao thức: Dallas 1-Wire (hỗ trợ nhiều cảm biến trên 1 bus)
 • Điện áp: 3.0V – 5.5V
-• Có model chống thấm nước dạng đầu dò inox
+• Thời gian chuyển đổi: 93.75ms (9-bit) đến 750ms (12-bit)
 
-Đấu nối:
-  DS18B20.VCC  → ESP32.3V3
-  DS18B20.DATA → ESP32.D4 (+ điện trở kéo 4.7kΩ)
-  DS18B20.GND  → ESP32.GND`,
+🌡️ Ứng dụng trong Quan trắc môi trường nước:
+• Đo nhiệt độ nước mặt sông/hồ/ao nuôi
+• Theo dõi nhiệt độ nước thải nhà máy
+• Giám sát nhiệt độ đất (phiên bản đầu dò)
+• Đo nhiệt độ trong hệ thống ống nước
+
+🔌 Đấu nối với ESP32:
+  DS18B20.VCC  → ESP32.3V3 (dây đỏ)
+  DS18B20.DATA → ESP32.D4 (dây vàng + điện trở kéo 4.7kΩ lên 3V3)
+  DS18B20.GND  → ESP32.GND (dây đen)
+
+⚠️ BẮT BUỘC phải có điện trở kéo 4.7kΩ — không có điện trở thì DS18B20 không hoạt động!`,
       },
     ],
     code: `#include <LiquidCrystal.h>
-#define TRIG_PIN 5
+#define TRIG_PIN  5
 #define ECHO_PIN 18
-#define TEMP_PIN 4
+#define TEMP_PIN  4
 
 LiquidCrystal lcd;
 
@@ -191,42 +252,40 @@ void setup() {
 }
 
 void loop() {
-  // Đo mực nước bằng siêu âm
-  digitalWrite(TRIG_PIN, LOW);
-  delayMicroseconds(2);
-  digitalWrite(TRIG_PIN, HIGH);
-  delayMicroseconds(10);
+  // Kích hoạt HC-SR04 đo khoảng cách
+  digitalWrite(TRIG_PIN, LOW);   delayMicroseconds(2);
+  digitalWrite(TRIG_PIN, HIGH);  delayMicroseconds(10);
   digitalWrite(TRIG_PIN, LOW);
 
   long duration = pulseIn(ECHO_PIN, HIGH);
-  int distanceCm = duration * 0.034 / 2;
-  int waterTemp = analogRead(TEMP_PIN);  // Nhiệt độ nước từ DS18B20
+  int distCm = duration * 0.034 / 2;
+  int waterTemp = analogRead(TEMP_PIN);  // DS18B20
 
-  Serial.print("Muc nuoc: "); Serial.print(distanceCm); Serial.print(" cm | ");
+  Serial.print("Muc nuoc: "); Serial.print(distCm); Serial.print(" cm | ");
   Serial.print("Nhiet do nuoc: "); Serial.print(waterTemp); Serial.println(" C");
 
   lcd.setCursor(0, 0);
-  lcd.print("MucNuoc: "); lcd.print(distanceCm); lcd.print(" cm  ");
+  lcd.print("MucNuoc:"); lcd.print(distCm); lcd.print("cm  ");
   lcd.setCursor(0, 1);
-  if (distanceCm < 15) {
+  if (distCm < 15) {
     lcd.print("!!! NGAP LUT !!!");
   } else {
-    lcd.print("NhietDo: "); lcd.print(waterTemp); lcd.print(" C ");
+    lcd.print("NhietDo:"); lcd.print(waterTemp); lcd.print("C  ");
   }
   delay(600);
 }`,
-    components: ['ESP32', 'HC-SR04', 'DS18B20', 'LCD1602 I²C'],
+    components: ['ESP32 DevKit', 'HC-SR04 Ultrasonic Sensor', 'DS18B20 (chống nước)', 'LCD1602 I²C', 'Điện trở 4.7kΩ'],
     wiring: [
-      'HC-SR04.VCC  → ESP32.VIN (đỏ)',
-      'HC-SR04.GND  → ESP32.GND (đen)',
-      'HC-SR04.TRIG → ESP32.D5 (xanh)',
-      'HC-SR04.ECHO → ESP32.D18 (tím)',
-      'DS18B20.VCC  → ESP32.3V3 (đỏ)',
-      'DS18B20.DATA → ESP32.D4 (vàng)',
-      'DS18B20.GND  → ESP32.GND (đen)',
+      'HC-SR04.VCC  → ESP32.VIN | HC-SR04.GND → ESP32.GND',
+      'HC-SR04.TRIG → ESP32.D5 (dây xanh lá)',
+      'HC-SR04.ECHO → ESP32.D18 (dây tím)',
+      'DS18B20.VCC  → ESP32.3V3 (dây đỏ)',
+      'DS18B20.DATA → ESP32.D4 (dây vàng + điện trở kéo 4.7kΩ)',
+      'DS18B20.GND  → ESP32.GND (dây đen)',
       'LCD.SDA → ESP32.D21 | LCD.SCL → ESP32.D22',
     ],
   },
+
   {
     id: 3,
     icon: <Droplets className="w-5 h-5" />,
@@ -235,69 +294,103 @@ void loop() {
     accent: '#10B981',
     theory: [
       {
-        title: '3.1 Nông nghiệp IoT & Quản lý nước tưới thông minh',
-        content: `Nông nghiệp chiếm ~70% lượng nước ngọt toàn cầu. Hệ thống tưới thông minh IoT có thể tiết kiệm 30–50% lượng nước bằng cách chỉ tưới khi đất thực sự khô, thay vì tưới theo lịch cố định.
+        title: '3.1 Nông nghiệp IoT & Tầm quan trọng của Quản lý nước tưới',
+        content: `Nông nghiệp chiếm ~70% tổng lượng nước ngọt toàn cầu. Hệ thống tưới thông minh IoT có thể tiết kiệm 30–50% lượng nước mà không ảnh hưởng đến năng suất cây trồng.
 
-Ứng dụng trong Kỹ thuật Môi trường:
-• Giảm rửa trôi đất và phân bón
-• Ngăn ngừa xói mòn đất do tưới quá mức
-• Tối ưu hóa nguồn nước ngầm
-• Tích hợp dữ liệu khí tượng để dự đoán nhu cầu tưới`,
+🌱 Tác động môi trường của tưới tiêu không kiểm soát:
+• Tưới quá mức → Rửa trôi đất và phân bón → Ô nhiễm nước ngầm
+• Tưới không đủ → Cây héo, đất xói mòn, năng suất giảm
+• Bốc hơi không kiểm soát → Lãng phí tài nguyên nước
+• Phân bón bị cuốn trôi → Phú dưỡng hóa ao hồ (Algae bloom)
+
+🤖 Hệ thống tưới IoT tự động:
+• Đọc độ ẩm đất thực tế từng khu vực
+• Chỉ tưới khi đất khô dưới ngưỡng cài đặt
+• Kết hợp dữ liệu thời tiết từ API để dự báo
+• Ghi nhật ký tưới, phân tích xu hướng theo mùa vụ`,
       },
       {
-        title: '3.2 Cảm biến Độ ẩm đất (Soil Moisture Sensor)',
-        content: `Cảm biến độ ẩm đất hoạt động dựa trên nguyên lý đo điện trở hoặc điện dung giữa 2 điện cực cắm vào đất. Đất ẩm có điện trở thấp hơn đất khô.
+        title: '3.2 Cảm biến Độ ẩm đất (Soil Moisture) — Nguyên lý & Hiệu chỉnh',
+        image: `${IMG}/soil_relay_pump.png`,
+        imageCaption: 'Sơ đồ hệ thống tưới tự động: Soil Moisture Sensor → ESP32 → Relay → Bơm nước',
+        content: `Cảm biến độ ẩm đất đo điện trở hoặc điện dung giữa 2 điện cực cắm vào đất. Đất ẩm dẫn điện tốt hơn đất khô.
 
-Thông số:
-• Đầu ra: Analog (0–4095 ADC) hoặc Digital (ngưỡng)
-• Điện áp: 3.3V – 5V
-• Chân: VCC, GND, AO (Analog), DO (Digital)
-• Giá trị ADC: ~0–300 = RẤT ẨM, ~300–600 = BÌNH THƯỜNG, ~600+ = KHÔ
+⚙️ Hai loại cảm biến phổ biến:
 
-Lưu ý thực tế:
-  Cảm biến điện trở bị ăn mòn theo thời gian do phân cực DC.
-  Cảm biến điện dung (Capacitive) bền hơn, phù hợp ngoài đồng.`,
+1. Loại Điện trở (Resistive):
+   • Rẻ tiền (~10.000–20.000 VND)
+   • Bị ăn mòn điện cực sau vài tuần trong đất ẩm
+   • Phù hợp thực hành, demo trong phòng lab
+   • Đầu ra: AO (Analog), DO (Digital ngưỡng)
+
+2. Loại Điện dung (Capacitive):
+   • Đắt hơn (~80.000–150.000 VND)
+   • Bền hơn nhiều, phù hợp triển khai thực tế ngoài đồng
+   • Không bị ăn mòn, hoạt động ổn định dài hạn
+
+📊 Thang giá trị ADC của Sensor Điện trở:
+  0    – 300  → ĐẤT RẤT ẨM (đang ngập nước)
+  300  – 600  → ĐỘ ẨM BÌNH THƯỜNG (lý tưởng cho cây)
+  600  – 900  → ĐẤT KHÔ (cần tưới sớm)
+  900  – 4095 → ĐẤT RẤT KHÔ (cây thiếu nước nghiêm trọng)
+
+⚠️ Lưu ý: Giá trị ADC đảo ngược với độ ẩm thực!
+  ADC thấp = Đất ẩm | ADC cao = Đất khô`,
       },
       {
-        title: '3.3 Module Relay — Điều khiển Máy bơm 220V/12V',
-        content: `Module Relay là công tắc điện từ cho phép vi điều khiển 3.3V/5V điều khiển các thiết bị công suất lớn (máy bơm 220V AC hoặc bơm 12V DC).
+        title: '3.3 Module Relay — Điều khiển thiết bị công suất lớn',
+        content: `Module Relay là cầu nối cho phép ESP32 (3.3V/5V) điều khiển an toàn các thiết bị công suất lớn như máy bơm 220V AC hoặc bơm 12V DC.
 
-Thông số Relay 5V 1 kênh:
-• Điện áp điều khiển: 5V (cuộn dây relay)
-• Tải AC tối đa: 250V/10A
-• Tải DC tối đa: 30V/10A
-• Chân điều khiển: IN (mức LOW = BẬT với relay thường hở)
-• Chân tải: COM (chung), NC (thường đóng), NO (thường mở)
+🔌 Cấu tạo Relay 5V 1 kênh:
+• Cuộn dây (Coil) 5V: Tạo từ trường khi có dòng điện
+• Tiếp điểm cơ học: Đóng/ngắt theo từ trường
+• Điện áp tải AC tối đa: 250V / 10A
+• Điện áp tải DC tối đa: 30V / 10A
 
-Logic điều khiển:
-  digitalWrite(RELAY_PIN, HIGH) → BẬT bơm
-  digitalWrite(RELAY_PIN, LOW)  → TẮT bơm`,
+📍 Sơ đồ cực tải Relay:
+  COM (Common)  → Kết nối với nguồn dương của bơm
+  NO (Normally Open)  → KHÔNG kết nối khi chưa kích
+  NC (Normally Closed) → CÓ kết nối khi chưa kích
+
+📝 Logic điều khiển Relay:
+  Relay thường dùng logic ACTIVE LOW:
+  digitalWrite(RELAY_PIN, HIGH) → TẮT bơm (cuộn không kích)
+  digitalWrite(RELAY_PIN, LOW)  → BẬT bơm (cuộn kích từ)
+
+  Nhưng code bài thực hành dùng Active HIGH để dễ hiểu:
+  HIGH = BẬT bơm | LOW = TẮT bơm
+
+🚨 Quy tắc an toàn điện:
+  • KHÔNG chạm tay vào cực 220V khi đang vận hành
+  • Luôn ngắt nguồn 220V trước khi đấu nối
+  • Dùng dây điện đủ tiết diện cho tải bơm`,
       },
     ],
     code: `#include <LiquidCrystal.h>
 #define SOIL_PIN   34
 #define RELAY_PIN  26
+#define THRESHOLD  400  // Ngưỡng kích bơm (ADC)
 
 LiquidCrystal lcd;
 
 void setup() {
   Serial.begin(115200);
   pinMode(RELAY_PIN, OUTPUT);
-  digitalWrite(RELAY_PIN, LOW);
+  digitalWrite(RELAY_PIN, LOW);  // Tắt bơm khi khởi động
   lcd.begin(16, 2);
   lcd.print("HE THONG TUOI");
   delay(1500);
 }
 
 void loop() {
-  int soilVal = analogRead(SOIL_PIN);  // 0–4095 ADC
+  int soilVal = analogRead(SOIL_PIN);  // 0–4095
 
   Serial.print("Do am dat: "); Serial.println(soilVal);
 
   lcd.setCursor(0, 0);
   lcd.print("DoAmDat: "); lcd.print(soilVal); lcd.print("   ");
 
-  if (soilVal < 400) {
+  if (soilVal < THRESHOLD) {
     digitalWrite(RELAY_PIN, HIGH);  // Bật bơm
     Serial.println("-> DAT KHO! BAT MAY BOM...");
     lcd.setCursor(0, 1);
@@ -309,16 +402,18 @@ void loop() {
   }
   delay(600);
 }`,
-    components: ['ESP32', 'Soil Moisture Sensor', 'Module Relay 5V', 'DC Motor (Bơm)', 'LCD1602'],
+    components: ['ESP32', 'Soil Moisture Sensor (Điện trở)', 'Module Relay 5V/10A', 'DC Motor/Bơm nước 5V', 'LCD1602 I²C'],
     wiring: [
       'Soil.VCC → ESP32.3V3 | Soil.GND → ESP32.GND',
-      'Soil.AO  → ESP32.D34 (chân Analog Input)',
+      'Soil.AO  → ESP32.D34 (ADC Analog Input — chỉ đọc)',
       'Relay.VCC → ESP32.VIN | Relay.GND → ESP32.GND',
       'Relay.IN  → ESP32.D26 (tín hiệu điều khiển)',
-      'Relay.NO  → Nguồn bơm (+) | Bơm.GND → GND',
+      'Relay.NO  → Cực (+) nguồn Bơm',
+      'Bơm.(-) → GND | Nguồn(+) → Relay.COM',
       'LCD.SDA → ESP32.D21 | LCD.SCL → ESP32.D22',
     ],
   },
+
   {
     id: 4,
     icon: <Wind className="w-5 h-5" />,
@@ -327,63 +422,89 @@ void loop() {
     accent: '#F97316',
     theory: [
       {
-        title: '4.1 Ô nhiễm không khí & Sức khỏe môi trường',
-        content: `Ô nhiễm không khí trong nhà và ngoài trời là vấn đề môi trường nghiêm trọng tại Việt Nam. Các khí độc phổ biến cần giám sát:
-• CO (Khí CO): >200 ppm gây ngộ độc, >1600 ppm gây tử vong
-• CH4 (Khí Methane/Biogas): Giới hạn cháy nổ 5–15% thể tích
-• LPG (Khí gas hóa lỏng): >1000 ppm nguy hiểm
-• Khói bụi (PM2.5/PM10): Gây bệnh hô hấp, tim mạch
+        title: '4.1 Tiêu chuẩn chất lượng không khí & Ngưỡng an toàn',
+        content: `Ô nhiễm không khí trong nhà và ngoài trời là vấn đề môi trường nghiêm trọng. Hiểu rõ ngưỡng an toàn là cơ sở thiết kế hệ thống cảnh báo đúng đắn.
 
-Tiêu chuẩn QCVN tham khảo:
-• QCVN 05:2013/BTNMT: Chất lượng không khí xung quanh
-• QCVN 19:2009/BTNMT: Khí thải công nghiệp`,
+🌫️ Các khí độc phổ biến cần giám sát (theo QCVN):
+
+┌──────────┬──────────────┬────────────────────────────────┐
+│ Khí      │ Ngưỡng an toàn│ Tác hại khi vượt ngưỡng       │
+├──────────┼──────────────┼────────────────────────────────┤
+│ CO       │ < 9 ppm/8h   │ Ngộ độc máu, tử vong >1600 ppm│
+│ CH4/LPG  │ < 1000 ppm   │ Cháy nổ khi 5–15% thể tích    │
+│ NH3      │ < 25 ppm     │ Kích ứng mắt, phổi            │
+│ H2S      │ < 1 ppm      │ Độc cực cao, mùi trứng thối   │
+│ NO2      │ < 100 µg/m³  │ Gây viêm phổi, hen suyễn      │
+└──────────┴──────────────┴────────────────────────────────┘
+
+📋 Tiêu chuẩn Việt Nam liên quan:
+• QCVN 05:2023/BTNMT: Chất lượng không khí xung quanh
+• QCVN 19:2009/BTNMT: Khí thải công nghiệp (bụi, SO2, NO2)
+• QCVN 06:2009/BTNMT: Chất độc hại trong không khí xung quanh`,
       },
       {
-        title: '4.2 Cảm biến Khí Gas MQ-2 — Phát hiện đa loại khí',
-        content: `MQ-2 là cảm biến điện hóa phát hiện được nhiều loại khí: LPG, Propane, Methane, Alcohol, Hydrogen, Smoke.
+        title: '4.2 Cảm biến MQ-2 — Phát hiện đa loại khí độc & Gas',
+        image: `${IMG}/mq2_gas_alarm.png`,
+        imageCaption: 'Sơ đồ hệ thống cảnh báo MQ-2 với thang đo PPM và logic điều khiển còi + quạt',
+        content: `MQ-2 là cảm biến bán dẫn (Metal Oxide Semiconductor) phát hiện được nhiều loại khí: LPG, Propane, Methane, Alcohol, Hydrogen, Smoke, CO.
 
-Thông số:
-• Điện áp: 5V (cần làm nóng 24–48h trước khi dùng)
-• Đầu ra Analog (AO): 0–4095 ADC (tỉ lệ thuận nồng độ khí)
-• Đầu ra Digital (DO): Ngưỡng cài sẵn bằng biến trở
-• Thời gian hồi đáp: <10 giây
-• Dải đo: 300–10,000 ppm (tùy loại khí)
+🔬 Nguyên lý hoạt động (Chemo-resistive):
+• Phần tử nhạy: Lớp SnO₂ (Thiếc dioxide) nung nóng 200–400°C
+• Khi có khí, SnO₂ giảm điện trở → điện áp AO tăng
+• Không có khí: SnO₂ điện trở cao → AO thấp
 
-Hiệu chỉnh (Calibration):
-  Trong không khí sạch: AO ≈ 100–200
-  Khí gas nhẹ: AO ≈ 300–600
-  Nguy hiểm: AO > 600
+⚙️ Thông số kỹ thuật:
+• Điện áp: 5V (cần cấp nguồn ổn định)
+• Thời gian làm nóng (Preheat): 20–30 giây
+• Cần hiệu chỉnh 24–48h đầu tiên khi dùng mới
+• Đầu ra AO: 0–4095 ADC (tỉ lệ thuận nồng độ)
+• Đầu ra DO: HIGH/LOW theo ngưỡng biến trở
 
-Chú ý: MQ-2 chỉ phát hiện SỰ HIỆN DIỆN của khí, không phân biệt loại khí cụ thể. Cần hiệu chỉnh thực tế.`,
+📊 Thang đo thực nghiệm (cần hiệu chỉnh theo điều kiện thực):
+  AO < 200   → Không khí sạch (SAFE)
+  AO 200–400 → Khí nhẹ, ngưỡng theo dõi (WARNING)
+  AO > 400   → Nguy hiểm, kích cảnh báo (DANGER)
+
+🌡️ Yếu tố ảnh hưởng độ chính xác:
+• Nhiệt độ và độ ẩm môi trường
+• Nồng độ oxy trong không khí
+• Thời gian nung nóng (preheat time)
+
+⚠️ MQ-2 KHÔNG phân biệt được loại khí cụ thể, chỉ phát hiện sự có mặt của khí. Cần kết hợp nhiều loại cảm biến MQ khác nhau cho hệ thống chuyên nghiệp.`,
       },
       {
-        title: '4.3 Còi hú (Buzzer) & Relay Quạt thông gió',
-        content: `Hệ thống cảnh báo kép kết hợp tín hiệu âm thanh (còi) và hành động tự động (quạt thông gió) giúp đảm bảo an toàn.
+        title: '4.3 Buzzer Passive & Relay Quạt thông gió — Hệ thống cảnh báo kép',
+        content: `Hệ thống phản ứng tự động kết hợp cảnh báo âm thanh + hành động vật lý (bật quạt hút khí độc ra ngoài).
 
-Buzzer Passive:
-  Kết nối trực tiếp vào GPIO
-  tone(pin, frequency)  → Phát âm tần số Hz
-  noTone(pin)           → Tắt âm thanh
+🔊 Buzzer Passive vs Active:
+• Buzzer Active (tích hợp dao động): Chỉ cần cấp điện là kêu, âm thanh cố định
+• Buzzer Passive (không dao động): Cần tín hiệu PWM từ ESP32, điều chỉnh tần số âm thanh
 
-Relay Quạt 5V:
-  Kết nối quạt DC hoặc quạt AC qua relay
-  HIGH → Bật quạt | LOW → Tắt quạt
+Sử dụng Buzzer Passive:
+  tone(pin, 1000);         // Kêu tần số 1000 Hz
+  tone(pin, 440);          // Kêu tần số 440 Hz (nốt La)
+  noTone(pin);             // Tắt âm thanh
 
-Logic cảnh báo:
-  if (gasPpm > THRESHOLD) {
-    tone(BUZZER, 1000);         // Còi 1kHz
-    digitalWrite(FAN, HIGH);    // Bật quạt hút
-  } else {
-    noTone(BUZZER);             // Tắt còi
-    digitalWrite(FAN, LOW);     // Tắt quạt
-  }`,
+Tạo âm thanh cảnh báo nhịp điệu:
+  tone(BUZZER, 1000); delay(200);
+  noTone(BUZZER);     delay(100);
+  tone(BUZZER, 1500); delay(200);
+  noTone(BUZZER);     delay(100);
+
+🌀 Quạt thông gió qua Relay:
+  Khi khí độc > ngưỡng: BẬT quạt hút khí ra ngoài
+  Khi không khí sạch: TẮT quạt để tiết kiệm điện
+
+💡 Mẹo thực tế:
+  Đặt quạt gần mặt đất (khí gas nặng hơn không khí, tích tụ phía dưới)
+  Cài thêm thời gian trễ: quạt chạy thêm 30 giây sau khi khí đã giảm xuống ngưỡng an toàn`,
       },
     ],
     code: `#include <LiquidCrystal.h>
-#define GAS_PIN      35
-#define BUZZER_PIN   27
-#define FAN_PIN      14
-#define THRESHOLD    300
+#define GAS_PIN    35
+#define BUZZER_PIN 27
+#define FAN_PIN    14
+#define THRESHOLD  300
 
 LiquidCrystal lcd;
 
@@ -405,87 +526,115 @@ void loop() {
   lcd.print("Gas: "); lcd.print(gasPpm); lcd.print(" PPM   ");
 
   if (gasPpm > THRESHOLD) {
-    digitalWrite(BUZZER_PIN, HIGH);
-    digitalWrite(FAN_PIN, HIGH);
+    digitalWrite(BUZZER_PIN, HIGH);   // Bật còi hú
+    digitalWrite(FAN_PIN, HIGH);      // Bật quạt hút
+    Serial.println("!!! CANH BAO KHI DOC !!!");
     lcd.setCursor(0, 1);
     lcd.print("DANGER! FAN: ON ");
-    Serial.println("!!! CANH BAO KHI DOC !!!");
   } else {
     noTone(BUZZER_PIN);
-    digitalWrite(BUZZER_PIN, LOW);
-    digitalWrite(FAN_PIN, LOW);
+    digitalWrite(BUZZER_PIN, LOW);    // Tắt còi
+    digitalWrite(FAN_PIN, LOW);       // Tắt quạt
     lcd.setCursor(0, 1);
     lcd.print("Status: AN TOAN ");
   }
   delay(600);
 }`,
-    components: ['ESP32', 'MQ-2 Gas Sensor', 'Buzzer Passive', 'Module Relay', 'LCD1602'],
+    components: ['ESP32', 'MQ-2 Gas Sensor', 'Buzzer Passive 5V', 'Module Relay 5V', 'Quạt mini DC', 'LCD1602 I²C'],
     wiring: [
-      'MQ-2.VCC → ESP32.VIN | MQ-2.GND → ESP32.GND',
-      'MQ-2.AO  → ESP32.D35 (Analog)',
+      'MQ-2.VCC → ESP32.VIN (5V) | MQ-2.GND → ESP32.GND',
+      'MQ-2.AO  → ESP32.D35 (Analog, chỉ đọc)',
       'Buzzer.+ → ESP32.D27 | Buzzer.− → ESP32.GND',
+      'Relay.VCC → ESP32.VIN | Relay.GND → ESP32.GND',
       'Relay.IN  → ESP32.D14 (điều khiển quạt)',
       'LCD.SDA → ESP32.D21 | LCD.SCL → ESP32.D22',
     ],
   },
+
   {
     id: 5,
     icon: <BarChart3 className="w-5 h-5" />,
-    title: 'Buổi 5: Trạm HMI Đa cảm biến tích hợp',
+    title: 'Buổi 5: Trạm HMI Môi trường Đa cảm biến',
     color: 'from-violet-500 to-purple-600',
     accent: '#7C3AED',
     theory: [
       {
-        title: '5.1 HMI (Human-Machine Interface) trong Trạm Quan trắc',
-        content: `HMI là giao diện giúp người vận hành theo dõi và tương tác với hệ thống quan trắc. Trong IoT môi trường, HMI tại chỗ thường là:
-• Màn hình LCD/OLED hiển thị giá trị tức thời
-• Nút bấm để chuyển màn hình, đặt ngưỡng cảnh báo
-• Đèn LED màu hiển thị trạng thái nhanh
+        title: '5.1 HMI (Human-Machine Interface) trong Quan trắc Môi trường',
+        content: `HMI là giao diện giúp người vận hành theo dõi và tương tác với hệ thống quan trắc mà không cần kết nối Internet — điều này rất quan trọng tại vùng sâu, vùng xa.
 
-Tại sao cần HMI tại chỗ?
-  → Không phụ thuộc vào kết nối Internet/Cloud
-  → Kỹ thuật viên vận hành dễ dàng đọc giá trị trực tiếp
-  → Phù hợp môi trường có sóng yếu (vùng nông thôn, rừng núi)`,
+🖥️ Các loại HMI trong hệ thống IoT môi trường:
+• HMI tại chỗ: LCD/OLED, đèn LED cảnh báo, còi, bảng số
+• HMI từ xa: Web dashboard, app mobile, SMS alert
+• HMI tập trung: SCADA system tại trung tâm điều hành
+
+💡 Tại sao cần HMI tại chỗ (Local HMI)?
+  ✓ Hoạt động khi mất Internet/điện thoại
+  ✓ Kỹ thuật viên đọc số liệu trực tiếp tại trạm
+  ✓ Phản ứng nhanh không cần đợi server
+  ✓ Chi phí thấp, đơn giản, đáng tin cậy
+  ✓ Phù hợp vùng nông thôn, rừng núi, hải đảo
+
+🔄 Vòng lặp HMI chuẩn:
+  Thu thập → Xử lý → Hiển thị → Cảnh báo → Ghi log`,
       },
       {
-        title: '5.2 Thiết kế giao diện LCD 16x2 hiệu quả',
-        content: `Với chỉ 32 ký tự (16×2), cần thiết kế hiển thị thông minh:
+        title: '5.2 Thiết kế giao diện LCD 16x2 tối ưu',
+        image: `${IMG}/lcd1602_grid.png`,
+        imageCaption: 'Sơ đồ lưới ký tự LCD 16x2 — cách bố trí thông tin tối ưu với setCursor() và print()',
+        content: `Với chỉ 32 ký tự (16×2), cần thiết kế bố cục hiển thị thật thông minh để truyền đạt tối đa thông tin.
 
-Nguyên tắc thiết kế:
-• Dòng 1: Thông số chính (Nhiệt độ, Độ ẩm)
-• Dòng 2: Thông số phụ (Khí gas, trạng thái)
-• Dùng ký tự viết tắt để tiết kiệm không gian: T=Temp, H=Humi
-• Luôn xóa ký tự cũ bằng khoảng trắng cuối chuỗi
+📐 Nguyên tắc thiết kế LCD hiệu quả:
+• Dòng 0: Thông số chính (Nhiệt độ, Độ ẩm, giá trị cần theo dõi liên tục)
+• Dòng 1: Thông số phụ hoặc trạng thái hệ thống (Cảnh báo, trạng thái bơm/quạt)
+• Dùng chữ viết tắt để tiết kiệm: T=Temp, H=Humi, G=Gas
+• Luôn thêm khoảng trắng cuối để xóa ký tự dư từ lần in trước
 
-Ví dụ bố cục tối ưu:
-  [Dòng 0]: "T:29C H:65%    " (16 ký tự)
-  [Dòng 1]: "Gas: 180 PPM   " (16 ký tự)
+🗂️ Bố cục tối ưu cho trạm môi trường:
+  Hàng 0: "T:28C H:65%     " ← 16 ký tự
+  Hàng 1: "Gas: 180 PPM   " ← 16 ký tự
 
-Kỹ thuật tránh nhấp nháy LCD:
-  Thay vì lcd.clear() trước mỗi lần cập nhật,
-  dùng setCursor() + print với đủ khoảng trắng
-  để ghi đè lên vị trí cũ mà không xóa toàn màn hình.`,
+🔧 Kỹ thuật ghi đè không nhấp nháy:
+  ❌ Sai: lcd.clear() → Gây nhấp nháy rõ ràng
+  ✓ Đúng: lcd.setCursor(0,0); lcd.print("T:28 H:65     ");
+  
+  Giải thích: Thêm khoảng trắng cuối chuỗi (min 2-3 ký tự) sẽ
+  ghi đè lên các ký tự số dài hơn từ lần trước (99→ 8 cần
+  xóa ký tự "9" thừa → thêm " " sau số).
+
+📍 Tọa độ setCursor(col, row):
+  setCursor(0, 0) → Đầu dòng 1 (góc trên trái)
+  setCursor(8, 0) → Giữa dòng 1
+  setCursor(0, 1) → Đầu dòng 2
+  setCursor(8, 1) → Giữa dòng 2`,
       },
       {
-        title: '5.3 Tổng hợp đa cảm biến — Xử lý & Hiển thị song song',
-        content: `Khi tích hợp nhiều cảm biến, cần chú ý:
+        title: '5.3 Phân bổ GPIO & Tích hợp đa cảm biến không xung đột',
+        content: `Khi lắp nhiều cảm biến, quản lý chân GPIO hợp lý là yếu tố quyết định hệ thống hoạt động ổn định.
 
-Vòng lặp đọc dữ liệu:
-  1. Đọc tất cả cảm biến đầu vòng loop()
+📋 Phân bổ GPIO cho Bài 5 (HMI Đa cảm biến):
+  ┌──────┬────────────────────────────────────┐
+  │ Chân │ Thiết bị / Chức năng               │
+  ├──────┼────────────────────────────────────┤
+  │ D15  │ DHT11 DATA (1-Wire, kéo lên 10kΩ) │
+  │ D34  │ MQ-2 Analog Out (chỉ đọc ADC)     │
+  │ D21  │ LCD SDA (I²C Bus)                  │
+  │ D22  │ LCD SCL (I²C Bus)                  │
+  │ VIN  │ 5V → DHT11, MQ-2, LCD VCC         │
+  │ GND  │ Tất cả GND chung                   │
+  └──────┴────────────────────────────────────┘
+
+⚠️ Các lỗi phổ biến cần tránh:
+  ❌ Dùng D34–D39 làm OUTPUT → Lỗi phần cứng (chỉ INPUT)
+  ❌ Quên delay(1000ms) giữa hai lần đọc DHT11 → Giá trị sai
+  ❌ Không kiểm tra isnan() cho DHT → Hiện "nan" trên LCD
+  ❌ Thiếu khoảng trắng cuối lcd.print() → Số dư trên LCD
+
+🔁 Cấu trúc vòng loop() chuẩn đa cảm biến:
+  1. Đọc tất cả cảm biến đầu vòng
   2. Xử lý logic cảnh báo
-  3. Hiển thị lên LCD và Serial
-  4. delay() cuối vòng
-
-Phân bổ chân GPIO hợp lý (không xung đột):
-  D15:  DHT11 (1-Wire)
-  D34:  MQ-2 Analog (chỉ đọc)
-  D21:  LCD SDA (I²C)
-  D22:  LCD SCL (I²C)
-
-Tránh các lỗi thường gặp:
-  ✘ Dùng D34-D39 làm OUTPUT → lỗi (chỉ INPUT)
-  ✘ Quên delay giữa các lần đọc DHT11 → giá trị sai
-  ✓ Luôn kiểm tra isnan() với cảm biến DHT trong code thực tế`,
+  3. In ra Serial Monitor
+  4. Cập nhật LCD
+  5. delay(600) → lặp lại`,
       },
     ],
     code: `#include <LiquidCrystal.h>
@@ -503,119 +652,130 @@ void setup() {
 
 void loop() {
   // Đọc đồng thời 3 thông số môi trường
-  int temp    = analogRead(DHT_PIN);
-  int humi    = dhtReadHumidity(DHT_PIN);
-  int gasPpm  = analogRead(GAS_PIN);
+  int temp   = analogRead(DHT_PIN);
+  int humi   = dhtReadHumidity(DHT_PIN);
+  int gasPpm = analogRead(GAS_PIN);
 
-  // Gửi dữ liệu lên Serial Monitor
-  Serial.print("Temp: "); Serial.print(temp); Serial.print(" C | ");
-  Serial.print("Humi: "); Serial.print(humi); Serial.print(" % | ");
-  Serial.print("Gas: ");  Serial.print(gasPpm); Serial.println(" PPM");
+  // Serial Monitor — dữ liệu phân tích
+  Serial.print("T:"); Serial.print(temp); Serial.print("C | ");
+  Serial.print("H:"); Serial.print(humi); Serial.print("% | ");
+  Serial.print("Gas:"); Serial.print(gasPpm); Serial.println("ppm");
 
-  // Hiển thị LCD 16x2
+  // LCD1602 — HMI tại chỗ
   lcd.setCursor(0, 0);
-  lcd.print("T:"); lcd.print(temp); lcd.print("C H:"); lcd.print(humi); lcd.print("%   ");
+  lcd.print("T:"); lcd.print(temp); lcd.print("C H:");
+  lcd.print(humi); lcd.print("%   ");
   lcd.setCursor(0, 1);
-  lcd.print("Gas PPM: "); lcd.print(gasPpm); lcd.print("   ");
+  lcd.print("Gas PPM: "); lcd.print(gasPpm); lcd.print("  ");
 
   delay(600);
 }`,
-    components: ['ESP32', 'DHT11', 'MQ-2', 'LCD1602 I²C'],
+    components: ['ESP32', 'DHT11 (nhiệt ẩm không khí)', 'MQ-2 (khí gas)', 'LCD1602 I²C (HMI)'],
     wiring: [
-      'DHT11.DATA → ESP32.D15 | DHT11.VCC → 5V',
-      'MQ-2.AO   → ESP32.D34 | MQ-2.VCC → 5V',
-      'LCD.SDA → ESP32.D21 | LCD.SCL → ESP32.D22',
+      'DHT11.DATA → D15 (dây vàng) | DHT11.VCC → VIN',
+      'MQ-2.AO   → D34 (dây cam) | MQ-2.VCC → VIN',
+      'LCD.SDA → D21 (dây tím) | LCD.SCL → D22 (dây xanh)',
+      'Tất cả GND nối chung → ESP32.GND',
     ],
   },
+
   {
     id: 6,
     icon: <Radio className="w-5 h-5" />,
-    title: 'Buổi 6: Trạm IoT Đa thông số & Kết nối Cloud',
+    title: 'Buổi 6: Trạm IoT Đa thông số & Cloud',
     color: 'from-rose-500 to-pink-600',
     accent: '#E11D48',
     theory: [
       {
-        title: '6.1 Kiến trúc Trạm IoT Môi trường đầy đủ',
-        content: `Một trạm quan trắc môi trường IoT hoàn chỉnh bao gồm 4 lớp:
+        title: '6.1 Kiến trúc Trạm Quan trắc Môi trường IoT đầy đủ',
+        image: `${IMG}/iot_architecture.png`,
+        imageCaption: 'Kiến trúc đầy đủ của Trạm IoT Môi trường — từ cảm biến đến Cloud Dashboard',
+        content: `Trạm quan trắc môi trường IoT đầy đủ tích hợp nhiều cảm biến, kết nối Cloud và phân tích dữ liệu thời gian thực.
 
-1. Lớp Cảm biến (Perception Layer):
-   • DHT11/22: Nhiệt độ & Độ ẩm không khí
-   • MQ-2/MQ-135: Khí gas & Chất lượng không khí
-   • HC-SR04: Mực nước
-   • DS18B20: Nhiệt độ nước/đất
+🏗️ Cấu trúc phần cứng Trạm IoT đa thông số:
+  ESP32 (CPU trung tâm)
+  ├── DHT11 (D15) → Nhiệt độ & Độ ẩm không khí
+  ├── MQ-2 (D35)  → Nồng độ khí gas/khói
+  ├── HC-SR04 (D5/D18) → Mực nước bề mặt
+  └── LCD1602 I²C (D21/D22) → Hiển thị tại chỗ
 
-2. Lớp Mạng (Network Layer):
-   • ESP32 WiFi → Router → Internet
-   • Giao thức: MQTT (nhẹ, tiết kiệm điện) hoặc HTTP REST
+🔋 Cấp nguồn cho trạm thực địa:
+  • Nguồn AC 220V → Adapter 5V/3A
+  • Pin năng lượng mặt trời 12V + Converter 5V
+  • Pin Lithium 18650 + Module sạc TP4056
+  • Thời lượng pin: 3–7 ngày (tùy tần số đo)
 
-3. Lớp Nền tảng (Platform Layer):
-   • ThingSpeak, Blynk, Grafana, Firebase
-   • Lưu trữ & Hiển thị dữ liệu lịch sử
-
-4. Lớp Ứng dụng (Application Layer):
-   • Dashboard web/mobile
-   • Cảnh báo qua Email/SMS/Telegram`,
+📡 Kết nối Cloud từ ESP32:
+  WiFi → Router → Internet → MQTT Broker
+  Giao thức: MQTT (nhẹ, tiết kiệm pin, real-time)
+  Nền tảng phổ biến: ThingSpeak, Blynk, Grafana + InfluxDB`,
       },
       {
-        title: '6.2 Giao thức MQTT — Xương sống của IoT',
-        content: `MQTT (Message Queuing Telemetry Transport) là giao thức nhắn tin nhẹ, lý tưởng cho IoT:
+        title: '6.2 Giao thức MQTT — Xương sống của IoT Cloud',
+        image: `${IMG}/mqtt_cloud.png`,
+        imageCaption: 'Mô hình Publish/Subscribe của MQTT — ESP32 gửi, Dashboard nhận theo thời gian thực',
+        content: `MQTT (Message Queuing Telemetry Transport) là giao thức truyền thông nhẹ, được thiết kế cho IoT với băng thông thấp và kết nối không ổn định.
 
-Mô hình Publish/Subscribe:
-  • Broker (Server): MQTT Broker (Mosquitto, HiveMQ)
-  • Publisher: ESP32 gửi dữ liệu lên topic
-  • Subscriber: Dashboard/ứng dụng nhận dữ liệu
+🌐 Mô hình Publish/Subscribe:
+  ┌────────────┐    PUBLISH     ┌───────────────┐    SUBSCRIBE    ┌─────────────┐
+  │  ESP32     │ ─────────────▶ │  MQTT Broker  │ ──────────────▶ │  Dashboard  │
+  │ (Publisher)│                │ (Mosquitto)   │                 │  (Subscriber│
+  └────────────┘                └───────────────┘                 └─────────────┘
 
-Ví dụ topic MQTT quan trắc môi trường:
-  kmt/station01/temperature → 28.5
-  kmt/station01/humidity    → 65.2
-  kmt/station01/gas         → 180
-  kmt/station01/water_level → 45
+📂 Cấu trúc Topic MQTT cho Trạm KMT:
+  kmt/station01/temperature  → "28.5"
+  kmt/station01/humidity     → "65.2"
+  kmt/station01/gas_ppm      → "180"
+  kmt/station01/water_level  → "45"
+  kmt/station01/alerts       → "flood_warning"
 
-Tần suất gửi dữ liệu khuyến nghị:
-  • Cảnh báo khẩn (khí độc): Real-time (<1s)
-  • Giám sát thường xuyên: 10–60 giây
-  • Lưu lịch sử: 5–15 phút`,
+⚙️ Thông số MQTT quan trọng:
+• QoS 0: Gửi một lần, không đảm bảo nhận (data thường)
+• QoS 1: Gửi ít nhất 1 lần, đảm bảo nhận (cảnh báo)
+• Retain: Broker lưu tin nhắn cuối, client mới vẫn nhận được
+• Keep Alive: 60 giây (ESP32 gửi PINGREQ để duy trì kết nối)
+
+🔄 Tần suất gửi dữ liệu khuyến nghị:
+  Cảnh báo khẩn (khí độc, lũ): < 1 giây (real-time)
+  Giám sát thường xuyên: 10–60 giây
+  Lưu lịch sử dài hạn: 5–15 phút`,
       },
       {
-        title: '6.3 Định dạng dữ liệu JSON cho IoT',
-        content: `JSON (JavaScript Object Notation) là định dạng dữ liệu phổ biến nhất trong IoT vì dễ đọc và phân tích.
+        title: '6.3 Định dạng JSON & Phân tích dữ liệu thời gian thực',
+        content: `JSON (JavaScript Object Notation) là định dạng dữ liệu chuẩn trong IoT — dễ đọc, dễ phân tích, được hỗ trợ mọi ngôn ngữ lập trình.
 
-Cấu trúc JSON payload chuẩn:
+📄 Cấu trúc JSON payload chuẩn cho Trạm IoT KMT:
 {
-  "station": "KMT_LAB_01",
-  "timestamp": "2025-01-15T10:30:00",
-  "location": { "lat": 10.762, "lon": 106.660 },
-  "data": {
-    "temp_air": 28.5,
-    "humidity": 65.2,
-    "gas_ppm": 180,
-    "water_level_cm": 45
+  "station_id": "KMT_LAB_01",
+  "timestamp":  "2025-07-26T10:30:00+07:00",
+  "location":   { "lat": 10.762, "lon": 106.660, "alt": 5 },
+  "sensors": {
+    "temp_air":       28.5,
+    "humidity":       65.2,
+    "gas_ppm":        180,
+    "water_level_cm": 45,
+    "water_temp_c":   26.3
   },
-  "alerts": { "gas_danger": false, "flood_risk": false }
+  "alerts": {
+    "gas_danger":  false,
+    "flood_risk":  true,
+    "low_battery": false
+  }
 }
 
-Gửi JSON qua Serial trong Simulator:
+💻 Mã gửi JSON qua Serial trong Simulator:
   Serial.print("{\\"temp\\":"); Serial.print(temp);
   Serial.print(",\\"humi\\":"); Serial.print(humi);
-  Serial.println("}");`,
-      },
-      {
-        title: '6.4 Tổng kết 6 Buổi & Hướng phát triển',
-        content: `Qua 6 buổi thực hành, sinh viên đã nắm vững:
+  Serial.print(",\\"gas\\":"); Serial.print(gasPpm);
+  Serial.println("}");
 
-✓ Buổi 1: Lập trình ESP32, đọc DHT11, hiển thị LCD
-✓ Buổi 2: Đo mực nước HC-SR04, nhiệt độ DS18B20, cảnh báo ngập
-✓ Buổi 3: Đọc độ ẩm đất, điều khiển relay & bơm tự động
-✓ Buổi 4: Phát hiện khí độc MQ-2, còi báo, quạt thông gió
-✓ Buổi 5: Tích hợp HMI đa cảm biến, thiết kế giao diện LCD
-✓ Buổi 6: Trạm đa thông số tổng hợp, kết nối Cloud & MQTT
-
-Hướng phát triển tiếp theo:
-• Kết nối ESP32 WiFi lên ThingSpeak/Blynk
-• Thêm module GPS (NEO-6M) cho trạm di động
-• Sử dụng năng lượng pin mặt trời (Solar Panel)
-• Xây dựng mạng lưới trạm LoRa WAN
-• Tích hợp AI phân tích xu hướng ô nhiễm`,
+📊 Tổng kết 6 Buổi — Kỹ năng đã đạt được:
+  ✓ B1: ESP32 + DHT11 → LCD1602 (Nhiệt ẩm)
+  ✓ B2: HC-SR04 + DS18B20 → Cảnh báo ngập lụt
+  ✓ B3: Soil Moisture + Relay → Tưới tự động
+  ✓ B4: MQ-2 + Buzzer + Quạt → Cảnh báo khí độc
+  ✓ B5: Đa cảm biến → HMI LCD1602 tại chỗ
+  ✓ B6: Trạm đa thông số → Telemetry JSON + Cloud MQTT`,
       },
     ],
     code: `#include <LiquidCrystal.h>
@@ -637,9 +797,9 @@ void setup() {
 
 void loop() {
   // Đọc tất cả cảm biến
-  int temp    = analogRead(DHT_PIN);
-  int humi    = dhtReadHumidity(DHT_PIN);
-  int gasPpm  = analogRead(GAS_PIN);
+  int temp   = analogRead(DHT_PIN);
+  int humi   = dhtReadHumidity(DHT_PIN);
+  int gasPpm = analogRead(GAS_PIN);
 
   digitalWrite(TRIG_PIN, LOW);  delayMicroseconds(2);
   digitalWrite(TRIG_PIN, HIGH); delayMicroseconds(10);
@@ -647,28 +807,29 @@ void loop() {
   long dur = pulseIn(ECHO_PIN, HIGH);
   int waterLevel = dur * 0.034 / 2;
 
-  // Telemetry JSON qua Serial
+  // Telemetry JSON
   Serial.print("{\\"temp\\":"); Serial.print(temp);
   Serial.print(",\\"humi\\":"); Serial.print(humi);
   Serial.print(",\\"gas\\":"); Serial.print(gasPpm);
   Serial.print(",\\"water\\":"); Serial.print(waterLevel);
   Serial.println("}");
 
-  // Hiển thị LCD
+  // LCD HMI
   lcd.setCursor(0, 0);
   lcd.print("T:"); lcd.print(temp); lcd.print("C H:");
   lcd.print(humi); lcd.print("% G:"); lcd.print(gasPpm);
   lcd.setCursor(0, 1);
-  lcd.print("Water:"); lcd.print(waterLevel); lcd.print("cm OK  ");
+  lcd.print("Water:"); lcd.print(waterLevel); lcd.print("cm    ");
 
   delay(600);
 }`,
-    components: ['ESP32', 'DHT11', 'MQ-2', 'HC-SR04', 'LCD1602'],
+    components: ['ESP32 WiFi', 'DHT11', 'MQ-2', 'HC-SR04', 'LCD1602 I²C', 'Module WiFi (tích hợp ESP32)'],
     wiring: [
-      'DHT11.DATA → D15 | MQ-2.AO → D35',
-      'HC-SR04.TRIG → D5 | HC-SR04.ECHO → D18',
-      'LCD.SDA → D21 | LCD.SCL → D22',
-      'Tất cả VCC → ESP32.VIN | Tất cả GND → ESP32.GND',
+      'DHT11.DATA → D15 | DHT11.VCC → VIN',
+      'MQ-2.AO   → D35 | MQ-2.VCC → VIN',
+      'HC-SR04.TRIG → D5 | HC-SR04.ECHO → D18 | HC-SR04.VCC → VIN',
+      'LCD.SDA → D21 | LCD.SCL → D22 | LCD.VCC → VIN',
+      'Tất cả GND → ESP32.GND (nối chung 1 điểm)',
     ],
   },
 ];
@@ -687,10 +848,7 @@ const CodeBlock = ({ code }) => {
           <Code2 className="w-3.5 h-3.5" />
           <span>Arduino C++ — Mã mẫu thực hành</span>
         </div>
-        <button
-          onClick={handleCopy}
-          className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md bg-slate-700 hover:bg-slate-600 text-slate-300 transition-colors"
-        >
+        <button onClick={handleCopy} className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md bg-slate-700 hover:bg-slate-600 text-slate-300 transition-colors">
           {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-green-400" /> : <Code2 className="w-3.5 h-3.5" />}
           {copied ? 'Đã sao chép!' : 'Sao chép'}
         </button>
@@ -702,10 +860,10 @@ const CodeBlock = ({ code }) => {
   );
 };
 
-const TheorySection = ({ section }) => {
-  const [open, setOpen] = useState(false);
+const TheorySection = ({ section, accent }) => {
+  const [open, setOpen] = useState(true);
   return (
-    <div className="border border-slate-700/50 rounded-xl overflow-hidden mb-2">
+    <div className="border border-slate-700/50 rounded-xl overflow-hidden mb-3">
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-between px-4 py-3 bg-slate-800/60 hover:bg-slate-800/90 text-left transition-colors"
@@ -714,8 +872,25 @@ const TheorySection = ({ section }) => {
         {open ? <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" /> : <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />}
       </button>
       {open && (
-        <div className="px-4 py-3 bg-slate-900/50 text-slate-300 text-xs leading-relaxed whitespace-pre-line">
-          {section.content}
+        <div className="bg-slate-900/50">
+          {section.image && (
+            <div className="px-4 pt-4">
+              <div className="rounded-xl overflow-hidden border border-slate-700/40">
+                <img
+                  src={section.image}
+                  alt={section.imageCaption || section.title}
+                  className="w-full object-contain max-h-72 bg-slate-950"
+                  onError={(e) => { e.target.style.display = 'none'; }}
+                />
+              </div>
+              {section.imageCaption && (
+                <p className="text-center text-[10px] text-slate-500 mt-1.5 italic px-2">{section.imageCaption}</p>
+              )}
+            </div>
+          )}
+          <div className="px-4 py-3 text-slate-300 text-xs leading-relaxed whitespace-pre-line font-mono">
+            {section.content}
+          </div>
         </div>
       )}
     </div>
@@ -728,14 +903,14 @@ export default function TheoryTab({ isDarkMode }) {
 
   return (
     <div className={`flex h-full overflow-hidden ${isDarkMode ? 'bg-[#0B0F19] text-slate-100' : 'bg-slate-50 text-slate-800'}`}>
-      {/* Sidebar — Session list */}
-      <div className={`w-64 shrink-0 flex flex-col border-r ${isDarkMode ? 'border-slate-700/50 bg-slate-900/60' : 'border-slate-200 bg-white'} overflow-y-auto`}>
+      {/* Sidebar */}
+      <div className={`w-60 shrink-0 flex flex-col border-r ${isDarkMode ? 'border-slate-700/50 bg-slate-900/60' : 'border-slate-200 bg-white'} overflow-y-auto`}>
         <div className="px-4 pt-4 pb-3 border-b border-slate-700/40">
           <div className="flex items-center gap-2 mb-1">
             <BookOpen className="w-4 h-4 text-blue-400" />
             <span className="text-xs font-bold text-slate-300 uppercase tracking-wider">Lý thuyết</span>
           </div>
-          <p className="text-[10px] text-slate-500">IoT trong Kỹ thuật Môi trường</p>
+          <p className="text-[10px] text-slate-500 leading-snug">IoT trong Kỹ thuật Môi trường — 6 Buổi thực hành</p>
         </div>
         <div className="flex-1 p-2">
           {SESSIONS.map((s, idx) => (
@@ -745,9 +920,7 @@ export default function TheoryTab({ isDarkMode }) {
               className={`w-full text-left px-3 py-2.5 rounded-lg mb-1 transition-all flex items-start gap-2.5 ${
                 activeSession === idx
                   ? 'bg-gradient-to-r ' + s.color + ' text-white shadow-lg'
-                  : isDarkMode
-                    ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-                    : 'text-slate-600 hover:bg-slate-100'
+                  : isDarkMode ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200' : 'text-slate-600 hover:bg-slate-100'
               }`}
             >
               <span className={`mt-0.5 shrink-0 ${activeSession === idx ? 'text-white' : 'text-slate-500'}`}>{s.icon}</span>
@@ -762,22 +935,22 @@ export default function TheoryTab({ isDarkMode }) {
 
       {/* Main content */}
       <div className="flex-1 overflow-y-auto p-5">
-        {/* Header */}
+        {/* Header banner */}
         <div className={`rounded-2xl p-5 mb-5 bg-gradient-to-r ${session.color} text-white shadow-lg`}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur">
+            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur shrink-0">
               {session.icon}
             </div>
             <div>
-              <div className="text-xs font-bold uppercase tracking-widest opacity-80 mb-0.5">Buổi {session.id} / 6</div>
-              <h2 className="text-lg font-bold">{session.title.split(':')[1]?.trim()}</h2>
+              <div className="text-xs font-bold uppercase tracking-widest opacity-80 mb-0.5">Buổi {session.id} / 6 — Lý thuyết & Thực hành</div>
+              <h2 className="text-base font-bold leading-tight">{session.title.split(':')[1]?.trim()}</h2>
             </div>
           </div>
         </div>
 
         {/* Components needed */}
         <div className={`rounded-xl border p-4 mb-4 ${isDarkMode ? 'border-slate-700/50 bg-slate-900/40' : 'border-slate-200 bg-white'}`}>
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-2.5">
             <Wrench className="w-4 h-4" style={{ color: session.accent }} />
             <span className="text-sm font-bold">Linh kiện cần chuẩn bị</span>
           </div>
@@ -793,11 +966,11 @@ export default function TheoryTab({ isDarkMode }) {
 
         {/* Theory sections */}
         <div className="mb-4">
-          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
-            <BookOpen className="w-4 h-4" /> Lý thuyết
+          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+            <BookOpen className="w-3.5 h-3.5" /> Nội dung Lý thuyết
           </h3>
           {session.theory.map((s, i) => (
-            <TheorySection key={i} section={s} />
+            <TheorySection key={i} section={s} accent={session.accent} />
           ))}
         </div>
 
@@ -805,31 +978,32 @@ export default function TheoryTab({ isDarkMode }) {
         <div className={`rounded-xl border p-4 mb-4 ${isDarkMode ? 'border-slate-700/50 bg-slate-900/40' : 'border-slate-200 bg-white'}`}>
           <div className="flex items-center gap-2 mb-3">
             <Zap className="w-4 h-4 text-yellow-400" />
-            <span className="text-sm font-bold">Sơ đồ đấu nối (Wiring)</span>
+            <span className="text-sm font-bold">Sơ đồ đấu nối (Wiring Guide)</span>
           </div>
           <div className="space-y-1.5">
             {session.wiring.map((w, i) => (
-              <div key={i} className="flex items-center gap-2 text-xs text-slate-300">
-                <span className="text-yellow-400 shrink-0">→</span>
-                <code className="font-mono">{w}</code>
+              <div key={i} className="flex items-start gap-2 text-xs text-slate-300">
+                <span className="text-yellow-400 shrink-0 mt-0.5">→</span>
+                <code className="font-mono leading-relaxed">{w}</code>
               </div>
             ))}
           </div>
-          <div className={`mt-3 px-3 py-2 rounded-lg text-xs flex items-start gap-2 ${isDarkMode ? 'bg-amber-900/30 text-amber-300' : 'bg-amber-50 text-amber-700'}`}>
+          <div className={`mt-3 px-3 py-2 rounded-lg text-xs flex items-start gap-2 ${isDarkMode ? 'bg-amber-900/30 text-amber-300 border border-amber-800/40' : 'bg-amber-50 text-amber-700 border border-amber-200'}`}>
             <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-            <span>Kiểm tra kỹ cực tính (+ / −) và điện áp (3.3V/5V) trước khi cấp điện. Đấu nhầm có thể hỏng cảm biến.</span>
+            <span>Kiểm tra kỹ cực tính (+ / −) và điện áp (3.3V/5V) trước khi cấp điện. Đấu sai có thể hỏng cảm biến vĩnh viễn.</span>
           </div>
         </div>
 
         {/* Code sample */}
-        <div className="mb-4">
-          <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-            <Code2 className="w-4 h-4" /> Mã nguồn mẫu
+        <div className="mb-6">
+          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+            <Code2 className="w-3.5 h-3.5" /> Mã nguồn mẫu Arduino
           </h3>
           <CodeBlock code={session.code} />
-          <p className="text-[10px] text-slate-500 mt-2">
-            💡 Nhấn tab <strong className="text-blue-400">Thực hành trên mạch</strong> để chạy mã này trực tiếp trên mạch ảo!
-          </p>
+          <div className={`mt-3 px-3 py-2.5 rounded-lg text-xs flex items-center gap-2 ${isDarkMode ? 'bg-emerald-900/30 text-emerald-300 border border-emerald-800/40' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}`}>
+            <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+            <span>Nhấn tab <strong>Thực hành trên mạch</strong> → chọn <strong>Buổi {session.id}</strong> để chạy mã này trực tiếp trên mạch ảo!</span>
+          </div>
         </div>
       </div>
     </div>
