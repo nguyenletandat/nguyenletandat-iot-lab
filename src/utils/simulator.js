@@ -66,6 +66,11 @@ export function transpileArduino(code) {
   js = js.replace(/(\w+)\.setTextSize\(([^)]+)\);?/g, 'if ($1 && $1.setTextSize) $1.setTextSize($2);');
   js = js.replace(/(\w+)\.setTextColor\(([^)]+)\);?/g, 'if ($1 && $1.setTextColor) $1.setTextColor($2);');
 
+  // Replace DHT & DallasTemperature libraries
+  js = js.replace(/DHT\s+(\w+)\s*\(([^,]+),\s*([^)]+)\);?/g, 'const $1 = new sys.DHT($2);');
+  js = js.replace(/OneWire\s+(\w+)\s*\([^)]*\);?/g, '// OneWire $1');
+  js = js.replace(/DallasTemperature\s+(\w+)\s*\([^)]*\);?/g, 'const $1 = new sys.DallasTemperature();');
+
   // Translate setup() and loop() to async functions
   js = js.replace(/void\s+setup\(\s*\)/g, 'async function setup()');
   js = js.replace(/void\s+loop\(\s*\)/g, 'async function loop()');

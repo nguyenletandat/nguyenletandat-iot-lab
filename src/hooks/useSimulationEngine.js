@@ -12,9 +12,17 @@ import { useSimulationStore } from '../stores/simulationStore';
 const CONTROL_BOARD_TYPES = ['ESP32', 'ESP32_V4', 'ARDUINO_UNO', 'ARDUINO_NANO', 'ARDUINO_MEGA', 'ESP8266'];
 
 const ANALOG_SENSOR_LOOKUP = [
-  ['LDR', 'value'], ['DHT11', 'value'], ['DHT22', 'value'], ['SOIL_MOISTURE', 'moisture'],
-  ['MQ2', 'gasLevel'], ['POTENTIOMETER', 'position'], ['RAIN_SENSOR', 'rainLevel'],
-  ['DS18B20', 'value'], ['BMP280', 'temp'], ['ACS712', 'current'],
+  ['SOIL_MOISTURE', 'moisture'],
+  ['MQ2', 'gasLevel'],
+  ['LDR', 'value'],
+  ['POTENTIOMETER', 'position'],
+  ['DHT11', 'value'],
+  ['DHT22', 'value'],
+  ['DS18B20', 'temp'],
+  ['DS18B20', 'value'],
+  ['BMP280', 'temp'],
+  ['ACS712', 'current'],
+  ['RAIN_SENSOR', 'rainLevel'],
 ];
 
 export function useSimulationEngine(code) {
@@ -41,25 +49,25 @@ export function useSimulationEngine(code) {
     }
 
     const boardProto = COMPONENT_TYPES[board.type];
-    const boardPort = boardProto?.ports.find(p => p.pin === pin);
-    if (!boardPort) {
-      const fallback = comps.find(c => c.type === sensorType);
-      return fallback?.config?.[configKey] !== undefined ? fallback.config[configKey] : defaultValue;
+    const boardPort = boardProto?.ports.find(p => p.pin === pin || p.id === `D${pin}` || p.id === `A${pin}` || p.id === `VP` || p.id === `VN`);
+    if (boardPort) {
+      const connWire = wrs.find(w =>
+        (w.from.componentId === board.id && w.from.portId === boardPort.id) ||
+        (w.to.componentId === board.id && w.to.portId === boardPort.id)
+      );
+
+      if (connWire) {
+        const targetRef = connWire.from.componentId === board.id ? connWire.to : connWire.from;
+        const targetComp = comps.find(c => c.id === targetRef.componentId);
+        if (targetComp && targetComp.config?.[configKey] !== undefined) {
+          return targetComp.config[configKey];
+        }
+      }
     }
 
-    const connWire = wrs.find(w =>
-      (w.from.componentId === board.id && w.from.portId === boardPort.id) ||
-      (w.to.componentId === board.id && w.to.portId === boardPort.id)
-    );
-
-    if (!connWire) {
-      const fallback = comps.find(c => c.type === sensorType);
-      return fallback?.config?.[configKey] !== undefined ? fallback.config[configKey] : defaultValue;
-    }
-
-    const targetRef = connWire.from.componentId === board.id ? connWire.to : connWire.from;
-    const targetComp = comps.find(c => c.id === targetRef.componentId);
-    return targetComp?.config?.[configKey] !== undefined ? targetComp.config[configKey] : defaultValue;
+    // Fallback: đọc trực tiếp cảm biến cùng loại trên canvas
+    const fallback = comps.find(c => c.type === sensorType);
+    return fallback?.config?.[configKey] !== undefined ? fallback.config[configKey] : defaultValue;
   };
 
   const createSystemInterface = () => ({
@@ -114,6 +122,22 @@ export function useSimulationEngine(code) {
     },
     noTone: (pin) => {
       if (oscillatorRef.current) { try { oscillatorRef.current.stop(); } catch (e) {} oscillatorRef.current = null; }
+    },
+    DHT: class {
+      constructor(pin) { this.pin = pin; }
+      begin() {}
+      readTemperature() { return getConnectedSensorValue(this.pin, 'DHT11', 'value', 28); }
+      readHumidity() { return getConnectedSensorValue(this.pin, 'DHT11', 'humidity', 65); }
+    },
+    DallasTemperature: class {
+      constructor() {}
+      begin() {}
+      requestTemperatures() {}
+      getTempCByIndex() {
+        const comps = useCanvasStore.getState().components;
+        const ds = comps.find(c => c.type === 'DS18B20');
+        return ds?.config?.temp !== undefined ? ds.config.temp : 25;
+      }
     },
     Servo: class {
       constructor() {}
