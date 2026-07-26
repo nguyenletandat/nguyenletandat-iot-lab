@@ -24,9 +24,12 @@ import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useIntegrityGuard } from './hooks/useIntegrityGuard';
 import { toPng } from 'html-to-image';
 
+const DEFAULT_PRESET_KEY = Object.keys(PROJECT_PRESETS)[0] || 'env_lab1';
+const DEFAULT_PRESET = PROJECT_PRESETS[DEFAULT_PRESET_KEY] || { code: '', components: [], wires: [] };
+
 export default function App() {
-  const [code, setCode] = useState(PROJECT_PRESETS.blink.code);
-  const [selectedProjectId, setSelectedProjectId] = useState('blink');
+  const [code, setCode] = useState(DEFAULT_PRESET.code);
+  const [selectedProjectId, setSelectedProjectId] = useState(DEFAULT_PRESET_KEY);
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleString('vi-VN'));
 
   // Two-way arrow panel collapse states
@@ -67,11 +70,12 @@ export default function App() {
   // Initialize on mount
   useEffect(() => {
     const saved = ui.loadAutoSave();
-    if (saved && saved.components) {
+    if (saved && saved.components && saved.components.length > 0) {
       canvas.loadState(saved.components, saved.wires || []);
-      setCode(saved.code || PROJECT_PRESETS.blink.code);
+      setCode(saved.code || DEFAULT_PRESET.code);
     } else {
-      canvas.loadState(PROJECT_PRESETS.blink.components, PROJECT_PRESETS.blink.wires);
+      canvas.loadState(DEFAULT_PRESET.components, DEFAULT_PRESET.wires);
+      setCode(DEFAULT_PRESET.code);
     }
     ui.initProjects();
 
