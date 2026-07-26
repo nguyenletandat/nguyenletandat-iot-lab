@@ -30,6 +30,7 @@ export function transpileArduino(code) {
   js = js.replace(/digitalRead\(([^)]+)\);?/g, 'sys.digitalRead($1)');
   js = js.replace(/analogWrite\(([^,]+),\s*([^)]+)\);?/g, 'sys.analogWrite($1, $2);');
   js = js.replace(/analogRead\(([^)]+)\);?/g, 'sys.analogRead($1)');
+  js = js.replace(/dhtReadHumidity\(([^)]+)\);?/g, 'sys.readHumidity($1)');
   js = js.replace(/pulseIn\(([^,]+),\s*([^)]+)\);?/g, 'sys.pulseIn($1, $2)');
 
   // Math & utility functions

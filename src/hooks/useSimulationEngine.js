@@ -123,6 +123,7 @@ export function useSimulationEngine(code) {
     noTone: (pin) => {
       if (oscillatorRef.current) { try { oscillatorRef.current.stop(); } catch (e) {} oscillatorRef.current = null; }
     },
+    readHumidity: (pin) => getConnectedSensorValue(pin, 'DHT11', 'humidity', 65),
     DHT: class {
       constructor(pin) { this.pin = pin; }
       begin() {}

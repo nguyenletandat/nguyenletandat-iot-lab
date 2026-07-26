@@ -621,7 +621,7 @@ export default function App() {
 
             {/* SERIAL MONITOR PANEL WITH TWO-WAY UP/DOWN COLLAPSE ARROW */}
             <div className={`border-t flex flex-col overflow-hidden transition-all duration-300 ${
-              isMonitorCollapsed ? 'h-9' : 'h-48'
+              isMonitorCollapsed ? 'h-9' : 'h-96'
             } ${ui.isDarkMode ? 'bg-[#080B14] border-white/5' : 'bg-slate-50 border-slate-200'}`}>
               <div className={`flex items-center justify-between px-4 py-1.5 border-b cursor-pointer select-none ${ui.isDarkMode ? 'bg-[#090C15] border-white/5' : 'bg-slate-100 border-slate-200'}`}
                 onClick={() => setIsMonitorCollapsed(!isMonitorCollapsed)}
