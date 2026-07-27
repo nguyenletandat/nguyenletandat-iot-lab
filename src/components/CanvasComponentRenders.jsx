@@ -1,5 +1,6 @@
 import React from 'react';
 import { COMPONENT_TYPES } from '../data/componentTypes';
+import { useUIStore } from '../stores/uiStore';
 
 /**
  * IoT Labs Maker Card-Style Component Renderer
@@ -27,7 +28,10 @@ const REAL_IMAGES = {
 };
 
 export default function CanvasComponentRender({ comp, allComps, isSelected, isSimulating, pinStates }) {
-  const proto = COMPONENT_TYPES[comp.type] || {
+  const myModules = useUIStore.getState().myModules || [];
+  const customProto = myModules.find(m => m.id === comp.type);
+
+  const proto = COMPONENT_TYPES[comp.type] || customProto || {
     name: comp.type,
     subtitle: 'Module',
     width: 240,

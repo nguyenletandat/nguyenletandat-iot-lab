@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   Code, Terminal, Sliders, ZoomIn, ZoomOut, Maximize2,
   ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Copy, FileCode, Lock,
-  BookOpen, FlaskConical,
+  BookOpen, FlaskConical, Cpu, Layers,
 } from 'lucide-react';
 import { COMPONENT_TYPES } from './data/componentTypes';
 import { PROJECT_PRESETS } from './data/projectPresets';
@@ -20,6 +20,8 @@ import ProjectManager from './components/ProjectManager';
 import TutorialOverlay from './components/TutorialOverlay';
 import StudentModal from './components/StudentModal';
 import TheoryTab from './components/TheoryTab';
+import MyLibrarySidebar from './components/MyLibrarySidebar';
+import CreateModuleModal from './components/CreateModuleModal';
 import { useSimulationEngine } from './hooks/useSimulationEngine';
 import { useCanvasInteractions } from './hooks/useCanvasInteractions';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
@@ -83,6 +85,8 @@ const DEFAULT_PRESET = PROJECT_PRESETS[DEFAULT_PRESET_KEY] || { code: '', compon
 
 export default function App() {
   const [mainTab, setMainTab] = useState('practice'); // 'theory' | 'practice'
+  const [leftDockTab, setLeftDockTab] = useState('wiring'); // 'wiring' | 'library'
+  const [isCreateModuleOpen, setIsCreateModuleOpen] = useState(false);
   const [code, setCode] = useState(DEFAULT_PRESET.code);
   const [selectedProjectId, setSelectedProjectId] = useState(DEFAULT_PRESET_KEY);
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleString('vi-VN'));
@@ -259,6 +263,8 @@ export default function App() {
       sim.clearLogs();
       sim.resetSimulation();
       if (sim.isSimulating) stopSimulation();
+      sim.logToConsole(`📘 Đã tải bài mẫu: ${proj.name}`);
+      if (proj.desc) sim.logToConsole(`ℹ️ ${proj.desc}`);
     }
   };
 
@@ -332,17 +338,56 @@ export default function App() {
       {/* ═══ PRACTICE WORKSPACE ═══ */}
       {mainTab === 'practice' && <div className="flex flex-1 overflow-hidden relative">
 
-        {/* LEFT PANEL: HARDWARE CATALOG SIDEBAR WITH TWO-WAY COLLAPSE ARROW */}
-        <HardwareCatalogSidebar
-          onAddComponent={addComponentToCanvas}
-          onOpenFullCatalog={() => ui.setCatalogModalOpen(false)}
-          isSimulating={sim.isSimulating}
-          selectedCompId={canvas.selectedCompIds[0]}
-          selectedWireId={canvas.selectedWireIds[0]}
-          onDeleteSelected={deleteSelected}
-          isCollapsed={isLeftPanelCollapsed}
-          onToggleCollapse={() => setIsLeftPanelCollapsed(!isLeftPanelCollapsed)}
-        />
+        {/* VERTICAL SIDE TAB DOCK (IoTLabs Workspace Style) */}
+        <div className={`w-16 shrink-0 flex flex-col items-center py-4 border-r gap-3.5 z-20 select-none ${
+          ui.isDarkMode ? 'bg-[#080B14] border-white/5' : 'bg-slate-50 border-slate-200'
+        }`}>
+          <button
+            onClick={() => { setLeftDockTab('wiring'); setIsLeftPanelCollapsed(false); }}
+            className={`w-12 h-12 rounded-xl flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
+              leftDockTab === 'wiring' && !isLeftPanelCollapsed
+                ? 'bg-emerald-600/10 text-emerald-600 border border-emerald-500/20'
+                : 'text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 dark:hover:bg-white/5'
+            }`}
+          >
+            <Layers className="w-4 h-4" />
+            <span className="text-[8.5px] font-bold">Vẽ sơ đồ</span>
+          </button>
+
+          <button
+            onClick={() => { setLeftDockTab('library'); setIsLeftPanelCollapsed(false); }}
+            className={`w-12 h-12 rounded-xl flex flex-col items-center justify-center gap-1 transition-all cursor-pointer ${
+              leftDockTab === 'library' && !isLeftPanelCollapsed
+                ? 'bg-emerald-600/10 text-emerald-600 border border-emerald-500/20'
+                : 'text-slate-400 hover:text-slate-600 hover:bg-slate-200/50 dark:hover:bg-white/5'
+            }`}
+          >
+            <BookOpen className="w-4 h-4" />
+            <span className="text-[8.5px] font-bold">Thư viện</span>
+          </button>
+        </div>
+
+        {/* LEFT PANEL SIDEBAR CONTENT */}
+        {leftDockTab === 'wiring' ? (
+          <HardwareCatalogSidebar
+            onAddComponent={addComponentToCanvas}
+            onOpenFullCatalog={() => ui.setCatalogModalOpen(false)}
+            isSimulating={sim.isSimulating}
+            selectedCompId={canvas.selectedCompIds[0]}
+            selectedWireId={canvas.selectedWireIds[0]}
+            onDeleteSelected={deleteSelected}
+            isCollapsed={isLeftPanelCollapsed}
+            onToggleCollapse={() => setIsLeftPanelCollapsed(!isLeftPanelCollapsed)}
+          />
+        ) : (
+          <MyLibrarySidebar
+            onAddComponent={addComponentToCanvas}
+            onCreateNewModule={() => setIsCreateModuleOpen(true)}
+            isSimulating={sim.isSimulating}
+            isCollapsed={isLeftPanelCollapsed}
+            onToggleCollapse={() => setIsLeftPanelCollapsed(!isLeftPanelCollapsed)}
+          />
+        )}
 
         <main className="flex-1 flex flex-col relative overflow-hidden" ref={canvasRef}>
 
@@ -540,7 +585,11 @@ export default function App() {
 
                 {/* Components */}
                 {canvas.components.map(comp => {
-                  const proto = COMPONENT_TYPES[comp.type];
+                  // Linh kiện tự tạo (Thư viện của tôi) không nằm trong COMPONENT_TYPES tĩnh —
+                  // phải tra thêm trong ui.myModules, nếu không thì component tự tạo sẽ hiển thị
+                  // được (do CanvasComponentRenders.jsx đã tra đúng) nhưng KHÔNG có chấm tròn pin
+                  // socket nào để cắm dây (proto?.ports ở dưới sẽ luôn là undefined).
+                  const proto = COMPONENT_TYPES[comp.type] || ui.myModules.find(m => m.id === comp.type);
                   const isSelected = canvas.selectedCompIds.includes(comp.id);
                   return (
                     <g key={comp.id} transform={`translate(${comp.x}, ${comp.y})`} className="cursor-move select-none"
@@ -799,6 +848,11 @@ export default function App() {
         onClose={() => ui.setTutorialOpen(false)}
         onNext={() => ui.setTutorialStep(ui.tutorialStep + 1)}
         onPrev={() => ui.setTutorialStep(Math.max(0, ui.tutorialStep - 1))}
+      />
+
+      <CreateModuleModal
+        isOpen={isCreateModuleOpen}
+        onClose={() => setIsCreateModuleOpen(false)}
       />
     </div>
   );

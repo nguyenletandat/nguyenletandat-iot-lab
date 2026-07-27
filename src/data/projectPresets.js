@@ -6,7 +6,7 @@
 export const PROJECT_PRESETS = {
   env_lab1: {
     name: 'B1: Quan trắc Khí hậu (DHT11 + LCD)',
-    desc: 'Buổi 1: Đọc Nhiệt độ & Độ ẩm không khí bằng DHT11, hiển thị chỉ số liên tục lên màn hình LCD1602 và Serial Monitor.',
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 1: Đọc Nhiệt độ & Độ ẩm không khí bằng DHT11, hiển thị chỉ số liên tục lên màn hình LCD1602 và Serial Monitor.',
     code: `// BUỔI 1: TỔNG QUAN IOT & QUAN TRẮC KHÍ HẬU CƠ BẢN
 // Cảm biến DHT11 (Chân D15) & Màn hình LCD1602 I2C (Chân D21/D22)
 
@@ -69,7 +69,7 @@ void loop() {
 
   env_lab2: {
     name: 'B2: Quan trắc Nước & Cảnh báo Ngập',
-    desc: 'Buổi 2: Đo mực nước (HC-SR04) & Nhiệt độ nguồn nước (DS18B20), hiển thị LCD1602 và phát cảnh báo ngập lụt.',
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 2: Đo mực nước (HC-SR04) & Nhiệt độ nguồn nước (DS18B20), hiển thị LCD1602 và phát cảnh báo ngập lụt.',
     code: `// BUỔI 2: QUAN TRẮC NGUỒN NƯỚC & CẢNH BÁO NGẬP LỤT
 // Siêu âm HC-SR04 (Trig: D5, Echo: D18), DS18B20 (D4), LCD1602
 
@@ -151,7 +151,7 @@ void loop() {
 
   env_lab3: {
     name: 'B3: Tưới cây Tự động (Soil + Bơm Relay)',
-    desc: 'Buổi 3: Giám sát độ ẩm đất. Tự động bật Module Relay kích hoạt Máy bơm nước khi đất bị khô dưới ngưỡng cài đặt.',
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 3: Giám sát độ ẩm đất. Tự động bật Module Relay kích hoạt Máy bơm nước khi đất bị khô dưới ngưỡng cài đặt.',
     code: `// BUỔI 3: QUAN TRẮC ĐẤT & HỆ THỐNG TƯỚI CÂY TỰ ĐỘNG
 // Cảm biến Độ ẩm đất (D34), Module Relay Bơm nước (D26), LCD1602
 
@@ -223,7 +223,7 @@ void loop() {
 
   env_lab4: {
     name: 'B4: Cảnh báo Khí độc (MQ-2 + Còi + Quạt)',
-    desc: 'Buổi 4: Đo nồng độ Khí Gas/Khói bằng MQ-2. Bật Còi hú + Quạt thông gió qua Relay khi nồng độ nguy hiểm, tự tắt còi khi an toàn.',
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 4: Đo nồng độ Khí Gas/Khói bằng MQ-2. Bật Còi hú + Quạt thông gió qua Relay khi nồng độ nguy hiểm, tự tắt còi khi an toàn.',
     code: `// BUỔI 4: CẢNH BÁO RÒ RỈ KHÍ ĐỘC & KHÓI THẢI MÔI TRƯỜNG
 // Cảm biến Gas MQ-2 (D35), Còi hú (D27), Relay Quạt (D14), LCD1602
 
@@ -305,7 +305,7 @@ void loop() {
 
   env_lab5: {
     name: 'B5: Trạm HMI Môi trường (LCD + CB)',
-    desc: 'Buổi 5: Xây dựng Giao diện Hiển thị HMI tại chỗ bằng Màn hình LCD1602 tích hợp cảm biến Khí độc MQ-2 & Nhiệt ẩm DHT11.',
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 5: Xây dựng Giao diện Hiển thị HMI tại chỗ bằng Màn hình LCD1602 tích hợp cảm biến Khí độc MQ-2 & Nhiệt ẩm DHT11.',
     code: `// BUỔI 5: GIAO DIỆN HMI TẠI CHỖ CHO TRẠM QUAN TRẮC MÔI TRƯỜNG
 // LCD1602 I2C (D21/D22), DHT11 (D15), MQ-2 (D34)
 
@@ -378,7 +378,7 @@ void loop() {
 
   env_lab6: {
     name: 'B6: Trạm Môi trường Đa thông số IoT',
-    desc: 'Buổi 6: Đồ án Đa cảm biến tổng hợp: Nhiệt ẩm, Mực nước, Khí độc. Hiển thị LCD1602 & đẩy Cloud Telemetry.',
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 6: Đồ án Đa cảm biến tổng hợp: Nhiệt ẩm, Mực nước, Khí độc. Hiển thị LCD1602 & đẩy Cloud Telemetry.',
     code: `// BUỔI 6: ĐỒ ÁN TỔNG HỢP — TRẠM QUAN TRẮC MÔI TRƯỜNG ĐA THÔNG SỐ IOT
 // Tích hợp Đa cảm biến & Tự động đẩy dữ liệu Telemetry lên IoT Cloud
 

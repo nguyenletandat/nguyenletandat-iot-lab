@@ -44,7 +44,7 @@ export default function AppHeader({
           {/* Project Tabs */}
           <div className={`flex items-center gap-1 p-1 rounded-xl border overflow-x-auto max-w-xl ${ui.isDarkMode ? 'bg-[#131929] border-white/5' : 'bg-slate-100 border-slate-200'}`}>
             {Object.keys(PROJECT_PRESETS).map(id => (
-              <button key={id} onClick={() => onLoadProject(id)}
+              <button key={id} onClick={() => onLoadProject(id)} title={PROJECT_PRESETS[id].desc}
                 className={`px-2 py-0.5 text-[10px] font-semibold rounded-lg transition-all whitespace-nowrap ${
                   selectedProjectId === id ? 'bg-emerald-600 text-white shadow-sm' : ui.isDarkMode ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-slate-600 hover:text-slate-900 hover:bg-white'
                 }`}
