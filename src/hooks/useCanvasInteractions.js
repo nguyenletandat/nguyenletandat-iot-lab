@@ -10,17 +10,19 @@ import { useCanvasStore } from '../stores/canvasStore';
 const I2C_MODULE_TYPES = ['OLED_SSD1306', 'LCD1602', 'BMP280', 'DS3231', 'ADXL345'];
 const CONTROL_BOARD_TYPES = ['ESP32', 'ESP32_V4', 'ARDUINO_UNO', 'ARDUINO_NANO', 'ARDUINO_MEGA', 'ESP8266'];
 
-export function useCanvasInteractions({ canvas, sim }) {
+export function useCanvasInteractions({ canvas, sim, isReadOnly = false }) {
   const canvasRef = useRef(null);
 
   // ─── IoT Labs Auto Tools ──────────────────────
   const handleAutoLine = () => {
+    if (isReadOnly) return;
     canvas.pushHistory();
     canvas.setWires(canvas.wires.map(w => ({ ...w, waypoints: [] })));
     sim.logToConsole('⚡ Đã tự động sắp xếp & đi lại đường dây nối.');
   };
 
   const handleAutoConnectI2C = () => {
+    if (isReadOnly) return;
     const currentComps = useCanvasStore.getState().components;
     const currentWires = useCanvasStore.getState().wires;
 
@@ -90,7 +92,7 @@ export function useCanvasInteractions({ canvas, sim }) {
   // ─── Canvas Interactions ──────────────────────
   const handleMouseDownCanvas = (e) => {
     if (e.target.tagName === 'svg' || e.target.classList.contains('canvas-grid')) {
-      if (canvas.isPlacingNote && canvasRef.current) {
+      if (canvas.isPlacingNote && !isReadOnly && canvasRef.current) {
         const rect = canvasRef.current.getBoundingClientRect();
         const rawX = (e.clientX - rect.left - canvas.pan.x) / canvas.zoom;
         const rawY = (e.clientY - rect.top - canvas.pan.y) / canvas.zoom;
@@ -115,7 +117,7 @@ export function useCanvasInteractions({ canvas, sim }) {
 
   const handleMouseDownComponent = (e, id) => {
     e.stopPropagation();
-    if (sim.isSimulating) return;
+    if (sim.isSimulating || isReadOnly) return;
     const comp = canvas.components.find(c => c.id === id);
     if (comp) {
       canvas.setDraggingCompId(id);
@@ -131,7 +133,7 @@ export function useCanvasInteractions({ canvas, sim }) {
 
   const handleMouseDownWaypoint = (e, wireId, index) => {
     e.stopPropagation();
-    if (sim.isSimulating) return;
+    if (sim.isSimulating || isReadOnly) return;
     canvas.setDraggingWaypoint({ wireId, index });
     canvas.selectWire(wireId);
   };
@@ -200,6 +202,7 @@ export function useCanvasInteractions({ canvas, sim }) {
   };
 
   const addComponentToCanvas = (type) => {
+    if (isReadOnly) return;
     const proto = COMPONENT_TYPES[type];
     if (!proto) return;
     const newId = `${type.toLowerCase()}_${Date.now().toString().slice(-4)}`;
@@ -221,7 +224,7 @@ export function useCanvasInteractions({ canvas, sim }) {
   };
 
   const deleteSelected = () => {
-    if (sim.isSimulating) return;
+    if (sim.isSimulating || isReadOnly) return;
     if (canvas.selectedCompIds.length > 0) {
       canvas.removeComponents(canvas.selectedCompIds);
     } else if (canvas.selectedWireIds.length > 0) {
@@ -240,7 +243,7 @@ export function useCanvasInteractions({ canvas, sim }) {
 
   const handlePortClick = (e, componentId, portId, portType) => {
     e.stopPropagation();
-    if (sim.isSimulating) return;
+    if (sim.isSimulating || isReadOnly) return;
     const coords = getPortCanvasCoords(componentId, portId);
     if (!canvas.wireStart) {
       canvas.setWireStart({ componentId, portId, x: coords.x, y: coords.y, portType });
@@ -266,7 +269,7 @@ export function useCanvasInteractions({ canvas, sim }) {
 
   const handleDoubleClickWire = (e, wireId) => {
     e.stopPropagation();
-    if (sim.isSimulating || !canvasRef.current) return;
+    if (sim.isSimulating || isReadOnly || !canvasRef.current) return;
     const rect = canvasRef.current.getBoundingClientRect();
     const rawX = (e.clientX - rect.left - canvas.pan.x) / canvas.zoom;
     const rawY = (e.clientY - rect.top - canvas.pan.y) / canvas.zoom;
@@ -277,7 +280,7 @@ export function useCanvasInteractions({ canvas, sim }) {
 
   const handleDoubleClickWaypoint = (e, wireId, index) => {
     e.stopPropagation();
-    if (sim.isSimulating) return;
+    if (sim.isSimulating || isReadOnly) return;
     canvas.removeWireWaypoint(wireId, index);
   };
 

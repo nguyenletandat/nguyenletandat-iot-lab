@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   Code, Terminal, Sliders, ZoomIn, ZoomOut, Maximize2,
   ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Copy, FileCode, Lock,
-  BookOpen, FlaskConical, Cpu, Layers,
+  BookOpen, FlaskConical, Layers,
 } from 'lucide-react';
 import { COMPONENT_TYPES } from './data/componentTypes';
 import { PROJECT_PRESETS } from './data/projectPresets';
@@ -79,14 +79,17 @@ const getWireFlowDirection = (w, start, end, components) => {
   return { start, end, waypoints: w.waypoints || [] };
 };
 
-const DEFAULT_PRESET_KEY = Object.keys(PROJECT_PRESETS)[0] || 'env_lab1';
-const DEFAULT_PRESET = PROJECT_PRESETS[DEFAULT_PRESET_KEY] || { code: '', components: [], wires: [] };
+// Bài mẫu của giảng viên (B1-B6) chỉ dùng để XEM — khi vào "Thực hành" sinh viên
+// bắt đầu từ 1 canvas trống và tự kéo thả linh kiện, không bị load sẵn mạch của GV.
+const BLANK_CODE_TEMPLATE = 'void setup() {\n\n}\n\nvoid loop() {\n\n}\n';
 
 export default function App() {
   const [mainTab, setMainTab] = useState('practice'); // 'theory' | 'practice'
   const [leftDockTab, setLeftDockTab] = useState('wiring'); // 'wiring' | 'library'
-  const [code, setCode] = useState(DEFAULT_PRESET.code);
-  const [selectedProjectId, setSelectedProjectId] = useState(DEFAULT_PRESET_KEY);
+  const [code, setCode] = useState(BLANK_CODE_TEMPLATE);
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
+  // true khi đang xem 1 bài mẫu của giảng viên (chỉ xem, không sửa được) thay vì canvas thực hành của sinh viên
+  const [isViewingGvSample, setIsViewingGvSample] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleString('vi-VN'));
 
   // Two-way arrow panel collapse states
@@ -112,9 +115,15 @@ export default function App() {
   const canvasContainerRef = useRef(null);
   const studentHeaderRef = useRef(null);
   const studentWatermarkRef = useRef(null);
+  // Lưu tạm mạch thực hành của sinh viên trước khi chuyển sang xem bài mẫu GV,
+  // để phục hồi lại đúng khi họ bấm "Quay lại bài thực hành"
+  const myPracticeSnapshotRef = useRef(null);
 
   // Mô phỏng (system interface, audio, mock hardware classes) — xem src/hooks/useSimulationEngine.js
   const { startSimulation, stopSimulation } = useSimulationEngine(code);
+
+  // Khi đang xem bài mẫu GV: khoá toàn bộ thao tác chỉnh sửa canvas (kéo thả, nối dây, xoá, undo/redo...)
+  const isEditingBlocked = sim.isSimulating || isViewingGvSample;
 
   // Tương tác canvas (pan/zoom/kéo thả/nối dây/auto-tools) — xem src/hooks/useCanvasInteractions.js
   const {
@@ -122,17 +131,17 @@ export default function App() {
     handleMouseDownWaypoint, handleMouseMove, handleMouseUp, handleWheel, handleTouchStart, handleTouchMove,
     addComponentToCanvas, deleteSelected, getPortCanvasCoords, handlePortClick, selectWire,
     handleDoubleClickWire, handleDoubleClickWaypoint, generateWirePath, getWireHandles,
-  } = useCanvasInteractions({ canvas, sim });
+  } = useCanvasInteractions({ canvas, sim, isReadOnly: isViewingGvSample });
 
-  // Initialize on mount
+  // Initialize on mount — mặc định canvas THỰC HÀNH trống, không load sẵn mạch bài mẫu nào
   useEffect(() => {
     const saved = ui.loadAutoSave();
     if (saved && saved.components && saved.components.length > 0) {
       canvas.loadState(saved.components, saved.wires || []);
-      setCode(saved.code || DEFAULT_PRESET.code);
+      setCode(saved.code || BLANK_CODE_TEMPLATE);
     } else {
-      canvas.loadState(DEFAULT_PRESET.components, DEFAULT_PRESET.wires);
-      setCode(DEFAULT_PRESET.code);
+      canvas.loadState([], []);
+      setCode(BLANK_CODE_TEMPLATE);
     }
     ui.initProjects();
 
@@ -157,8 +166,10 @@ export default function App() {
     loadStudentInfo: ui.loadStudentInfo,
   });
 
-  // Auto-save debounce
+  // Auto-save debounce — bỏ qua khi đang xem bài mẫu GV (chỉ xem), tránh ghi đè
+  // autosave của sinh viên bằng dữ liệu mạch của giảng viên
   useEffect(() => {
+    if (isViewingGvSample) return;
     const timer = setTimeout(() => {
       ui.autoSave({
         components: canvas.components,
@@ -167,7 +178,7 @@ export default function App() {
       });
     }, 2000);
     return () => clearTimeout(timer);
-  }, [canvas.components, canvas.wires, code]);
+  }, [canvas.components, canvas.wires, code, isViewingGvSample]);
 
   // Auto-scroll console
   useEffect(() => {
@@ -181,6 +192,7 @@ export default function App() {
   // luôn ghi đè lên project hiện tại bất kể người dùng gõ tên gì). Ctrl+S / nút Lưu nhanh
   // gọi không truyền tham số nên vẫn dùng tên project hiện tại như cũ.
   const handleQuickSave = (nameOverride) => {
+    if (isViewingGvSample) return; // đang xem bài mẫu GV (chỉ xem) — không lưu nhầm mạch của GV thành bài của mình
     const name = (typeof nameOverride === 'string' && nameOverride.trim()) || ui.currentProjectName || 'Untitled Project';
     ui.saveProject(name, {
       code,
@@ -223,7 +235,7 @@ export default function App() {
     ui.exportIno(code, ui.currentProjectName);
   };
 
-  useKeyboardShortcuts({ canvas, sim, startSimulation, stopSimulation, deleteSelected, handleQuickSave });
+  useKeyboardShortcuts({ canvas, sim, startSimulation, stopSimulation, deleteSelected, handleQuickSave, isReadOnly: isViewingGvSample });
 
   // ─── Export Canvas as High-Contrast PNG ──────────────────────
   const handleExportPNG = async () => {
@@ -251,19 +263,38 @@ export default function App() {
     }
   };
 
-  // ─── Load Preset ──────────────────────
+  // ─── Xem bài mẫu Giảng viên (chỉ xem) ──────────────────────
+  // Bấm tab B1-B6: lưu tạm mạch thực hành hiện tại của sinh viên (nếu chưa lưu tạm),
+  // rồi tải mạch mẫu của GV lên canvas ở chế độ read-only.
   const loadProject = (id) => {
     const proj = PROJECT_PRESETS[id];
     if (proj) {
+      if (!isViewingGvSample) {
+        myPracticeSnapshotRef.current = { components: canvas.components, wires: canvas.wires, code };
+      }
       setSelectedProjectId(id);
       setCode(proj.code);
       canvas.loadState(proj.components, proj.wires);
       sim.clearLogs();
       sim.resetSimulation();
       if (sim.isSimulating) stopSimulation();
-      sim.logToConsole(`📘 Đã tải bài mẫu: ${proj.name}`);
+      setIsViewingGvSample(true);
+      sim.logToConsole(`📘 Đang xem bài mẫu (chỉ xem): ${proj.name}`);
       if (proj.desc) sim.logToConsole(`ℹ️ ${proj.desc}`);
     }
+  };
+
+  // Quay lại canvas thực hành của chính sinh viên (khôi phục đúng mạch đã lưu tạm trước đó)
+  const exitGvPreview = () => {
+    const snap = myPracticeSnapshotRef.current || { components: [], wires: [], code: BLANK_CODE_TEMPLATE };
+    canvas.loadState(snap.components, snap.wires);
+    setCode(snap.code);
+    setSelectedProjectId(null);
+    setIsViewingGvSample(false);
+    sim.clearLogs();
+    sim.resetSimulation();
+    if (sim.isSimulating) stopSimulation();
+    sim.logToConsole('✏️ Đã quay lại bài thực hành của bạn.');
   };
 
   const selectedComp = canvas.selectedCompIds.length === 1 ? canvas.components.find(c => c.id === canvas.selectedCompIds[0]) : null;
@@ -286,6 +317,8 @@ export default function App() {
         onDeleteSelected={deleteSelected}
         onAutoLine={handleAutoLine}
         onAutoConnectI2C={handleAutoConnectI2C}
+        isViewingGvSample={isViewingGvSample}
+        onGoToPractice={exitGvPreview}
       />
 
       {/* ═══ MAIN TAB BAR ═══ */}
@@ -370,7 +403,7 @@ export default function App() {
           <HardwareCatalogSidebar
             onAddComponent={addComponentToCanvas}
             onOpenFullCatalog={() => ui.setCatalogModalOpen(false)}
-            isSimulating={sim.isSimulating}
+            isSimulating={isEditingBlocked}
             selectedCompId={canvas.selectedCompIds[0]}
             selectedWireId={canvas.selectedWireIds[0]}
             onDeleteSelected={deleteSelected}
@@ -383,7 +416,7 @@ export default function App() {
             onLoadProject={handleLoadProject}
             onDeleteProject={handleDeleteProject}
             onOpenSaveDialog={() => ui.setProjectManagerOpen(true)}
-            isSimulating={sim.isSimulating}
+            isSimulating={isEditingBlocked}
             isCollapsed={isLeftPanelCollapsed}
             onToggleCollapse={() => setIsLeftPanelCollapsed(!isLeftPanelCollapsed)}
           />
@@ -391,14 +424,24 @@ export default function App() {
 
         <main className="flex-1 flex flex-col relative overflow-hidden" ref={canvasRef}>
 
-          {/* Canvas Help Banner */}
-          <div className="absolute top-3 left-3 z-10 flex items-center gap-2 pointer-events-none no-export">
-            <span className={`flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-semibold rounded-full border shadow-sm ${
-              ui.isDarkMode ? 'bg-[#131929] border-white/10 text-gray-300' : 'bg-white border-slate-200 text-slate-600'
-            }`}>
-              Double-click dây để thêm nút nắn | Kéo nút để dịch chuyển | Double-click nút để xóa
-            </span>
-          </div>
+          {/* Canvas Help Banner / Chế độ Xem bài mẫu GV */}
+          {isViewingGvSample ? (
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 px-4 py-2 rounded-2xl shadow-lg border no-export bg-amber-500 border-amber-400 text-white">
+              <Lock className="w-4 h-4 shrink-0" />
+              <span className="text-xs font-bold">Đang xem bài mẫu Giảng viên — chỉ xem, không chỉnh sửa được</span>
+              <button onClick={exitGvPreview} className="px-3 py-1 text-xs font-bold bg-white text-amber-700 rounded-lg hover:bg-amber-50 transition-all shrink-0">
+                ✏️ Bắt đầu làm bài thực hành
+              </button>
+            </div>
+          ) : (
+            <div className="absolute top-3 left-3 z-10 flex items-center gap-2 pointer-events-none no-export">
+              <span className={`flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-semibold rounded-full border shadow-sm ${
+                ui.isDarkMode ? 'bg-[#131929] border-white/10 text-gray-300' : 'bg-white border-slate-200 text-slate-600'
+              }`}>
+                Double-click dây để thêm nút nắn | Kéo nút để dịch chuyển | Double-click nút để xóa
+              </span>
+            </div>
+          )}
 
           {/* Zoom Controls */}
           <div className={`absolute top-3 right-3 z-10 flex items-center gap-1 p-1 rounded-xl shadow-md border no-export ${
@@ -592,7 +635,7 @@ export default function App() {
                       onMouseDown={(e) => handleMouseDownComponent(e, comp.id)}
                       onTouchStart={(e) => { e.stopPropagation(); handleMouseDownComponent(e, comp.id); }}
                     >
-                      <CanvasComponentRender comp={comp} allComps={canvas.components} isSelected={isSelected} isSimulating={sim.isSimulating} pinStates={sim.pinStates} />
+                      <CanvasComponentRender comp={comp} allComps={canvas.components} isSelected={isSelected} isSimulating={sim.isSimulating} />
                       {/* Port Pin Sockets — Dual Ring Hardware Socket System */}
                       {proto?.ports.map(p => {
                         const connectedWire = canvas.wires.find(w =>
@@ -768,7 +811,7 @@ export default function App() {
             </div>
 
             <div className="flex-1 relative">
-              <CodeEditor code={code} onChange={setCode} isSimulating={sim.isSimulating} isDarkMode={ui.isDarkMode} />
+              <CodeEditor code={code} onChange={setCode} isSimulating={isEditingBlocked} isDarkMode={ui.isDarkMode} />
             </div>
 
             {/* SERIAL MONITOR PANEL WITH TWO-WAY UP/DOWN COLLAPSE ARROW */}

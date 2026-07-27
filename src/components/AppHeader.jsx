@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   Play, Square, Trash2, StickyNote, Eye, EyeOff, Volume2, VolumeX,
-  Moon, Sun, Cpu, Save, Package, Download, HelpCircle, Undo2, Redo2, Clock, GraduationCap, Lock, Zap,
+  Moon, Sun, Cpu, Save, Package, Download, HelpCircle, Undo2, Redo2, Clock, GraduationCap, Lock, Zap, PencilRuler,
 } from 'lucide-react';
 import { COMPONENT_TYPES } from '../data/componentTypes';
 import { PROJECT_PRESETS } from '../data/projectPresets';
@@ -16,7 +16,7 @@ import WireStyleSelector from './WireStyleSelector';
 export default function AppHeader({
   ui, sim, canvas, selectedProjectId, currentTime, studentHeaderRef,
   onLoadProject, onQuickSave, onExportPNG, onStartSimulation, onStopSimulation,
-  onDeleteSelected, onAutoLine, onAutoConnectI2C,
+  onDeleteSelected, onAutoLine, onAutoConnectI2C, isViewingGvSample, onGoToPractice,
 }) {
   const darkBtn = ui.isDarkMode
     ? 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'
@@ -41,12 +41,21 @@ export default function AppHeader({
             </div>
           </div>
 
-          {/* Project Tabs */}
+          {/* Bài thực hành của tôi — canvas trống, luôn có sẵn để quay lại */}
+          <button onClick={onGoToPractice} title="Canvas trống của riêng bạn để tự kéo thả linh kiện và chạy thử"
+            className={`flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold rounded-xl border transition-all shrink-0 ${
+              !isViewingGvSample ? 'bg-emerald-600 text-white border-emerald-500 shadow-sm' : ui.isDarkMode ? 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10' : 'bg-slate-100 border-slate-200 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            <PencilRuler className="w-3 h-3" /> Bài thực hành của tôi
+          </button>
+
+          {/* Project Tabs — bài mẫu Giảng viên, CHỈ XEM */}
           <div className={`flex items-center gap-1 p-1 rounded-xl border overflow-x-auto max-w-xl ${ui.isDarkMode ? 'bg-[#131929] border-white/5' : 'bg-slate-100 border-slate-200'}`}>
             {Object.keys(PROJECT_PRESETS).map(id => (
               <button key={id} onClick={() => onLoadProject(id)} title={PROJECT_PRESETS[id].desc}
                 className={`px-2 py-0.5 text-[10px] font-semibold rounded-lg transition-all whitespace-nowrap ${
-                  selectedProjectId === id ? 'bg-emerald-600 text-white shadow-sm' : ui.isDarkMode ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-slate-600 hover:text-slate-900 hover:bg-white'
+                  isViewingGvSample && selectedProjectId === id ? 'bg-amber-500 text-white shadow-sm' : ui.isDarkMode ? 'text-gray-400 hover:text-white hover:bg-white/5' : 'text-slate-600 hover:text-slate-900 hover:bg-white'
                 }`}
               >{PROJECT_PRESETS[id].name.split('.')[1] || PROJECT_PRESETS[id].name}</button>
             ))}
@@ -89,7 +98,7 @@ export default function AppHeader({
 
           <div className={`w-px h-5 mx-0.5 ${ui.isDarkMode ? 'bg-white/10' : 'bg-slate-200'}`} />
 
-          <button onClick={onQuickSave} title="Lưu nhanh (Ctrl+S)" className={`p-1.5 rounded-lg border transition-all ${darkBtn}`}>
+          <button onClick={onQuickSave} disabled={isViewingGvSample} title={isViewingGvSample ? 'Đang xem bài mẫu GV — không lưu được' : 'Lưu nhanh (Ctrl+S)'} className={`p-1.5 rounded-lg border transition-all disabled:opacity-30 ${darkBtn}`}>
             <Save className="w-3.5 h-3.5" />
           </button>
           <button onClick={() => ui.setProjectManagerOpen(true)} title="Quản lý Project" className={`p-1.5 rounded-lg border transition-all ${darkBtn}`}>
@@ -136,11 +145,11 @@ export default function AppHeader({
           Công cụ mạch:
         </span>
 
-        <button onClick={() => canvas.undo()} disabled={!canvas.canUndo()} title="Undo (Ctrl+Z)"
+        <button onClick={() => canvas.undo()} disabled={!canvas.canUndo() || isViewingGvSample} title="Undo (Ctrl+Z)"
           className={`flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-lg border transition-all disabled:opacity-30 ${darkBtn}`}>
           <Undo2 className="w-3.5 h-3.5" /> Hoàn tác
         </button>
-        <button onClick={() => canvas.redo()} disabled={!canvas.canRedo()} title="Redo (Ctrl+Y)"
+        <button onClick={() => canvas.redo()} disabled={!canvas.canRedo() || isViewingGvSample} title="Redo (Ctrl+Y)"
           className={`flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-lg border transition-all disabled:opacity-30 ${darkBtn}`}>
           <Redo2 className="w-3.5 h-3.5" /> Làm lại
         </button>
@@ -149,8 +158,9 @@ export default function AppHeader({
 
         <button
           onClick={() => canvas.togglePlacingNote()}
+          disabled={isViewingGvSample}
           title="Notes tool — Nhấp vào canvas để tạo Ghi chú"
-          className={`flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-lg border transition-all ${
+          className={`flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-lg border transition-all disabled:opacity-30 ${
             canvas.isPlacingNote
               ? 'bg-amber-500 text-white border-amber-400 shadow-md ring-2 ring-amber-300'
               : ui.isDarkMode ? 'bg-white/5 border-white/10 text-amber-400 hover:bg-white/10' : 'bg-slate-100 border-slate-200 text-amber-600 hover:bg-slate-200'
@@ -177,16 +187,16 @@ export default function AppHeader({
 
         <div className={`w-px h-4 mx-1 shrink-0 ${ui.isDarkMode ? 'bg-white/10' : 'bg-slate-200'}`} />
 
-        <button onClick={onDeleteSelected} title="Xóa linh kiện / dây đang chọn (Delete)"
-          className={`flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-lg border transition-all ${ui.isDarkMode ? 'bg-white/5 border-white/10 text-rose-400 hover:bg-white/10' : 'bg-slate-100 border-slate-200 text-rose-600 hover:bg-slate-200'}`}>
+        <button onClick={onDeleteSelected} disabled={isViewingGvSample} title="Xóa linh kiện / dây đang chọn (Delete)"
+          className={`flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-lg border transition-all disabled:opacity-30 ${ui.isDarkMode ? 'bg-white/5 border-white/10 text-rose-400 hover:bg-white/10' : 'bg-slate-100 border-slate-200 text-rose-600 hover:bg-slate-200'}`}>
           <Trash2 className="w-3.5 h-3.5" /> Xóa
         </button>
-        <button onClick={onAutoLine} title="Auto Line — Căn thẳng & bẻ góc 90°"
-          className={`flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-lg border transition-all ${ui.isDarkMode ? 'bg-white/5 border-white/10 text-amber-400 hover:bg-white/10' : 'bg-slate-100 border-slate-200 text-amber-600 hover:bg-slate-200'}`}>
+        <button onClick={onAutoLine} disabled={isViewingGvSample} title="Auto Line — Căn thẳng & bẻ góc 90°"
+          className={`flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-lg border transition-all disabled:opacity-30 ${ui.isDarkMode ? 'bg-white/5 border-white/10 text-amber-400 hover:bg-white/10' : 'bg-slate-100 border-slate-200 text-amber-600 hover:bg-slate-200'}`}>
           <Zap className="w-3.5 h-3.5" /> Auto Line
         </button>
-        <button onClick={onAutoConnectI2C} title="Tự động kết nối Màn hình LCD / Module I2C"
-          className={`flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-lg border transition-all ${ui.isDarkMode ? 'bg-white/5 border-white/10 text-emerald-400 hover:bg-white/10' : 'bg-slate-100 border-slate-200 text-emerald-600 hover:bg-slate-200'}`}>
+        <button onClick={onAutoConnectI2C} disabled={isViewingGvSample} title="Tự động kết nối Màn hình LCD / Module I2C"
+          className={`flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-lg border transition-all disabled:opacity-30 ${ui.isDarkMode ? 'bg-white/5 border-white/10 text-emerald-400 hover:bg-white/10' : 'bg-slate-100 border-slate-200 text-emerald-600 hover:bg-slate-200'}`}>
           <Cpu className="w-3.5 h-3.5" /> Auto I2C
         </button>
       </div>

@@ -26,7 +26,7 @@ const REAL_IMAGES = {
   LDR: `${ASSET_BASE}ldr.png`,
 };
 
-export default function CanvasComponentRender({ comp, allComps, isSelected, isSimulating, pinStates }) {
+export default function CanvasComponentRender({ comp, allComps, isSelected, isSimulating }) {
   const proto = COMPONENT_TYPES[comp.type] || {
     name: comp.type,
     subtitle: 'Module',
@@ -42,12 +42,6 @@ export default function CanvasComponentRender({ comp, allComps, isSelected, isSi
   const rightPorts = proto.ports.filter(p => p.side === 'right');
   const topPorts = proto.ports.filter(p => p.side === 'top');
   const bottomPorts = proto.ports.filter(p => p.side === 'bottom');
-
-  // Helper to check if any connected pin is HIGH
-  const isPinHigh = (pinNumber) => {
-    if (pinNumber === undefined || !pinStates) return false;
-    return pinStates[pinNumber]?.val === 1;
-  };
 
   return (
     <g className="drop-shadow-md transition-transform">
@@ -312,7 +306,7 @@ export default function CanvasComponentRender({ comp, allComps, isSelected, isSi
             <line x1="5" y1="18" x2="75" y2="18" stroke="#3B82F6" strokeWidth="2" opacity="0.7" />
             <line x1="5" y1="28" x2="75" y2="28" stroke="#CBD5E1" strokeWidth="3" />
             <line x1="5" y1="38" x2="75" y2="38" stroke="#EF4444" strokeWidth="2" opacity="0.7" />
-            <line x1="5" y1="44" x2="75" y2="44" stroke="#3B82F6" strokeWidth="2" opacity="0.7" opacity="0.7" />
+            <line x1="5" y1="44" x2="75" y2="44" stroke="#3B82F6" strokeWidth="2" opacity="0.7" />
           </g>
         ) : (
           <g>

@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { BookOpen, Cpu, Zap, Droplets, Wind, Radio, BarChart3, ChevronDown, ChevronRight, Code2, Wrench, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 // Import ảnh trực tiếp qua Vite — tự động xử lý base path đúng cho GitHub Pages
-import imgESP32 from '../assets/theory-images/esp32_pinout.png';
-import imgDHT11LCD from '../assets/theory-images/dht11_lcd1602_wiring.png';
-import imgIoTArch from '../assets/theory-images/iot_architecture.png';
-import imgHCSR04 from '../assets/theory-images/hcsr04_water_level.png';
-import imgSoilPump from '../assets/theory-images/soil_relay_pump.png';
-import imgMQ2Gas from '../assets/theory-images/mq2_gas_alarm.png';
-import imgLCD1602 from '../assets/theory-images/lcd1602_grid.png';
-import imgMQTT from '../assets/theory-images/mqtt_cloud.png';
+import imgESP32 from '../assets/theory-images/esp32_pinout.webp';
+import imgDHT11LCD from '../assets/theory-images/dht11_lcd1602_wiring.webp';
+import imgIoTArch from '../assets/theory-images/iot_architecture.webp';
+import imgHCSR04 from '../assets/theory-images/hcsr04_water_level.webp';
+import imgSoilPump from '../assets/theory-images/soil_relay_pump.webp';
+import imgMQ2Gas from '../assets/theory-images/mq2_gas_alarm.webp';
+import imgLCD1602 from '../assets/theory-images/lcd1602_grid.webp';
+import imgMQTT from '../assets/theory-images/mqtt_cloud.webp';
 
 const SESSIONS = [
   {

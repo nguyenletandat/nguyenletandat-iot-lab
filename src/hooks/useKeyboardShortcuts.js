@@ -4,38 +4,38 @@
  */
 import { useEffect, useRef } from 'react';
 
-export function useKeyboardShortcuts({ canvas, sim, startSimulation, stopSimulation, deleteSelected, handleQuickSave }) {
+export function useKeyboardShortcuts({ canvas, sim, startSimulation, stopSimulation, deleteSelected, handleQuickSave, isReadOnly = false }) {
   // Luôn giữ tham chiếu MỚI NHẤT của canvas/sim/... — listener bên dưới chỉ gắn 1 lần lúc mount
   // nhưng đọc qua ref nên không bao giờ dùng closure cũ (tránh lỗi Ctrl+S lưu nhầm dữ liệu cũ/rỗng
   // vì trước đây effect chỉ re-subscribe khi canvas.zoom/sim.isSimulating đổi, không phải mỗi lần
   // canvas.components/code thay đổi).
-  const latest = useRef({ canvas, sim, startSimulation, stopSimulation, deleteSelected, handleQuickSave });
+  const latest = useRef({ canvas, sim, startSimulation, stopSimulation, deleteSelected, handleQuickSave, isReadOnly });
   useEffect(() => {
-    latest.current = { canvas, sim, startSimulation, stopSimulation, deleteSelected, handleQuickSave };
+    latest.current = { canvas, sim, startSimulation, stopSimulation, deleteSelected, handleQuickSave, isReadOnly };
   });
 
   useEffect(() => {
     const handleKeyDown = (e) => {
-      const { canvas, sim, startSimulation, stopSimulation, deleteSelected, handleQuickSave } = latest.current;
+      const { canvas, sim, startSimulation, stopSimulation, deleteSelected, handleQuickSave, isReadOnly } = latest.current;
       const isMod = e.ctrlKey || e.metaKey;
       const isEditableTarget = () =>
         document.activeElement?.tagName === 'TEXTAREA' || !!document.activeElement?.closest('.monaco-editor');
 
       if (isMod && !e.shiftKey && e.key === 'z') {
-        if (!isEditableTarget()) {
+        if (!isEditableTarget() && !isReadOnly) {
           e.preventDefault();
           canvas.undo();
         }
       }
       if (isMod && (e.key === 'y' || (e.shiftKey && e.key === 'z' || e.key === 'Z'))) {
-        if (!isEditableTarget()) {
+        if (!isEditableTarget() && !isReadOnly) {
           e.preventDefault();
           canvas.redo();
         }
       }
       if (isMod && e.key === 's') {
         e.preventDefault();
-        handleQuickSave();
+        if (!isReadOnly) handleQuickSave();
       }
       if (e.key === 'Delete' || e.key === 'Backspace') {
         if (document.activeElement?.tagName !== 'TEXTAREA' && document.activeElement?.tagName !== 'INPUT' && !document.activeElement?.closest('.monaco-editor')) {
@@ -44,7 +44,7 @@ export function useKeyboardShortcuts({ canvas, sim, startSimulation, stopSimulat
         }
       }
       if (isMod && e.key === 'd') {
-        if (!isEditableTarget()) {
+        if (!isEditableTarget() && !isReadOnly) {
           e.preventDefault();
           canvas.duplicateSelected();
         }
