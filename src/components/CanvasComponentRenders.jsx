@@ -26,7 +26,7 @@ const REAL_IMAGES = {
   LDR: `${ASSET_BASE}ldr.png`,
 };
 
-export default function CanvasComponentRender({ comp, allComps, isSelected, isSimulating }) {
+export default function CanvasComponentRender({ comp, allComps, isSelected, isSimulating, isLit }) {
   const proto = COMPONENT_TYPES[comp.type] || {
     name: comp.type,
     subtitle: 'Module',
@@ -183,11 +183,11 @@ export default function CanvasComponentRender({ comp, allComps, isSelected, isSi
           </g>
         ) : comp.type === 'LED' ? (
           <g transform="translate(5, 5)">
-            {/* Aura Glow when simulating */}
-            {isSimulating && (
+            {/* Aura Glow — khi mô phỏng code Arduino ĐANG chạy, HOẶC mạch thụ động (pin/khoai tây/chanh) kín */}
+            {(isSimulating || isLit) && (
               <circle cx="30" cy="20" r="26" fill={comp.config.color || '#EF4444'} opacity="0.4" className="led-glow" style={{ '--glow-color': comp.config.color || '#EF4444' }} />
             )}
-            <circle cx="30" cy="20" r="18" fill={comp.config.color || '#EF4444'} stroke="#334155" strokeWidth="2" className={isSimulating ? 'led-glow' : ''} style={{ '--glow-color': comp.config.color || '#EF4444' }} />
+            <circle cx="30" cy="20" r="18" fill={comp.config.color || '#EF4444'} stroke="#334155" strokeWidth="2" className={(isSimulating || isLit) ? 'led-glow' : ''} style={{ '--glow-color': comp.config.color || '#EF4444' }} />
             <rect x="25" y="38" width="4" height="12" fill="#94A3B8" />
             <rect x="31" y="38" width="4" height="12" fill="#94A3B8" />
           </g>
@@ -256,6 +256,37 @@ export default function CanvasComponentRender({ comp, allComps, isSelected, isSi
           <g>
             <rect width="70" height="55" rx="4" fill="#1E293B" />
             <text x="35" y="42" fill="#EF4444" fontSize="32" fontWeight="bold" textAnchor="middle" fontFamily="monospace" className={isSimulating ? "led-glow" : ""} style={{ '--glow-color': '#EF4444' }}>8</text>
+          </g>
+        ) : comp.type === 'BATTERY_9V' ? (
+          <g>
+            <rect width="70" height="50" rx="4" fill="#1E293B" />
+            <rect x="42" width="28" height="50" rx="4" fill="#D97706" />
+            <circle cx="56" cy="16" r="6" fill="none" stroke="#1E293B" strokeWidth="1.5" />
+            <text x="56" y="19" fill="#1E293B" fontSize="8" fontWeight="bold" textAnchor="middle">+</text>
+            <circle cx="56" cy="34" r="6" fill="none" stroke="#1E293B" strokeWidth="1.5" />
+            <text x="56" y="37" fill="#1E293B" fontSize="9" fontWeight="bold" textAnchor="middle">−</text>
+            <text x="20" y="29" fill="#FFF" fontSize="9" fontWeight="bold" textAnchor="middle">9V</text>
+          </g>
+        ) : comp.type === 'POTATO' ? (
+          <g transform="translate(0, 8)">
+            <ellipse cx="35" cy="20" rx="34" ry="18" fill="#A16207" stroke="#78350F" strokeWidth="1.5" />
+            <ellipse cx="24" cy="14" rx="6" ry="3" fill="#78350F" opacity="0.4" />
+            <ellipse cx="46" cy="26" rx="5" ry="2.5" fill="#78350F" opacity="0.4" />
+            {/* Đinh kẽm (−) bên trái */}
+            <line x1="1" y1="18" x2="14" y2="18" stroke="#94A3B8" strokeWidth="3" />
+            <circle cx="1" cy="18" r="2.5" fill="#CBD5E1" />
+            {/* Cuộn dây đồng (+) bên phải */}
+            <path d="M 56 12 q 4 2 0 4 q 4 2 0 4 q 4 2 0 4 q 4 2 0 4" fill="none" stroke="#D97706" strokeWidth="3" strokeLinecap="round" />
+          </g>
+        ) : comp.type === 'LEMON' ? (
+          <g transform="translate(0, 8)">
+            <ellipse cx="35" cy="18" rx="32" ry="16" fill="#FDE047" stroke="#CA8A04" strokeWidth="1.5" />
+            <ellipse cx="35" cy="18" rx="12" ry="6" fill="#FEF9C3" opacity="0.6" />
+            {/* Đinh kẽm (−) bên trái */}
+            <line x1="1" y1="16" x2="14" y2="16" stroke="#94A3B8" strokeWidth="3" />
+            <circle cx="1" cy="16" r="2.5" fill="#CBD5E1" />
+            {/* Cuộn dây đồng (+) bên phải */}
+            <path d="M 54 10 q 4 2 0 4 q 4 2 0 4 q 4 2 0 4 q 4 2 0 4" fill="none" stroke="#D97706" strokeWidth="3" strokeLinecap="round" />
           </g>
         ) : comp.type === 'RESISTOR' ? (
           <g transform="translate(0, 10)">

@@ -5,6 +5,7 @@
 
 export const COMPONENT_CATEGORIES = [
   { id: 'ALL', name: 'Tất cả', icon: '📦' },
+  { id: 'Power', name: '🔋 Nguồn điện', icon: '🔋' },
   { id: 'EnvSensors', name: '🌱 CB Môi trường', icon: '🌱' },
   { id: 'Boards', name: 'Bo mạch', icon: '🔲' },
   { id: 'Sensors', name: 'Cảm biến', icon: '📡' },
@@ -616,6 +617,45 @@ export const COMPONENT_TYPES = {
       { id: 'GND', name: 'GND', x: 222, y: 92, side: 'right', type: 'gnd' }
     ],
     defaultConfig: { digit: 8, label: '7-Seg' }
+  },
+
+  // ═══════════════════════════════════════════════
+  // NGUỒN ĐIỆN (bài nhập môn — mạch không vi điều khiển)
+  // ═══════════════════════════════════════════════
+  BATTERY_9V: {
+    name: 'Pin 9V',
+    subtitle: 'Nguồn điện',
+    category: 'Power', tags: ['Power', 'Battery'],
+    width: 220, height: 130,
+    ports: [
+      { id: 'VCC', name: '+', x: 212, y: 40, side: 'right', type: 'power', voltage: 9 },
+      { id: 'GND', name: '−', x: 212, y: 90, side: 'right', type: 'gnd' }
+    ],
+    defaultConfig: { label: 'Pin 9V' }
+  },
+
+  POTATO: {
+    name: 'Khoai tây (Pin sinh học)',
+    subtitle: 'Nguồn điện',
+    category: 'Power', tags: ['Power', 'Bio-battery'],
+    width: 200, height: 120,
+    ports: [
+      { id: 'CU', name: 'Đồng (+)', x: 192, y: 40, side: 'right', type: 'power', voltage: 0.5 },
+      { id: 'NAIL', name: 'Kẽm (−)', x: 8, y: 40, side: 'left', type: 'gnd' }
+    ],
+    defaultConfig: { label: 'Khoai tây' }
+  },
+
+  LEMON: {
+    name: 'Chanh (Pin sinh học)',
+    subtitle: 'Nguồn điện',
+    category: 'Power', tags: ['Power', 'Bio-battery'],
+    width: 200, height: 110,
+    ports: [
+      { id: 'CU', name: 'Đồng (+)', x: 192, y: 38, side: 'right', type: 'power', voltage: 0.7 },
+      { id: 'NAIL', name: 'Kẽm (−)', x: 8, y: 38, side: 'left', type: 'gnd' }
+    ],
+    defaultConfig: { label: 'Chanh' }
   },
 
   // ═══════════════════════════════════════════════

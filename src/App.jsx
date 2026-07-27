@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Code, Terminal, Sliders, ZoomIn, ZoomOut, Maximize2,
   ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Copy, FileCode, Lock,
@@ -25,6 +25,7 @@ import { useSimulationEngine } from './hooks/useSimulationEngine';
 import { useCanvasInteractions } from './hooks/useCanvasInteractions';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useIntegrityGuard } from './hooks/useIntegrityGuard';
+import { computeLitLeds } from './utils/passiveCircuit';
 import { toPng } from 'html-to-image';
 
 const CONTROL_BOARD_TYPES = ['ESP32', 'ESP32_V4', 'ARDUINO_UNO', 'ARDUINO_NANO', 'ARDUINO_MEGA', 'ESP8266'];
@@ -312,6 +313,13 @@ export default function App() {
   };
 
   const selectedComp = canvas.selectedCompIds.length === 1 ? canvas.components.find(c => c.id === canvas.selectedCompIds[0]) : null;
+
+  // Mạch không vi điều khiển (Pin 9V / khoai tây / chanh + LED) — đèn tự sáng khi nối
+  // đúng vòng kín, độc lập với mô phỏng code Arduino. Xem src/utils/passiveCircuit.js
+  const litLedIds = useMemo(
+    () => computeLitLeds(canvas.components, canvas.wires),
+    [canvas.components, canvas.wires]
+  );
 
   return (
     <div className={`flex flex-col h-full w-full ${ui.isDarkMode ? 'bg-[#0B0F19] text-gray-100' : 'bg-slate-50 text-slate-800'} overflow-hidden transition-colors duration-300`}>
@@ -649,7 +657,7 @@ export default function App() {
                       onMouseDown={(e) => handleMouseDownComponent(e, comp.id)}
                       onTouchStart={(e) => { e.stopPropagation(); handleMouseDownComponent(e, comp.id); }}
                     >
-                      <CanvasComponentRender comp={comp} allComps={canvas.components} isSelected={isSelected} isSimulating={sim.isSimulating} />
+                      <CanvasComponentRender comp={comp} allComps={canvas.components} isSelected={isSelected} isSimulating={sim.isSimulating} isLit={litLedIds.has(comp.id)} />
                       {/* Port Pin Sockets — Dual Ring Hardware Socket System */}
                       {proto?.ports.map(p => {
                         const connectedWire = canvas.wires.find(w =>

@@ -4,6 +4,180 @@
  */
 
 export const PROJECT_PRESETS = {
+  // ═══════════════════════════════════════════════
+  // BÀI MỞ ĐẦU — Mạch điện cơ bản, làm quen trước khi vào Buổi 1-6 IoT
+  // ═══════════════════════════════════════════════
+  intro1: {
+    name: 'N1: Đèn LED sáng với Pin 9V',
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 1: Mạch điện cơ bản nhất — Pin 9V, điện trở và đèn LED, KHÔNG cần vi điều khiển hay viết code. Đèn LED tự sáng khi nối đúng vòng kín.',
+    code: `// Bài này KHÔNG dùng vi điều khiển — không cần viết code!
+// Đèn LED sẽ tự sáng khi bạn nối đúng mạch kín:
+// Pin 9V (+) -> Điện trở -> LED (chân dài: Anode) -> LED (chân ngắn: Cathode) -> Pin 9V (-)
+// Hãy quan sát đèn LED trong khi kéo dây nối trên canvas — không cần bấm "Chạy".`,
+    components: [
+      { id: 'bat1', type: 'BATTERY_9V', x: 60, y: 100, config: {} },
+      { id: 'r1', type: 'RESISTOR', x: 380, y: 60, config: { resistance: 330 } },
+      { id: 'led1', type: 'LED', x: 380, y: 220, config: {} }
+    ],
+    wires: [
+      { id: 'w1', from: { componentId: 'bat1', portId: 'VCC' }, to: { componentId: 'r1', portId: 'L' }, color: '#EF4444' },
+      { id: 'w2', from: { componentId: 'r1', portId: 'R' }, to: { componentId: 'led1', portId: 'A' }, color: '#F59E0B' },
+      { id: 'w3', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'bat1', portId: 'GND' }, color: '#1F2937' }
+    ]
+  },
+
+  intro2: {
+    name: 'N2: Dãy 7 đèn LED chạy (LED Chaser)',
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 2: Điều khiển 7 đèn LED sáng đuổi nhau lần lượt bằng Arduino Uno — làm quen digitalWrite() và pinMode() trên nhiều chân cùng lúc.',
+    code: `// BÀI MỞ ĐẦU 2: DÃY 7 ĐÈN LED CHẠY (LED CHASER)
+#define LED1 2
+#define LED2 3
+#define LED3 4
+#define LED4 5
+#define LED5 6
+#define LED6 7
+#define LED7 8
+
+void setup() {
+  pinMode(LED1, OUTPUT);
+  pinMode(LED2, OUTPUT);
+  pinMode(LED3, OUTPUT);
+  pinMode(LED4, OUTPUT);
+  pinMode(LED5, OUTPUT);
+  pinMode(LED6, OUTPUT);
+  pinMode(LED7, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(LED1, HIGH); delay(100); digitalWrite(LED1, LOW);
+  digitalWrite(LED2, HIGH); delay(100); digitalWrite(LED2, LOW);
+  digitalWrite(LED3, HIGH); delay(100); digitalWrite(LED3, LOW);
+  digitalWrite(LED4, HIGH); delay(100); digitalWrite(LED4, LOW);
+  digitalWrite(LED5, HIGH); delay(100); digitalWrite(LED5, LOW);
+  digitalWrite(LED6, HIGH); delay(100); digitalWrite(LED6, LOW);
+  digitalWrite(LED7, HIGH); delay(100); digitalWrite(LED7, LOW);
+}`,
+    components: [
+      { id: 'uno1', type: 'ARDUINO_UNO', x: 60, y: 40, config: {} },
+      { id: 'led1', type: 'LED', x: 460, y: 20, config: {} },
+      { id: 'r1', type: 'RESISTOR', x: 460, y: 150, config: {} },
+      { id: 'led2', type: 'LED', x: 530, y: 20, config: {} },
+      { id: 'r2', type: 'RESISTOR', x: 530, y: 150, config: {} },
+      { id: 'led3', type: 'LED', x: 600, y: 20, config: {} },
+      { id: 'r3', type: 'RESISTOR', x: 600, y: 150, config: {} },
+      { id: 'led4', type: 'LED', x: 670, y: 20, config: {} },
+      { id: 'r4', type: 'RESISTOR', x: 670, y: 150, config: {} },
+      { id: 'led5', type: 'LED', x: 740, y: 20, config: {} },
+      { id: 'r5', type: 'RESISTOR', x: 740, y: 150, config: {} },
+      { id: 'led6', type: 'LED', x: 810, y: 20, config: {} },
+      { id: 'r6', type: 'RESISTOR', x: 810, y: 150, config: {} },
+      { id: 'led7', type: 'LED', x: 880, y: 20, config: {} },
+      { id: 'r7', type: 'RESISTOR', x: 880, y: 150, config: {} }
+    ],
+    wires: [
+      { id: 'w1a', from: { componentId: 'uno1', portId: 'D2' }, to: { componentId: 'r1', portId: 'L' }, color: '#F59E0B' },
+      { id: 'w1b', from: { componentId: 'r1', portId: 'R' }, to: { componentId: 'led1', portId: 'A' }, color: '#F59E0B' },
+      { id: 'w1c', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#10B981' },
+
+      { id: 'w2a', from: { componentId: 'uno1', portId: 'D3' }, to: { componentId: 'r2', portId: 'L' }, color: '#F59E0B' },
+      { id: 'w2b', from: { componentId: 'r2', portId: 'R' }, to: { componentId: 'led2', portId: 'A' }, color: '#F59E0B' },
+      { id: 'w2c', from: { componentId: 'led2', portId: 'K' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#10B981' },
+
+      { id: 'w3a', from: { componentId: 'uno1', portId: 'D4' }, to: { componentId: 'r3', portId: 'L' }, color: '#F59E0B' },
+      { id: 'w3b', from: { componentId: 'r3', portId: 'R' }, to: { componentId: 'led3', portId: 'A' }, color: '#F59E0B' },
+      { id: 'w3c', from: { componentId: 'led3', portId: 'K' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#10B981' },
+
+      { id: 'w4a', from: { componentId: 'uno1', portId: 'D5' }, to: { componentId: 'r4', portId: 'L' }, color: '#F59E0B' },
+      { id: 'w4b', from: { componentId: 'r4', portId: 'R' }, to: { componentId: 'led4', portId: 'A' }, color: '#F59E0B' },
+      { id: 'w4c', from: { componentId: 'led4', portId: 'K' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#10B981' },
+
+      { id: 'w5a', from: { componentId: 'uno1', portId: 'D6' }, to: { componentId: 'r5', portId: 'L' }, color: '#F59E0B' },
+      { id: 'w5b', from: { componentId: 'r5', portId: 'R' }, to: { componentId: 'led5', portId: 'A' }, color: '#F59E0B' },
+      { id: 'w5c', from: { componentId: 'led5', portId: 'K' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#10B981' },
+
+      { id: 'w6a', from: { componentId: 'uno1', portId: 'D7' }, to: { componentId: 'r6', portId: 'L' }, color: '#F59E0B' },
+      { id: 'w6b', from: { componentId: 'r6', portId: 'R' }, to: { componentId: 'led6', portId: 'A' }, color: '#F59E0B' },
+      { id: 'w6c', from: { componentId: 'led6', portId: 'K' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#10B981' },
+
+      { id: 'w7a', from: { componentId: 'uno1', portId: 'D8' }, to: { componentId: 'r7', portId: 'L' }, color: '#F59E0B' },
+      { id: 'w7b', from: { componentId: 'r7', portId: 'R' }, to: { componentId: 'led7', portId: 'A' }, color: '#F59E0B' },
+      { id: 'w7c', from: { componentId: 'led7', portId: 'K' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#10B981' }
+    ]
+  },
+
+  intro3: {
+    name: 'N3: Đèn LED nhấp nháy cơ bản (chân 13)',
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 3: Mạch "Blink" kinh điển — 1 đèn LED nhấp nháy qua chân số 13 của Arduino Uno, bài đầu tiên khi học lập trình vi điều khiển.',
+    code: `// BÀI MỞ ĐẦU 3: BLINK - ĐÈN LED NHẤP NHÁY CƠ BẢN
+#define LED_PIN 13
+
+void setup() {
+  pinMode(LED_PIN, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(LED_PIN, HIGH);
+  delay(500);
+  digitalWrite(LED_PIN, LOW);
+  delay(500);
+}`,
+    components: [
+      { id: 'uno1', type: 'ARDUINO_UNO', x: 60, y: 40, config: {} },
+      { id: 'led1', type: 'LED', x: 420, y: 40, config: {} },
+      { id: 'r1', type: 'RESISTOR', x: 420, y: 180, config: {} }
+    ],
+    wires: [
+      { id: 'w1', from: { componentId: 'uno1', portId: 'D13' }, to: { componentId: 'led1', portId: 'A' }, color: '#EF4444' },
+      { id: 'w2', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'r1', portId: 'L' }, color: '#1F2937' },
+      { id: 'w3', from: { componentId: 'r1', portId: 'R' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#1F2937' }
+    ]
+  },
+
+  intro4: {
+    name: 'N4: Pin Khoai tây nối tiếp',
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 4: Ghép nối tiếp 4 củ khoai tây (đinh kẽm + cuộn dây đồng) thành 1 nguồn điện sinh học, thắp sáng đèn LED. KHÔNG cần vi điều khiển hay viết code.',
+    code: `// Bài này KHÔNG dùng vi điều khiển — không cần viết code!
+// Mỗi củ khoai tây là 1 "pin sinh học" nhỏ (phản ứng hoá học giữa đinh kẽm và dây đồng).
+// Ghép nối tiếp nhiều củ (cực đồng củ này -> đinh kẽm củ kế tiếp) để cộng dồn điện áp.
+// Lưu ý thực tế: 1 củ khoai tây cho ra rất ít điện áp (~0.5V), cần ghép NHIỀU củ nối
+// tiếp mới đủ thắp sáng LED thật — mô phỏng này đơn giản hoá, chỉ kiểm tra vòng kín.`,
+    components: [
+      { id: 'p1', type: 'POTATO', x: 60, y: 180, config: {} },
+      { id: 'p2', type: 'POTATO', x: 300, y: 180, config: {} },
+      { id: 'p3', type: 'POTATO', x: 540, y: 180, config: {} },
+      { id: 'p4', type: 'POTATO', x: 780, y: 180, config: {} },
+      { id: 'led1', type: 'LED', x: 1020, y: 100, config: {} }
+    ],
+    wires: [
+      { id: 'w1', from: { componentId: 'p1', portId: 'CU' }, to: { componentId: 'p2', portId: 'NAIL' }, color: '#1F2937' },
+      { id: 'w2', from: { componentId: 'p2', portId: 'CU' }, to: { componentId: 'p3', portId: 'NAIL' }, color: '#1F2937' },
+      { id: 'w3', from: { componentId: 'p3', portId: 'CU' }, to: { componentId: 'p4', portId: 'NAIL' }, color: '#1F2937' },
+      { id: 'w4', from: { componentId: 'p4', portId: 'CU' }, to: { componentId: 'led1', portId: 'A' }, color: '#EF4444' },
+      { id: 'w5', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'p1', portId: 'NAIL' }, color: '#1F2937' }
+    ]
+  },
+
+  intro5: {
+    name: 'N5: Pin Chanh nối tiếp thắp sáng LED',
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 5: Ghép nối tiếp 3 quả chanh thành nguồn điện sinh học, thắp sáng đèn LED — cùng nguyên lý pin khoai tây nhưng dùng axit citric trong chanh.',
+    code: `// Bài này KHÔNG dùng vi điều khiển — không cần viết code!
+// Axit citric trong chanh phản ứng với đinh kẽm và dây đồng, sinh ra dòng điện nhỏ.
+// Ghép nối tiếp 3 quả chanh (cực đồng quả này -> đinh kẽm quả kế tiếp) để đủ thắp LED.
+// Lưu ý thực tế: mô phỏng này đơn giản hoá, chỉ kiểm tra vòng kín, không tính điện áp.`,
+    components: [
+      { id: 'l1', type: 'LEMON', x: 60, y: 180, config: {} },
+      { id: 'l2', type: 'LEMON', x: 300, y: 180, config: {} },
+      { id: 'l3', type: 'LEMON', x: 540, y: 180, config: {} },
+      { id: 'led1', type: 'LED', x: 780, y: 100, config: {} }
+    ],
+    wires: [
+      { id: 'w1', from: { componentId: 'l1', portId: 'CU' }, to: { componentId: 'l2', portId: 'NAIL' }, color: '#1F2937' },
+      { id: 'w2', from: { componentId: 'l2', portId: 'CU' }, to: { componentId: 'l3', portId: 'NAIL' }, color: '#1F2937' },
+      { id: 'w3', from: { componentId: 'l3', portId: 'CU' }, to: { componentId: 'led1', portId: 'A' }, color: '#EF4444' },
+      { id: 'w4', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'l1', portId: 'NAIL' }, color: '#1F2937' }
+    ]
+  },
+
   env_lab1: {
     name: 'B1: Quan trắc Khí hậu (DHT11 + LCD)',
     desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 1: Đọc Nhiệt độ & Độ ẩm không khí bằng DHT11, hiển thị chỉ số liên tục lên màn hình LCD1602 và Serial Monitor.',
