@@ -284,7 +284,41 @@ export function useCanvasInteractions({ canvas, sim, isReadOnly = false }) {
     canvas.removeWireWaypoint(wireId, index);
   };
 
+  // Vẽ dây bo góc mềm (như Tinkercad) thay vì góc vuông nhọn: nối các điểm gấp khúc
+  // bằng đường cong bezier bậc 2 nhỏ tại mỗi góc, thay vì rẽ vuông 90° đột ngột.
+  const roundedPathFromPoints = (points, radius = 7) => {
+    if (points.length < 2) return '';
+    if (points.length === 2) return `M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y}`;
+
+    let d = `M ${points[0].x} ${points[0].y}`;
+    for (let i = 1; i < points.length - 1; i++) {
+      const prev = points[i - 1];
+      const curr = points[i];
+      const next = points[i + 1];
+      const v1x = prev.x - curr.x, v1y = prev.y - curr.y;
+      const v2x = next.x - curr.x, v2y = next.y - curr.y;
+      const len1 = Math.hypot(v1x, v1y);
+      const len2 = Math.hypot(v2x, v2y);
+      const r = Math.min(radius, len1 / 2, len2 / 2);
+
+      if (r <= 0.5 || len1 === 0 || len2 === 0) {
+        d += ` L ${curr.x} ${curr.y}`;
+        continue;
+      }
+      const p1x = curr.x + (v1x / len1) * r;
+      const p1y = curr.y + (v1y / len1) * r;
+      const p2x = curr.x + (v2x / len2) * r;
+      const p2y = curr.y + (v2y / len2) * r;
+      d += ` L ${p1x} ${p1y} Q ${curr.x} ${curr.y} ${p2x} ${p2y}`;
+    }
+    const last = points[points.length - 1];
+    d += ` L ${last.x} ${last.y}`;
+    return d;
+  };
+
   const generateWirePath = (start, end, waypoints = [], wireIndex = 0) => {
+    let points;
+
     if (!waypoints || waypoints.length === 0) {
       // Calculate a pseudo-random offset based on wire index to prevent overlap
       const offset = 20 + ((wireIndex * 15) % 80);
@@ -301,20 +335,29 @@ export function useCanvasInteractions({ canvas, sim, isReadOnly = false }) {
       if (start.side === end.side && start.side !== 'top' && start.side !== 'bottom') {
         const maxOffset = Math.max(Math.abs(pt1x - start.x), Math.abs(pt2x - end.x));
         const outX = start.side === 'left' ? Math.min(start.x, end.x) - maxOffset : Math.max(start.x, end.x) + maxOffset;
-        return `M ${start.x} ${start.y} H ${outX} V ${end.y} H ${end.x}`;
+        points = [
+          { x: start.x, y: start.y },
+          { x: outX, y: start.y },
+          { x: outX, y: end.y },
+          { x: end.x, y: end.y },
+        ];
+      } else {
+        // Default S-shape with 5 segments
+        const midY = (pt1y + pt2y) / 2 + ((wireIndex * 10) % 40) - 20;
+        points = [
+          { x: start.x, y: start.y },
+          { x: pt1x, y: pt1y },
+          { x: pt1x, y: midY },
+          { x: pt2x, y: midY },
+          { x: pt2x, y: pt2y },
+          { x: end.x, y: end.y },
+        ];
       }
-
-      // Default S-shape with 5 segments
-      const midY = (pt1y + pt2y) / 2 + ((wireIndex * 10) % 40) - 20;
-      return `M ${start.x} ${start.y} L ${pt1x} ${pt1y} L ${pt1x} ${midY} L ${pt2x} ${midY} L ${pt2x} ${pt2y} L ${end.x} ${end.y}`;
+    } else {
+      points = [{ x: start.x, y: start.y }, ...waypoints, { x: end.x, y: end.y }];
     }
 
-    let d = `M ${start.x} ${start.y}`;
-    waypoints.forEach(wp => {
-      d += ` L ${wp.x} ${wp.y}`;
-    });
-    d += ` L ${end.x} ${end.y}`;
-    return d;
+    return roundedPathFromPoints(points);
   };
 
   const getWireHandles = (wire, start, end) => {

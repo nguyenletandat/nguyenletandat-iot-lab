@@ -183,13 +183,24 @@ export default function CanvasComponentRender({ comp, allComps, isSelected, isSi
           </g>
         ) : comp.type === 'LED' ? (
           <g transform="translate(5, 5)">
+            <defs>
+              <radialGradient id={`ledDome-${comp.id}`} cx="38%" cy="30%" r="72%">
+                <stop offset="0%" stopColor="#FFFFFF" />
+                <stop offset="28%" stopColor={comp.config.color || '#EF4444'} />
+                <stop offset="100%" stopColor={comp.config.color || '#EF4444'} stopOpacity="0.82" />
+              </radialGradient>
+            </defs>
             {/* Aura Glow — khi mô phỏng code Arduino ĐANG chạy, HOẶC mạch thụ động (pin/khoai tây/chanh) kín */}
             {(isSimulating || isLit) && (
-              <circle cx="30" cy="20" r="26" fill={comp.config.color || '#EF4444'} opacity="0.4" className="led-glow" style={{ '--glow-color': comp.config.color || '#EF4444' }} />
+              <circle cx="30" cy="20" r="27" fill={comp.config.color || '#EF4444'} opacity="0.4" className="led-glow" style={{ '--glow-color': comp.config.color || '#EF4444' }} />
             )}
-            <circle cx="30" cy="20" r="18" fill={comp.config.color || '#EF4444'} stroke="#334155" strokeWidth="2" className={(isSimulating || isLit) ? 'led-glow' : ''} style={{ '--glow-color': comp.config.color || '#EF4444' }} />
-            <rect x="25" y="38" width="4" height="12" fill="#94A3B8" />
-            <rect x="31" y="38" width="4" height="12" fill="#94A3B8" />
+            {/* Vòm LED — gradient bóng thay vì màu phẳng, giống LED 5mm thật */}
+            <circle cx="30" cy="20" r="18" fill={`url(#ledDome-${comp.id})`} stroke="#334155" strokeWidth="2" className={(isSimulating || isLit) ? 'led-glow' : ''} style={{ '--glow-color': comp.config.color || '#EF4444' }} />
+            {/* Điểm sáng bóng (highlight) */}
+            <ellipse cx="24" cy="13" rx="5" ry="3" fill="#FFFFFF" opacity="0.6" transform="rotate(-30 24 13)" />
+            {/* 2 chân — chân Anode (phải) dài hơn chân Cathode (trái), giống LED thật */}
+            <rect x="25" y="38" width="4" height="10" fill="#94A3B8" />
+            <rect x="31" y="38" width="4" height="16" fill="#94A3B8" />
           </g>
         ) : comp.type === 'RGB_LED' ? (
           <g>
@@ -259,8 +270,19 @@ export default function CanvasComponentRender({ comp, allComps, isSelected, isSi
           </g>
         ) : comp.type === 'BATTERY_9V' ? (
           <g>
-            <rect width="70" height="50" rx="4" fill="#1E293B" />
-            <rect x="42" width="28" height="50" rx="4" fill="#D97706" />
+            <defs>
+              <linearGradient id={`batBody-${comp.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#334155" />
+                <stop offset="100%" stopColor="#0F172A" />
+              </linearGradient>
+              <linearGradient id={`batCap-${comp.id}`} x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#F59E0B" />
+                <stop offset="100%" stopColor="#B45309" />
+              </linearGradient>
+            </defs>
+            <rect width="70" height="50" rx="4" fill={`url(#batBody-${comp.id})`} />
+            <rect x="42" width="28" height="50" rx="4" fill={`url(#batCap-${comp.id})`} />
+            <rect x="2" y="2" width="36" height="6" rx="3" fill="#FFFFFF" opacity="0.08" />
             <circle cx="56" cy="16" r="6" fill="none" stroke="#1E293B" strokeWidth="1.5" />
             <text x="56" y="19" fill="#1E293B" fontSize="8" fontWeight="bold" textAnchor="middle">+</text>
             <circle cx="56" cy="34" r="6" fill="none" stroke="#1E293B" strokeWidth="1.5" />
@@ -269,9 +291,17 @@ export default function CanvasComponentRender({ comp, allComps, isSelected, isSi
           </g>
         ) : comp.type === 'POTATO' ? (
           <g transform="translate(0, 8)">
-            <ellipse cx="35" cy="20" rx="34" ry="18" fill="#A16207" stroke="#78350F" strokeWidth="1.5" />
-            <ellipse cx="24" cy="14" rx="6" ry="3" fill="#78350F" opacity="0.4" />
-            <ellipse cx="46" cy="26" rx="5" ry="2.5" fill="#78350F" opacity="0.4" />
+            <defs>
+              <radialGradient id={`potatoBody-${comp.id}`} cx="35%" cy="30%" r="75%">
+                <stop offset="0%" stopColor="#C2872F" />
+                <stop offset="60%" stopColor="#A16207" />
+                <stop offset="100%" stopColor="#78350F" />
+              </radialGradient>
+            </defs>
+            <ellipse cx="35" cy="20" rx="34" ry="18" fill={`url(#potatoBody-${comp.id})`} stroke="#78350F" strokeWidth="1.5" />
+            <ellipse cx="24" cy="14" rx="6" ry="3" fill="#78350F" opacity="0.35" />
+            <ellipse cx="46" cy="26" rx="5" ry="2.5" fill="#78350F" opacity="0.35" />
+            <ellipse cx="26" cy="10" rx="10" ry="4" fill="#FFFFFF" opacity="0.12" />
             {/* Đinh kẽm (−) bên trái */}
             <line x1="1" y1="18" x2="14" y2="18" stroke="#94A3B8" strokeWidth="3" />
             <circle cx="1" cy="18" r="2.5" fill="#CBD5E1" />
@@ -280,8 +310,16 @@ export default function CanvasComponentRender({ comp, allComps, isSelected, isSi
           </g>
         ) : comp.type === 'LEMON' ? (
           <g transform="translate(0, 8)">
-            <ellipse cx="35" cy="18" rx="32" ry="16" fill="#FDE047" stroke="#CA8A04" strokeWidth="1.5" />
+            <defs>
+              <radialGradient id={`lemonBody-${comp.id}`} cx="35%" cy="28%" r="75%">
+                <stop offset="0%" stopColor="#FEF08A" />
+                <stop offset="55%" stopColor="#FDE047" />
+                <stop offset="100%" stopColor="#CA8A04" />
+              </radialGradient>
+            </defs>
+            <ellipse cx="35" cy="18" rx="32" ry="16" fill={`url(#lemonBody-${comp.id})`} stroke="#CA8A04" strokeWidth="1.5" />
             <ellipse cx="35" cy="18" rx="12" ry="6" fill="#FEF9C3" opacity="0.6" />
+            <ellipse cx="26" cy="9" rx="9" ry="3.5" fill="#FFFFFF" opacity="0.25" />
             {/* Đinh kẽm (−) bên trái */}
             <line x1="1" y1="16" x2="14" y2="16" stroke="#94A3B8" strokeWidth="3" />
             <circle cx="1" cy="16" r="2.5" fill="#CBD5E1" />
@@ -290,8 +328,15 @@ export default function CanvasComponentRender({ comp, allComps, isSelected, isSi
           </g>
         ) : comp.type === 'RESISTOR' ? (
           <g transform="translate(0, 10)">
+            <defs>
+              <linearGradient id={`resBody-${comp.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#E8CBA0" />
+                <stop offset="45%" stopColor="#D2B48C" />
+                <stop offset="100%" stopColor="#B8935F" />
+              </linearGradient>
+            </defs>
             <line x1="5" y1="18" x2="20" y2="18" stroke="#94A3B8" strokeWidth="3" />
-            <rect x="20" y="10" width="40" height="16" rx="4" fill="#D2B48C" stroke="#8B7355" strokeWidth="1" />
+            <rect x="20" y="10" width="40" height="16" rx="4" fill={`url(#resBody-${comp.id})`} stroke="#8B7355" strokeWidth="1" />
             <line x1="28" y1="10" x2="28" y2="26" stroke="#EF4444" strokeWidth="3" />
             <line x1="36" y1="10" x2="36" y2="26" stroke="#EF4444" strokeWidth="3" />
             <line x1="44" y1="10" x2="44" y2="26" stroke="#8B4513" strokeWidth="3" />
