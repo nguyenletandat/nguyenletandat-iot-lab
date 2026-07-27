@@ -270,7 +270,11 @@ export default function App() {
     const proj = PROJECT_PRESETS[id];
     if (proj) {
       if (!isViewingGvSample) {
-        myPracticeSnapshotRef.current = { components: canvas.components, wires: canvas.wires, code };
+        const practiceState = { components: canvas.components, wires: canvas.wires, code };
+        myPracticeSnapshotRef.current = practiceState;
+        // Lưu ngay vào localStorage thay vì chờ debounce autosave 2s — vì autosave sẽ bị tạm
+        // dừng ngay sau đây (đang xem bài mẫu GV), lỡ đóng tab sớm sẽ mất vài giây chỉnh sửa cuối.
+        ui.autoSave(practiceState);
       }
       setSelectedProjectId(id);
       setCode(proj.code);
@@ -284,8 +288,11 @@ export default function App() {
     }
   };
 
-  // Quay lại canvas thực hành của chính sinh viên (khôi phục đúng mạch đã lưu tạm trước đó)
+  // Quay lại canvas thực hành của chính sinh viên (khôi phục đúng mạch đã lưu tạm trước đó).
+  // Chỉ làm gì đó khi ĐANG xem bài mẫu GV — nếu bấm nút này lúc đã ở sẵn canvas thực hành thì
+  // bỏ qua, tránh ghi đè/xóa mất mạch đang làm dở bằng snapshot cũ (hoặc rỗng nếu chưa có snapshot).
   const exitGvPreview = () => {
+    if (!isViewingGvSample) return;
     const snap = myPracticeSnapshotRef.current || { components: [], wires: [], code: BLANK_CODE_TEMPLATE };
     canvas.loadState(snap.components, snap.wires);
     setCode(snap.code);
