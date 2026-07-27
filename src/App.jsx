@@ -21,7 +21,6 @@ import TutorialOverlay from './components/TutorialOverlay';
 import StudentModal from './components/StudentModal';
 import TheoryTab from './components/TheoryTab';
 import MyLibrarySidebar from './components/MyLibrarySidebar';
-import CreateModuleModal from './components/CreateModuleModal';
 import { useSimulationEngine } from './hooks/useSimulationEngine';
 import { useCanvasInteractions } from './hooks/useCanvasInteractions';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
@@ -86,7 +85,6 @@ const DEFAULT_PRESET = PROJECT_PRESETS[DEFAULT_PRESET_KEY] || { code: '', compon
 export default function App() {
   const [mainTab, setMainTab] = useState('practice'); // 'theory' | 'practice'
   const [leftDockTab, setLeftDockTab] = useState('wiring'); // 'wiring' | 'library'
-  const [isCreateModuleOpen, setIsCreateModuleOpen] = useState(false);
   const [code, setCode] = useState(DEFAULT_PRESET.code);
   const [selectedProjectId, setSelectedProjectId] = useState(DEFAULT_PRESET_KEY);
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleString('vi-VN'));
@@ -381,8 +379,10 @@ export default function App() {
           />
         ) : (
           <MyLibrarySidebar
-            onAddComponent={addComponentToCanvas}
-            onCreateNewModule={() => setIsCreateModuleOpen(true)}
+            savedProjects={ui.savedProjects.length ? ui.savedProjects : ui.loadAllProjects()}
+            onLoadProject={handleLoadProject}
+            onDeleteProject={handleDeleteProject}
+            onOpenSaveDialog={() => ui.setProjectManagerOpen(true)}
             isSimulating={sim.isSimulating}
             isCollapsed={isLeftPanelCollapsed}
             onToggleCollapse={() => setIsLeftPanelCollapsed(!isLeftPanelCollapsed)}
@@ -585,11 +585,7 @@ export default function App() {
 
                 {/* Components */}
                 {canvas.components.map(comp => {
-                  // Linh kiện tự tạo (Thư viện của tôi) không nằm trong COMPONENT_TYPES tĩnh —
-                  // phải tra thêm trong ui.myModules, nếu không thì component tự tạo sẽ hiển thị
-                  // được (do CanvasComponentRenders.jsx đã tra đúng) nhưng KHÔNG có chấm tròn pin
-                  // socket nào để cắm dây (proto?.ports ở dưới sẽ luôn là undefined).
-                  const proto = COMPONENT_TYPES[comp.type] || ui.myModules.find(m => m.id === comp.type);
+                  const proto = COMPONENT_TYPES[comp.type];
                   const isSelected = canvas.selectedCompIds.includes(comp.id);
                   return (
                     <g key={comp.id} transform={`translate(${comp.x}, ${comp.y})`} className="cursor-move select-none"
@@ -848,11 +844,6 @@ export default function App() {
         onClose={() => ui.setTutorialOpen(false)}
         onNext={() => ui.setTutorialStep(ui.tutorialStep + 1)}
         onPrev={() => ui.setTutorialStep(Math.max(0, ui.tutorialStep - 1))}
-      />
-
-      <CreateModuleModal
-        isOpen={isCreateModuleOpen}
-        onClose={() => setIsCreateModuleOpen(false)}
       />
     </div>
   );

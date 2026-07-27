@@ -52,8 +52,6 @@ const getHardwareFingerprint = () => {
   }
 };
 
-const CUSTOM_MODULES_KEY = 'iot_my_custom_modules';
-
 export const useUIStore = create((set, get) => ({
   isDarkMode: false,
   isCatalogModalOpen: false,
@@ -62,7 +60,6 @@ export const useUIStore = create((set, get) => ({
   isStudentModalOpen: false,
   tutorialStep: 0,
   showTutorialOnStart: true,
-  myModules: [],
 
   // Student Identity Info (Anti-Plagiarism & Hardware Signature)
   studentInfo: {
@@ -237,42 +234,8 @@ export const useUIStore = create((set, get) => ({
     URL.revokeObjectURL(url);
   },
 
-  loadMyModules: () => {
-    try {
-      const raw = localStorage.getItem(CUSTOM_MODULES_KEY);
-      const modules = raw ? JSON.parse(raw) : [];
-      set({ myModules: modules });
-      return modules;
-    } catch {
-      return [];
-    }
-  },
-
-  addMyModule: (mod) => {
-    const modules = get().loadMyModules();
-    const existingIdx = modules.findIndex(m => m.id === mod.id);
-    if (existingIdx >= 0) {
-      modules[existingIdx] = mod;
-    } else {
-      modules.push(mod);
-    }
-    try {
-      localStorage.setItem(CUSTOM_MODULES_KEY, JSON.stringify(modules));
-    } catch (e) {}
-    set({ myModules: modules });
-  },
-
-  deleteMyModule: (id) => {
-    const modules = get().loadMyModules().filter(m => m.id !== id);
-    try {
-      localStorage.setItem(CUSTOM_MODULES_KEY, JSON.stringify(modules));
-    } catch (e) {}
-    set({ myModules: modules });
-  },
-
   initProjects: () => {
     const projects = get().loadAllProjects();
-    get().loadMyModules();
     set({ savedProjects: projects });
   },
 }));

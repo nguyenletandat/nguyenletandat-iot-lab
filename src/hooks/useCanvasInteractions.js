@@ -6,7 +6,6 @@
 import { useRef } from 'react';
 import { COMPONENT_TYPES } from '../data/componentTypes';
 import { useCanvasStore } from '../stores/canvasStore';
-import { useUIStore } from '../stores/uiStore';
 
 const I2C_MODULE_TYPES = ['OLED_SSD1306', 'LCD1602', 'BMP280', 'DS3231', 'ADXL345'];
 const CONTROL_BOARD_TYPES = ['ESP32', 'ESP32_V4', 'ARDUINO_UNO', 'ARDUINO_NANO', 'ARDUINO_MEGA', 'ESP8266'];
@@ -201,8 +200,7 @@ export function useCanvasInteractions({ canvas, sim }) {
   };
 
   const addComponentToCanvas = (type) => {
-    const myModules = useUIStore.getState().myModules || [];
-    const proto = COMPONENT_TYPES[type] || myModules.find(m => m.id === type);
+    const proto = COMPONENT_TYPES[type];
     if (!proto) return;
     const newId = `${type.toLowerCase()}_${Date.now().toString().slice(-4)}`;
     const newComp = {
@@ -234,8 +232,7 @@ export function useCanvasInteractions({ canvas, sim }) {
   const getPortCanvasCoords = (componentId, portId) => {
     const comp = canvas.components.find(c => c.id === componentId);
     if (!comp) return { x: 0, y: 0, side: 'left', name: portId };
-    const myModules = useUIStore.getState().myModules || [];
-    const proto = COMPONENT_TYPES[comp.type] || myModules.find(m => m.id === comp.type);
+    const proto = COMPONENT_TYPES[comp.type];
     const port = proto?.ports.find(p => p.id === portId);
     if (!port) return { x: 0, y: 0, side: 'left', name: portId };
     return { x: comp.x + port.x, y: comp.y + port.y, side: port.side, name: port.name || port.id };
