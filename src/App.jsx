@@ -207,10 +207,15 @@ export default function App() {
     sim.logToConsole('🗑️ Đã xóa project: ' + name);
   };
 
+  // Tải project đã lưu (qua Quản lý Project hoặc Thư viện của tôi) — phải tự thoát chế độ
+  // "xem bài mẫu GV" (nếu đang bật), nếu không canvas vẫn bị khóa read-only dù đã hiện bài
+  // của chính sinh viên, và banner vẫn báo nhầm "đang xem bài mẫu Giảng viên".
   const handleLoadProject = (proj) => {
     canvas.loadState(proj.data.components, proj.data.wires);
     setCode(proj.data.code || '');
     ui.setCurrentProjectName(proj.name);
+    setSelectedProjectId(null);
+    setIsViewingGvSample(false);
     sim.clearLogs();
     sim.logToConsole('📂 Đã tải project: ' + proj.name);
   };
@@ -227,6 +232,8 @@ export default function App() {
     canvas.loadState(data.components || [], data.wires || []);
     if (data.code) setCode(data.code);
     if (data.name) ui.setCurrentProjectName(data.name);
+    setSelectedProjectId(null);
+    setIsViewingGvSample(false);
     sim.clearLogs();
     sim.logToConsole('📥 Đã import project: ' + (data.name || 'Unknown'));
   };
