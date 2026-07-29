@@ -312,6 +312,23 @@ export default function App() {
     sim.logToConsole('✏️ Đã quay lại bài thực hành của bạn.');
   };
 
+  // Bắt đầu 1 bài thực hành mới, hoàn toàn trống (nút "Tạo mới" trong Thư viện của tôi).
+  // Hỏi xác nhận nếu canvas hiện tại không trống, tránh xóa nhầm bài đang làm dở chưa lưu.
+  const handleNewPractice = () => {
+    const isEmpty = canvas.components.length === 0 && canvas.wires.length === 0;
+    if (!isEmpty && !confirm('Canvas hiện tại chưa trống. Tạo bài thực hành mới sẽ xóa hết mạch đang có (nếu chưa lưu sẽ mất). Tiếp tục?')) {
+      return;
+    }
+    canvas.loadState([], []);
+    setCode(BLANK_CODE_TEMPLATE);
+    ui.setCurrentProjectName('Untitled Project');
+    myPracticeSnapshotRef.current = null;
+    sim.clearLogs();
+    sim.resetSimulation();
+    if (sim.isSimulating) stopSimulation();
+    sim.logToConsole('🆕 Đã tạo bài thực hành mới (canvas trống).');
+  };
+
   const selectedComp = canvas.selectedCompIds.length === 1 ? canvas.components.find(c => c.id === canvas.selectedCompIds[0]) : null;
 
   // Mạch không vi điều khiển (Pin 9V / khoai tây / chanh + LED) — đèn tự sáng khi nối
@@ -438,6 +455,7 @@ export default function App() {
             onLoadProject={handleLoadProject}
             onDeleteProject={handleDeleteProject}
             onOpenSaveDialog={() => ui.setProjectManagerOpen(true)}
+            onCreateNew={handleNewPractice}
             isSimulating={isEditingBlocked}
             isCollapsed={isLeftPanelCollapsed}
             onToggleCollapse={() => setIsLeftPanelCollapsed(!isLeftPanelCollapsed)}

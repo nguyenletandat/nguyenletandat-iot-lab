@@ -1,5 +1,5 @@
 import React from 'react';
-import { Save, Trash2, ChevronLeft, Clock, FolderGit2 } from 'lucide-react';
+import { Save, Trash2, ChevronLeft, Clock, FolderGit2, FilePlus2 } from 'lucide-react';
 
 /**
  * Thư viện của tôi — danh sách các bài thực hành (sơ đồ + code) mà sinh viên
@@ -11,6 +11,7 @@ export default function MyLibrarySidebar({
   onLoadProject,
   onDeleteProject,
   onOpenSaveDialog,
+  onCreateNew,
   isSimulating,
   isCollapsed,
   onToggleCollapse,
@@ -67,11 +68,22 @@ export default function MyLibrarySidebar({
           Các bài thực hành do bạn tự xây dựng, mô phỏng theo cấu trúc bài mẫu của giảng viên.
         </p>
 
+        {/* Bắt đầu 1 bài thực hành mới (canvas trống) */}
+        <button
+          onClick={onCreateNew}
+          disabled={isSimulating}
+          title="Xóa canvas hiện tại để bắt đầu 1 bài thực hành mới, hoàn toàn trống"
+          className="w-full mt-3 flex items-center justify-center gap-2 py-2 px-3 text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 rounded-xl transition-all disabled:opacity-50"
+        >
+          <FilePlus2 className="w-4 h-4" />
+          Tạo mới
+        </button>
+
         {/* Save current circuit as a new library entry */}
         <button
           onClick={onOpenSaveDialog}
           disabled={isSimulating}
-          className="w-full mt-3 flex items-center justify-center gap-2 py-2 px-3 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl shadow-md transition-all disabled:opacity-50"
+          className="w-full mt-2 flex items-center justify-center gap-2 py-2 px-3 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl shadow-md transition-all disabled:opacity-50"
         >
           <Save className="w-4 h-4" />
           Lưu bài thực hành hiện tại
