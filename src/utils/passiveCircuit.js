@@ -16,6 +16,14 @@ const PASS_THROUGH_PORTS = {
   RESISTOR: ['L', 'R'],
   DIODE: ['A', 'K'],
   CAPACITOR: ['L', 'R'],
+  ZENER_DIODE: ['A', 'K'],
+  INDUCTOR: ['L', 'R'],
+  CAP_ELECTROLYTIC: ['PLUS', 'MINUS'],
+  PHOTODIODE: ['A', 'K'],
+  FLEX_SENSOR: ['L', 'R'],
+  FORCE_SENSOR: ['L', 'R'],
+  TILT_SENSOR: ['L', 'R'],
+  PUSHBUTTON: ['A', 'B'],
 };
 
 // Các nguồn điện — 2 cực được coi là "nối thông" với nhau để kiểm tra vòng kín
@@ -24,6 +32,15 @@ const SOURCE_PORTS = {
   BATTERY_9V: ['VCC', 'GND'],
   POTATO: ['CU', 'NAIL'],
   LEMON: ['CU', 'NAIL'],
+  BATTERY_1V5: ['VCC', 'GND'],
+  COIN_CELL_3V: ['VCC', 'GND'],
+  SOLAR_CELL: ['VCC', 'GND'],
+};
+
+// Các linh kiện "tải" sẽ sáng/kích hoạt khi mạch tạo thành vòng kín (giống LED)
+const GLOWING_LOAD_TYPES = {
+  LED: { anodeType: 'gpio', cathodeType: 'gnd' },
+  LIGHT_BULB: { anodeType: 'gpio', cathodeType: 'gnd' },
 };
 
 const nodeKey = (compId, portId) => `${compId}:${portId}`;
@@ -75,10 +92,11 @@ export function computeLitLeds(components, wires) {
   }
 
   for (const c of components) {
-    if (c.type !== 'LED') continue;
-    const proto = COMPONENT_TYPES.LED;
-    const anodePort = proto.ports.find(p => p.type === 'gpio')?.id || 'A';
-    const cathodePort = proto.ports.find(p => p.type === 'gnd')?.id || 'K';
+    const loadSpec = GLOWING_LOAD_TYPES[c.type];
+    if (!loadSpec) continue;
+    const proto = COMPONENT_TYPES[c.type];
+    const anodePort = proto.ports.find(p => p.type === loadSpec.anodeType)?.id;
+    const cathodePort = proto.ports.find(p => p.type === loadSpec.cathodeType)?.id;
     const a = nodeKey(c.id, anodePort);
     const k = nodeKey(c.id, cathodePort);
     if (uf.parent.has(a) && uf.parent.has(k) && uf.find(a) === uf.find(k)) {

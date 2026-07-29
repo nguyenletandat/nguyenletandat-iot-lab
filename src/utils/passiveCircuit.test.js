@@ -70,6 +70,34 @@ describe('computeLitLeds — mạch thụ động (pin + LED, không vi điều 
     expect(lit.has('led1')).toBe(true);
   });
 
+  it('Pin AA 1.5V thắp sáng Light bulb khi nối vòng kín (linh kiện mới bổ sung)', () => {
+    const components = [
+      { id: 'bat1', type: 'BATTERY_1V5', x: 0, y: 0, config: {} },
+      { id: 'bulb1', type: 'LIGHT_BULB', x: 0, y: 0, config: {} },
+    ];
+    const wires = [
+      wire('w1', 'bat1', 'VCC', 'bulb1', 'A'),
+      wire('w2', 'bulb1', 'K', 'bat1', 'GND'),
+    ];
+    const lit = computeLitLeds(components, wires);
+    expect(lit.has('bulb1')).toBe(true);
+  });
+
+  it('Solar Cell + Zener Diode (pass-through) vẫn tạo vòng kín thắp sáng LED', () => {
+    const components = [
+      { id: 'solar1', type: 'SOLAR_CELL', x: 0, y: 0, config: {} },
+      { id: 'z1', type: 'ZENER_DIODE', x: 0, y: 0, config: {} },
+      { id: 'led1', type: 'LED', x: 0, y: 0, config: {} },
+    ];
+    const wires = [
+      wire('w1', 'solar1', 'VCC', 'z1', 'A'),
+      wire('w2', 'z1', 'K', 'led1', 'A'),
+      wire('w3', 'led1', 'K', 'solar1', 'GND'),
+    ];
+    const lit = computeLitLeds(components, wires);
+    expect(lit.has('led1')).toBe(true);
+  });
+
   it('điện trở dẫn điện xuyên qua 2 chân (pass-through) đúng như dây dẫn', () => {
     const components = [
       { id: 'bat1', type: 'BATTERY_9V', x: 0, y: 0, config: {} },

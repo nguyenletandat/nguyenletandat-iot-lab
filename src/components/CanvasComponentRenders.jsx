@@ -10,6 +10,16 @@ import { COMPONENT_TYPES } from '../data/componentTypes';
 // khi app được deploy dưới 1 subpath (vd: GitHub Pages project site)
 const ASSET_BASE = `${import.meta.env.BASE_URL}assets/components/`;
 
+// Các linh kiện IC (DIP) dùng chung 1 kiểu vẽ "chip đen 2 hàng chân" — không mô
+// phỏng logic thật bên trong (xem ghi chú genericDipPorts trong componentTypes.js)
+const CHIP_BODY_TYPES = new Set([
+  'IC_555', 'IC_556', 'IC_741', 'IC_LM339', 'IC_LM393', 'IC_4N35',
+  'IC_74HC00', 'IC_74HC02', 'IC_74HC08', 'IC_74HC32', 'IC_74HC86', 'IC_74HC04', 'IC_74HC14', 'IC_74HC132',
+  'IC_74HC10', 'IC_74HC11', 'IC_74HC27', 'IC_74HC20', 'IC_74HC21', 'IC_74HC73', 'IC_74HC74', 'IC_74HC93',
+  'IC_74HC75', 'IC_74HC283', 'IC_74HC595', 'IC_74HC4017', 'IC_CD4511', 'IC_PCF8574',
+  'MOTOR_DRIVER_L293D', 'REGULATOR_5V', 'REGULATOR_3V3', 'ATTINY85',
+]);
+
 const REAL_IMAGES = {
   ESP32: `${ASSET_BASE}esp32.png`,
   ESP32_V4: `${ASSET_BASE}esp32.png`,
@@ -383,6 +393,218 @@ export default function CanvasComponentRender({ comp, allComps, isSelected, isSi
             <line x1="5" y1="28" x2="75" y2="28" stroke="#CBD5E1" strokeWidth="3" />
             <line x1="5" y1="38" x2="75" y2="38" stroke="#EF4444" strokeWidth="2" opacity="0.7" />
             <line x1="5" y1="44" x2="75" y2="44" stroke="#3B82F6" strokeWidth="2" opacity="0.7" />
+          </g>
+        ) : (comp.type === 'BREADBOARD_SMALL' || comp.type === 'BREADBOARD_MINI') ? (
+          <g>
+            <rect width="80" height="55" rx="4" fill="#F8FAFC" stroke="#CBD5E1" strokeWidth="1.5" />
+            <line x1="5" y1="14" x2="75" y2="14" stroke="#EF4444" strokeWidth="2" opacity="0.7" />
+            <line x1="5" y1="27" x2="75" y2="27" stroke="#CBD5E1" strokeWidth="3" />
+            <line x1="5" y1="41" x2="75" y2="41" stroke="#3B82F6" strokeWidth="2" opacity="0.7" />
+          </g>
+        ) : CHIP_BODY_TYPES.has(comp.type) ? (
+          <g>
+            <rect x="0" y="6" width="80" height="44" rx="3" fill="#18181B" stroke="#000000" strokeWidth="1" />
+            <path d="M 32 6 A 8 8 0 0 0 48 6 Z" fill="#0F0F11" />
+            <circle cx="8" cy="12" r="2" fill="#94A3B8" />
+            <text x="40" y="32" fill="#E2E8F0" fontSize="7.5" fontWeight="bold" textAnchor="middle">
+              {String(comp.config?.label || comp.type.replace('IC_', '')).slice(0, 12)}
+            </text>
+          </g>
+        ) : comp.type === 'ZENER_DIODE' ? (
+          <g transform="translate(0, 10)">
+            <line x1="5" y1="18" x2="25" y2="18" stroke="#94A3B8" strokeWidth="3" />
+            <rect x="25" y="8" width="30" height="20" rx="3" fill="#1E293B" />
+            <path d="M 48 8 L 55 8 L 55 15 M 48 28 L 41 28 L 41 21" stroke="#CBD5E1" strokeWidth="2.5" fill="none" />
+            <line x1="55" y1="18" x2="75" y2="18" stroke="#94A3B8" strokeWidth="3" />
+          </g>
+        ) : comp.type === 'INDUCTOR' ? (
+          <g transform="translate(0, 15)">
+            <line x1="5" y1="10" x2="18" y2="10" stroke="#94A3B8" strokeWidth="3" />
+            <path d="M 18 10 a 6 6 0 1 1 12 0 a 6 6 0 1 1 12 0 a 6 6 0 1 1 12 0 a 6 6 0 1 1 12 0" fill="none" stroke="#D97706" strokeWidth="3.5" />
+            <line x1="66" y1="10" x2="79" y2="10" stroke="#94A3B8" strokeWidth="3" />
+          </g>
+        ) : comp.type === 'CAP_ELECTROLYTIC' ? (
+          <g transform="translate(5, 3)">
+            <line x1="20" y1="0" x2="20" y2="14" stroke="#94A3B8" strokeWidth="3" />
+            <rect x="6" y="14" width="28" height="30" rx="4" fill="#334155" stroke="#1E293B" strokeWidth="1" />
+            <rect x="6" y="14" width="28" height="8" rx="4" fill="#64748B" />
+            <text x="20" y="38" fill="#F8FAFC" fontSize="10" fontWeight="bold" textAnchor="middle">+</text>
+            <line x1="20" y1="44" x2="20" y2="56" stroke="#94A3B8" strokeWidth="3" />
+          </g>
+        ) : comp.type === 'PHOTODIODE' ? (
+          <g transform="translate(0, 10)">
+            <line x1="5" y1="18" x2="20" y2="18" stroke="#94A3B8" strokeWidth="3" />
+            <path d="M 18 12 L 12 4 M 18 12 L 24 4 M 24 18 L 18 10 M 24 18 L 30 10" stroke="#F59E0B" strokeWidth="1.5" />
+            <rect x="20" y="8" width="30" height="20" rx="3" fill="#1E293B" />
+            <rect x="43" y="8" width="7" height="20" fill="#CBD5E1" />
+            <line x1="50" y1="18" x2="75" y2="18" stroke="#94A3B8" strokeWidth="3" />
+          </g>
+        ) : (comp.type === 'FLEX_SENSOR' || comp.type === 'FORCE_SENSOR') ? (
+          <g transform="translate(0, 12)">
+            <line x1="5" y1="15" x2="18" y2="15" stroke="#94A3B8" strokeWidth="3" />
+            <rect x="18" y="4" width="44" height="22" rx="3" fill="#475569" stroke="#334155" strokeWidth="1" />
+            <text x="40" y="19" fill="#E2E8F0" fontSize="7" fontWeight="bold" textAnchor="middle">{comp.type === 'FLEX_SENSOR' ? 'FLEX' : 'FSR'}</text>
+            <line x1="62" y1="15" x2="75" y2="15" stroke="#94A3B8" strokeWidth="3" />
+          </g>
+        ) : comp.type === 'TILT_SENSOR' ? (
+          <g transform="translate(0, 12)">
+            <line x1="5" y1="15" x2="20" y2="15" stroke="#94A3B8" strokeWidth="3" />
+            <rect x="20" y="2" width="14" height="26" rx="4" fill="#94A3B8" stroke="#64748B" strokeWidth="1" />
+            <circle cx="27" cy="10" r="4" fill="#334155" />
+            <line x1="34" y1="15" x2="75" y2="15" stroke="#94A3B8" strokeWidth="3" />
+          </g>
+        ) : comp.type === 'PUSHBUTTON' ? (
+          <g transform="translate(0, 10)">
+            <line x1="5" y1="18" x2="22" y2="18" stroke="#94A3B8" strokeWidth="3" />
+            <rect x="22" y="6" width="36" height="24" rx="4" fill="#475569" stroke="#334155" strokeWidth="1.5" />
+            <circle cx="40" cy="18" r="8" fill={comp.config?.pressed ? '#EF4444' : '#CBD5E1'} />
+            <line x1="58" y1="18" x2="75" y2="18" stroke="#94A3B8" strokeWidth="3" />
+          </g>
+        ) : comp.type === 'LIGHT_BULB' ? (
+          <g transform="translate(5, 2)">
+            {(isSimulating || isLit) && (
+              <circle cx="30" cy="18" r="26" fill="#FBBF24" opacity="0.4" className="led-glow" style={{ '--glow-color': '#FBBF24' }} />
+            )}
+            <circle cx="30" cy="18" r="17" fill={(isSimulating || isLit) ? '#FEF3C7' : '#F8FAFC'} stroke="#94A3B8" strokeWidth="1.5" />
+            <path d="M 22 18 Q 30 10 38 18 M 24 22 L 36 22" stroke="#D97706" strokeWidth="1.5" fill="none" />
+            <rect x="24" y="34" width="12" height="10" fill="#94A3B8" />
+            <path d="M 22 44 L 38 44 L 34 50 L 26 50 Z" fill="#64748B" />
+          </g>
+        ) : comp.type === 'VIBRATION_MOTOR' ? (
+          <g>
+            <circle cx="30" cy="25" r="17" fill="#475569" stroke="#334155" strokeWidth="2" />
+            <circle cx="38" cy="16" r="7" fill="#1E293B" className={isSimulating ? 'animate-spin-fast' : ''} style={{ transformOrigin: '38px 16px' }} />
+          </g>
+        ) : (comp.type === 'NEOPIXEL' || comp.type === 'NEOPIXEL_RING' || comp.type === 'NEOPIXEL_STRIP') ? (
+          comp.type === 'NEOPIXEL' ? (
+            <g>
+              {isSimulating && <circle cx="35" cy="25" r="24" fill={comp.config?.color || '#FFFFFF'} opacity="0.35" className="led-glow" style={{ '--glow-color': comp.config?.color || '#FFFFFF' }} />}
+              <rect x="20" y="10" width="30" height="30" rx="4" fill={comp.config?.color || '#F8FAFC'} stroke="#334155" strokeWidth="1.5" className={isSimulating ? 'led-glow' : ''} style={{ '--glow-color': comp.config?.color || '#FFFFFF' }} />
+            </g>
+          ) : comp.type === 'NEOPIXEL_RING' ? (
+            <g transform="translate(35, 25)">
+              {Array.from({ length: Math.min(comp.config?.ledCount || 12, 16) }).map((_, i, arr) => {
+                const angle = (i / arr.length) * Math.PI * 2;
+                const r = 20;
+                return (
+                  <circle key={i} cx={Math.cos(angle) * r} cy={Math.sin(angle) * r} r="3.5"
+                    fill={isSimulating ? (comp.config?.color || '#22D3EE') : '#334155'}
+                    className={isSimulating ? 'led-glow' : ''} style={{ '--glow-color': comp.config?.color || '#22D3EE' }} />
+                );
+              })}
+            </g>
+          ) : (
+            <g transform="translate(5, 22)">
+              {Array.from({ length: Math.min(comp.config?.ledCount || 8, 12) }).map((_, i) => (
+                <circle key={i} cx={i * 6} cy="0" r="3"
+                  fill={isSimulating ? (comp.config?.color || '#22D3EE') : '#334155'}
+                  className={isSimulating ? 'led-glow' : ''} style={{ '--glow-color': comp.config?.color || '#22D3EE' }} />
+              ))}
+            </g>
+          )
+        ) : (comp.type === 'BATTERY_1V5' || comp.type === 'COIN_CELL_3V') ? (
+          <g>
+            <defs>
+              <linearGradient id={`smallBat-${comp.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#38BDF8" />
+                <stop offset="100%" stopColor="#0369A1" />
+              </linearGradient>
+            </defs>
+            {comp.type === 'BATTERY_1V5' ? (
+              <rect x="15" y="5" width="30" height="45" rx="6" fill={`url(#smallBat-${comp.id})`} stroke="#075985" strokeWidth="1" />
+            ) : (
+              <ellipse cx="35" cy="25" rx="20" ry="20" fill="#CBD5E1" stroke="#94A3B8" strokeWidth="2" />
+            )}
+            <text x={comp.type === 'BATTERY_1V5' ? 30 : 35} y="28" fill={comp.type === 'BATTERY_1V5' ? '#FFFFFF' : '#334155'} fontSize="8" fontWeight="bold" textAnchor="middle">
+              {comp.type === 'BATTERY_1V5' ? '1.5V' : '3V'}
+            </text>
+          </g>
+        ) : comp.type === 'SOLAR_CELL' ? (
+          <g>
+            <rect width="70" height="45" rx="2" fill="#1E3A8A" stroke="#1E293B" strokeWidth="1.5" />
+            {Array.from({ length: 4 }).map((_, r) => Array.from({ length: 6 }).map((_, c) => (
+              <rect key={`${r}-${c}`} x={2 + c * 11.3} y={2 + r * 10.5} width="10" height="9" fill="#3B82F6" stroke="#1E3A8A" strokeWidth="0.5" />
+            )))}
+          </g>
+        ) : (comp.type === 'MULTIMETER' || comp.type === 'POWER_SUPPLY' || comp.type === 'FUNCTION_GENERATOR' || comp.type === 'OSCILLOSCOPE') ? (
+          <g>
+            <rect width="80" height="55" rx="4" fill="#374151" stroke="#1F2937" strokeWidth="1.5" />
+            <rect x="8" y="6" width="64" height="26" rx="2" fill="#052E16" />
+            <text x="40" y="23" fill="#4ADE80" fontSize="8" fontFamily="monospace" fontWeight="bold" textAnchor="middle">
+              {comp.type === 'MULTIMETER' ? `${comp.config?.reading ?? 0}` :
+                comp.type === 'POWER_SUPPLY' ? `${comp.config?.voltage ?? 5}V` :
+                comp.type === 'FUNCTION_GENERATOR' ? `${comp.config?.frequency ?? 1000}Hz` : '∿'}
+            </text>
+            <circle cx="14" cy="45" r="5" fill="#94A3B8" />
+            <circle cx="30" cy="45" r="5" fill="#94A3B8" />
+          </g>
+        ) : comp.type === 'MICROBIT' ? (
+          <g>
+            <rect width="80" height="55" rx="4" fill="#111827" stroke="#000000" strokeWidth="1" />
+            {Array.from({ length: 5 }).map((_, r) => Array.from({ length: 5 }).map((_, c) => (
+              <circle key={`${r}-${c}`} cx={14 + c * 12} cy={10 + r * 8} r="2.2" fill={isSimulating ? '#EF4444' : '#374151'} className={isSimulating ? 'led-glow' : ''} style={{ '--glow-color': '#EF4444' }} />
+            )))}
+          </g>
+        ) : (comp.type === 'SLIDE_SWITCH' || comp.type.startsWith('DIP_SWITCH')) ? (
+          <g>
+            <rect width="70" height="50" rx="3" fill="#1E293B" stroke="#0F172A" strokeWidth="1" />
+            <rect x="8" y="10" width="20" height="30" rx="2" fill="#DC2626" />
+            <text x="42" y="47" fill="#94A3B8" fontSize="6.5" fontWeight="bold" textAnchor="middle">SWITCH</text>
+          </g>
+        ) : comp.type === 'KEYPAD_4X4' ? (
+          <g>
+            <rect width="80" height="55" rx="3" fill="#1E293B" />
+            {Array.from({ length: 4 }).map((_, r) => Array.from({ length: 4 }).map((_, c) => (
+              <rect key={`${r}-${c}`} x={5 + c * 18} y={4 + r * 12} width="14" height="9" rx="1.5" fill="#475569" stroke="#0F172A" strokeWidth="0.5" />
+            )))}
+          </g>
+        ) : comp.type === 'AMBIENT_LIGHT_SENSOR' ? (
+          <g>
+            <rect width="70" height="50" rx="3" fill="#0EA5E9" />
+            <circle cx="35" cy="25" r="14" fill="#FEF9C3" stroke="#FDE047" strokeWidth="2" />
+          </g>
+        ) : comp.type === 'IR_REMOTE' ? (
+          <g>
+            <rect width="50" height="120" rx="10" fill="#1E293B" stroke="#0F172A" strokeWidth="1.5" />
+            <circle cx="25" cy="16" r="6" fill="#DC2626" />
+            {Array.from({ length: 4 }).map((_, r) => Array.from({ length: 3 }).map((_, c) => (
+              <rect key={`${r}-${c}`} x={8 + c * 12} y={30 + r * 20} width="9" height="14" rx="2" fill="#475569" />
+            )))}
+          </g>
+        ) : comp.type === 'DC_MOTOR_ENCODER' ? (
+          <g>
+            <circle cx="30" cy="25" r="20" fill="#64748B" stroke="#334155" strokeWidth="2" />
+            <g className={isSimulating ? 'animate-spin-fast' : ''} style={{ transformOrigin: '30px 25px' }}>
+              <line x1="30" y1="25" x2="30" y2="8" stroke="#FFFFFF" strokeWidth="3" />
+            </g>
+            <rect x="52" y="12" width="16" height="26" rx="2" fill="#22C55E" />
+            <text x="60" y="49" fill="#22C55E" fontSize="6" fontWeight="bold" textAnchor="middle">ENC</text>
+          </g>
+        ) : comp.type === 'RELAY_DPDT' ? (
+          <g>
+            <rect width="75" height="55" rx="4" fill="#2563EB" />
+            <rect x="8" y="8" width="59" height="39" rx="3" fill="#1E40AF" />
+            <circle cx="20" cy="20" r="4" fill={isSimulating ? '#22C55E' : '#64748B'} className={isSimulating ? 'led-glow' : ''} style={{ '--glow-color': '#22C55E' }} />
+            <text x="42" y="32" fill="#FFFFFF" fontSize="8" fontWeight="bold" textAnchor="middle">DPDT</text>
+          </g>
+        ) : (comp.type === 'PNP_TRANSISTOR' || comp.type === 'MOSFET_N' || comp.type === 'MOSFET_P' || comp.type === 'IC_TIP120') ? (
+          <g>
+            <path d="M 20 10 C 20 10 50 10 50 25 C 50 40 20 40 20 40 Z" fill="#1E293B" />
+            <rect x="18" y="10" width="5" height="30" fill="#0F172A" />
+            <text x="32" y="28" fill="#FFFFFF" fontSize="6.5" fontWeight="bold" textAnchor="middle">
+              {comp.type === 'PNP_TRANSISTOR' ? 'PNP' : comp.type === 'MOSFET_N' ? 'nMOS' : comp.type === 'MOSFET_P' ? 'pMOS' : 'TIP120'}
+            </text>
+          </g>
+        ) : (comp.type === 'PIN_HEADER_8' || comp.type === 'USB_CONNECTOR_A') ? (
+          <g>
+            <rect width="70" height="50" rx="2" fill="#1E293B" />
+            {comp.type === 'PIN_HEADER_8' ? (
+              Array.from({ length: 8 }).map((_, i) => (
+                <rect key={i} x={8 + (i % 4) * 15} y={i < 4 ? 8 : 28} width="8" height="14" fill="#CBD5E1" />
+              ))
+            ) : (
+              <rect x="15" y="10" width="40" height="30" rx="4" fill="#94A3B8" />
+            )}
           </g>
         ) : (
           <g>
