@@ -49,7 +49,7 @@ export function useSimulationEngine(code) {
     }
 
     const boardProto = COMPONENT_TYPES[board.type];
-    const boardPort = boardProto?.ports.find(p => p.pin === pin || p.id === `D${pin}` || p.id === `A${pin}` || p.id === `VP` || p.id === `VN`);
+    const boardPort = boardProto?.ports.find(p => p.pin === pin || p.id === `D${pin}` || p.id === `A${pin}`);
     if (boardPort) {
       const connWire = wrs.find(w =>
         (w.from.componentId === board.id && w.from.portId === boardPort.id) ||
