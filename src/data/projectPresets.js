@@ -7,9 +7,33 @@ export const PROJECT_PRESETS = {
   // ═══════════════════════════════════════════════
   // BÀI MỞ ĐẦU — Mạch điện cơ bản, làm quen trước khi vào Buổi 1-6 IoT
   // ═══════════════════════════════════════════════
+  intro4: {
+    name: 'N1: Pin Khoai tây nối tiếp',
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 1: Ghép nối tiếp 4 củ khoai tây (đinh kẽm + cuộn dây đồng) thành 1 nguồn điện sinh học, thắp sáng đèn LED. KHÔNG cần vi điều khiển hay viết code.',
+    code: `// Bài này KHÔNG dùng vi điều khiển — không cần viết code!
+// Mỗi củ khoai tây là 1 "pin sinh học" nhỏ (phản ứng hoá học giữa đinh kẽm và dây đồng).
+// Ghép nối tiếp nhiều củ (cực đồng củ này -> đinh kẽm củ kế tiếp) để cộng dồn điện áp.
+// Lưu ý thực tế: 1 củ khoai tây cho ra rất ít điện áp (~0.5V), cần ghép NHIỀU củ nối
+// tiếp mới đủ thắp sáng LED thật — mô phỏng này đơn giản hoá, chỉ kiểm tra vòng kín.`,
+    components: [
+      { id: 'p1', type: 'POTATO', x: 60, y: 180, config: {} },
+      { id: 'p2', type: 'POTATO', x: 300, y: 180, config: {} },
+      { id: 'p3', type: 'POTATO', x: 540, y: 180, config: {} },
+      { id: 'p4', type: 'POTATO', x: 780, y: 180, config: {} },
+      { id: 'led1', type: 'LED', x: 1020, y: 100, config: {} }
+    ],
+    wires: [
+      { id: 'w1', from: { componentId: 'p1', portId: 'CU' }, to: { componentId: 'p2', portId: 'NAIL' }, color: '#1F2937' },
+      { id: 'w2', from: { componentId: 'p2', portId: 'CU' }, to: { componentId: 'p3', portId: 'NAIL' }, color: '#1F2937' },
+      { id: 'w3', from: { componentId: 'p3', portId: 'CU' }, to: { componentId: 'p4', portId: 'NAIL' }, color: '#1F2937' },
+      { id: 'w4', from: { componentId: 'p4', portId: 'CU' }, to: { componentId: 'led1', portId: 'A' }, color: '#EF4444' },
+      { id: 'w5', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'p1', portId: 'NAIL' }, color: '#1F2937' }
+    ]
+  },
+
   intro1: {
-    name: 'N1: Đèn LED sáng với Pin 9V',
-    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 1: Mạch điện cơ bản nhất — Pin 9V, điện trở và đèn LED, KHÔNG cần vi điều khiển hay viết code. Đèn LED tự sáng khi nối đúng vòng kín.',
+    name: 'N2: Đèn LED sáng với Pin 9V',
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 2: Mạch điện cơ bản nhất — Pin 9V, điện trở và đèn LED, KHÔNG cần vi điều khiển hay viết code. Đèn LED tự sáng khi nối đúng vòng kín.',
     code: `// Bài này KHÔNG dùng vi điều khiển — không cần viết code!
 // Đèn LED sẽ tự sáng khi bạn nối đúng mạch kín:
 // Pin 9V (+) -> Điện trở -> LED (chân dài: Anode) -> LED (chân ngắn: Cathode) -> Pin 9V (-)
@@ -27,9 +51,9 @@ export const PROJECT_PRESETS = {
   },
 
   intro2: {
-    name: 'N2: Dãy 7 đèn LED chạy (LED Chaser)',
-    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 2: Điều khiển 7 đèn LED sáng đuổi nhau lần lượt bằng Arduino Uno — làm quen digitalWrite() và pinMode() trên nhiều chân cùng lúc.',
-    code: `// BÀI MỞ ĐẦU 2: DÃY 7 ĐÈN LED CHẠY (LED CHASER)
+    name: 'N3: Dãy 7 đèn LED chạy (LED Chaser)',
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 3: Điều khiển 7 đèn LED sáng đuổi nhau lần lượt bằng Arduino Uno — làm quen digitalWrite() và pinMode() trên nhiều chân cùng lúc.',
+    code: `// BÀI MỞ ĐẦU 3: DÃY 7 ĐÈN LED CHẠY (LED CHASER)
 #define LED1 2
 #define LED2 3
 #define LED3 4
@@ -61,18 +85,18 @@ void loop() {
       { id: 'uno1', type: 'ARDUINO_UNO', x: 60, y: 40, config: {} },
       { id: 'led1', type: 'LED', x: 460, y: 20, config: {} },
       { id: 'r1', type: 'RESISTOR', x: 460, y: 150, config: {} },
-      { id: 'led2', type: 'LED', x: 530, y: 20, config: {} },
-      { id: 'r2', type: 'RESISTOR', x: 530, y: 150, config: {} },
-      { id: 'led3', type: 'LED', x: 600, y: 20, config: {} },
-      { id: 'r3', type: 'RESISTOR', x: 600, y: 150, config: {} },
-      { id: 'led4', type: 'LED', x: 670, y: 20, config: {} },
-      { id: 'r4', type: 'RESISTOR', x: 670, y: 150, config: {} },
-      { id: 'led5', type: 'LED', x: 740, y: 20, config: {} },
-      { id: 'r5', type: 'RESISTOR', x: 740, y: 150, config: {} },
-      { id: 'led6', type: 'LED', x: 810, y: 20, config: {} },
-      { id: 'r6', type: 'RESISTOR', x: 810, y: 150, config: {} },
-      { id: 'led7', type: 'LED', x: 880, y: 20, config: {} },
-      { id: 'r7', type: 'RESISTOR', x: 880, y: 150, config: {} }
+      { id: 'led2', type: 'LED', x: 720, y: 20, config: {} },
+      { id: 'r2', type: 'RESISTOR', x: 720, y: 150, config: {} },
+      { id: 'led3', type: 'LED', x: 980, y: 20, config: {} },
+      { id: 'r3', type: 'RESISTOR', x: 980, y: 150, config: {} },
+      { id: 'led4', type: 'LED', x: 1240, y: 20, config: {} },
+      { id: 'r4', type: 'RESISTOR', x: 1240, y: 150, config: {} },
+      { id: 'led5', type: 'LED', x: 1500, y: 20, config: {} },
+      { id: 'r5', type: 'RESISTOR', x: 1500, y: 150, config: {} },
+      { id: 'led6', type: 'LED', x: 1760, y: 20, config: {} },
+      { id: 'r6', type: 'RESISTOR', x: 1760, y: 150, config: {} },
+      { id: 'led7', type: 'LED', x: 2020, y: 20, config: {} },
+      { id: 'r7', type: 'RESISTOR', x: 2020, y: 150, config: {} }
     ],
     wires: [
       { id: 'w1a', from: { componentId: 'uno1', portId: 'D2' }, to: { componentId: 'r1', portId: 'L' }, color: '#F59E0B' },
@@ -106,9 +130,9 @@ void loop() {
   },
 
   intro3: {
-    name: 'N3: Đèn LED nhấp nháy cơ bản (chân 13)',
-    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 3: Mạch "Blink" kinh điển — 1 đèn LED nhấp nháy qua chân số 13 của Arduino Uno, bài đầu tiên khi học lập trình vi điều khiển.',
-    code: `// BÀI MỞ ĐẦU 3: BLINK - ĐÈN LED NHẤP NHÁY CƠ BẢN
+    name: 'N4: Đèn LED nhấp nháy cơ bản (chân 13)',
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 4: Mạch "Blink" kinh điển — 1 đèn LED nhấp nháy qua chân số 13 của Arduino Uno, bài đầu tiên khi học lập trình vi điều khiển.',
+    code: `// BÀI MỞ ĐẦU 4: BLINK - ĐÈN LED NHẤP NHÁY CƠ BẢN
 #define LED_PIN 13
 
 void setup() {
@@ -130,30 +154,6 @@ void loop() {
       { id: 'w1', from: { componentId: 'uno1', portId: 'D13' }, to: { componentId: 'led1', portId: 'A' }, color: '#EF4444' },
       { id: 'w2', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'r1', portId: 'L' }, color: '#1F2937' },
       { id: 'w3', from: { componentId: 'r1', portId: 'R' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#1F2937' }
-    ]
-  },
-
-  intro4: {
-    name: 'N4: Pin Khoai tây nối tiếp',
-    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 4: Ghép nối tiếp 4 củ khoai tây (đinh kẽm + cuộn dây đồng) thành 1 nguồn điện sinh học, thắp sáng đèn LED. KHÔNG cần vi điều khiển hay viết code.',
-    code: `// Bài này KHÔNG dùng vi điều khiển — không cần viết code!
-// Mỗi củ khoai tây là 1 "pin sinh học" nhỏ (phản ứng hoá học giữa đinh kẽm và dây đồng).
-// Ghép nối tiếp nhiều củ (cực đồng củ này -> đinh kẽm củ kế tiếp) để cộng dồn điện áp.
-// Lưu ý thực tế: 1 củ khoai tây cho ra rất ít điện áp (~0.5V), cần ghép NHIỀU củ nối
-// tiếp mới đủ thắp sáng LED thật — mô phỏng này đơn giản hoá, chỉ kiểm tra vòng kín.`,
-    components: [
-      { id: 'p1', type: 'POTATO', x: 60, y: 180, config: {} },
-      { id: 'p2', type: 'POTATO', x: 300, y: 180, config: {} },
-      { id: 'p3', type: 'POTATO', x: 540, y: 180, config: {} },
-      { id: 'p4', type: 'POTATO', x: 780, y: 180, config: {} },
-      { id: 'led1', type: 'LED', x: 1020, y: 100, config: {} }
-    ],
-    wires: [
-      { id: 'w1', from: { componentId: 'p1', portId: 'CU' }, to: { componentId: 'p2', portId: 'NAIL' }, color: '#1F2937' },
-      { id: 'w2', from: { componentId: 'p2', portId: 'CU' }, to: { componentId: 'p3', portId: 'NAIL' }, color: '#1F2937' },
-      { id: 'w3', from: { componentId: 'p3', portId: 'CU' }, to: { componentId: 'p4', portId: 'NAIL' }, color: '#1F2937' },
-      { id: 'w4', from: { componentId: 'p4', portId: 'CU' }, to: { componentId: 'led1', portId: 'A' }, color: '#EF4444' },
-      { id: 'w5', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'p1', portId: 'NAIL' }, color: '#1F2937' }
     ]
   },
 
@@ -305,8 +305,8 @@ void loop() {
     components: [
       { id: 'esp1', type: 'ESP32_S3', x: 60, y: 60, config: {} },
       { id: 'sonar1', type: 'HC_SR04', x: 420, y: 40, config: { distance: 12 } },
-      { id: 'ds18', type: 'DS18B20', x: 420, y: 200, config: { temp: 26 } },
-      { id: 'lcd1', type: 'LCD1602', x: 420, y: 360, config: { textLine1: 'MucNuoc: 12 cm', textLine2: 'CANH BAO: NGAP!' } }
+      { id: 'ds18', type: 'DS18B20', x: 420, y: 300, config: { temp: 26 } },
+      { id: 'lcd1', type: 'LCD1602', x: 420, y: 460, config: { textLine1: 'MucNuoc: 12 cm', textLine2: 'CANH BAO: NGAP!' } }
     ],
     wires: [
       { id: 'w1', from: { componentId: 'esp1', portId: '5V' }, to: { componentId: 'sonar1', portId: 'VCC' }, color: '#EF4444' },
@@ -458,7 +458,7 @@ void loop() {
       { id: 'mq2_1',  type: 'MQ2',     x: 420, y: 40,  config: { gasLevel: 650 } },
       { id: 'buzzer1',type: 'BUZZER',  x: 420, y: 200, config: {} },
       { id: 'relay1', type: 'RELAY',   x: 680, y: 200, config: {} },
-      { id: 'fan1',   type: 'DC_MOTOR',x: 680, y: 360, config: {} },
+      { id: 'fan1',   type: 'DC_MOTOR',x: 740, y: 360, config: {} },
       { id: 'lcd1',   type: 'LCD1602', x: 420, y: 360, config: { textLine1: 'Gas PPM: 650', textLine2: 'DANGER! FAN: ON' } }
     ],
     wires: [
@@ -545,10 +545,10 @@ void loop() {
     components: [
       { id: 'esp1', type: 'ESP32_S3', x: 60, y: 60, config: {} },
       { id: 'lcd1', type: 'LCD1602', x: 420, y: 40, config: { textLine1: 'T:29C H:60%', textLine2: 'Gas PPM: 180' } },
-      { id: 'dht1', type: 'DHT11', x: 420, y: 220, config: { value: 29, humidity: 60 } },
-      { id: 'mq2_1', type: 'MQ2', x: 680, y: 220, config: { gasLevel: 180 } },
-      { id: 'led1', type: 'LED', x: 680, y: 40, config: {} },
-      { id: 'r1', type: 'RESISTOR', x: 680, y: 130, config: {} }
+      { id: 'dht1', type: 'DHT11', x: 420, y: 380, config: { value: 29, humidity: 60 } },
+      { id: 'mq2_1', type: 'MQ2', x: 740, y: 120, config: { gasLevel: 180 } },
+      { id: 'r1', type: 'RESISTOR', x: 1020, y: 40, config: {} },
+      { id: 'led1', type: 'LED', x: 1020, y: 170, config: {} }
     ],
     wires: [
       { id: 'w1', from: { componentId: 'esp1', portId: '5V' }, to: { componentId: 'lcd1', portId: 'VCC' }, color: '#EF4444' },
@@ -650,10 +650,10 @@ void loop() {
       { id: 'esp1', type: 'ESP32_S3', x: 60, y: 60, config: {} },
       { id: 'dht1', type: 'DHT11', x: 420, y: 40, config: { value: 28, humidity: 62 } },
       { id: 'mq2_1', type: 'MQ2', x: 680, y: 40, config: { gasLevel: 110 } },
-      { id: 'sonar1', type: 'HC_SR04', x: 420, y: 230, config: { distance: 45 } },
-      { id: 'lcd1', type: 'LCD1602', x: 680, y: 230, config: { textLine1: 'T:28C H:62% G:110', textLine2: 'Water: 45cm OK' } },
-      { id: 'led1', type: 'LED', x: 940, y: 40, config: {} },
-      { id: 'r1', type: 'RESISTOR', x: 940, y: 130, config: {} }
+      { id: 'sonar1', type: 'HC_SR04', x: 420, y: 300, config: { distance: 45 } },
+      { id: 'lcd1', type: 'LCD1602', x: 700, y: 230, config: { textLine1: 'T:28C H:62% G:110', textLine2: 'Water: 45cm OK' } },
+      { id: 'r1', type: 'RESISTOR', x: 1020, y: 40, config: {} },
+      { id: 'led1', type: 'LED', x: 1020, y: 170, config: {} }
     ],
     wires: [
       { id: 'w1', from: { componentId: 'esp1', portId: '5V' }, to: { componentId: 'dht1', portId: 'VCC' }, color: '#EF4444' },
