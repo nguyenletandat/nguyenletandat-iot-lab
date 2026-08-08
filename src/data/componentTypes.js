@@ -593,11 +593,12 @@ export const COMPONENT_TYPES = {
     name: 'Relay 1 kênh 5V',
     subtitle: 'Module',
     category: 'Actuators', tags: ['Digital', 'Relay'],
-    width: 240, height: 120,
+    width: 240, height: 140,
     ports: [
       { id: 'VCC', name: 'VCC', x: 232, y: 24, side: 'right', type: 'power' },
       { id: 'GND', name: 'GND', x: 232, y: 44, side: 'right', type: 'gnd' },
-      { id: 'IN', name: 'IN Signal', x: 232, y: 64, side: 'right', type: 'gpio' }
+      { id: 'IN', name: 'IN Signal', x: 232, y: 64, side: 'right', type: 'gpio' },
+      { id: 'OUT', name: 'OUT (Tải)', x: 232, y: 84, side: 'right', type: 'power' }
     ],
     defaultConfig: { state: false, label: 'Relay' }
   },

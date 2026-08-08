@@ -180,9 +180,9 @@ void loop() {
 
   env_lab1: {
     name: 'B1: Quan trắc Khí hậu (DHT11 + LCD)',
-    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 1: Đọc Nhiệt độ & Độ ẩm không khí bằng DHT11, hiển thị chỉ số liên tục lên màn hình LCD1602 và Serial Monitor.',
-    code: `// BUỔI 1: TỔNG QUAN IOT & QUAN TRẮC KHÍ HẬU CƠ BẢN
-// Cảm biến DHT11 (Chân D15) & Màn hình LCD1602 I2C (Chân D21/D22)
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 1: Đọc Nhiệt độ & Độ ẩm không khí bằng DHT11, hiển thị chỉ số liên tục lên màn hình LCD1602 và Serial Monitor. Board: ESP32-S3-DevKitC-1.',
+    code: `// BUỔI 1: TỔNG QUAN IOT & QUAN TRẮC KHÍ HẬU CƠ BẢN (board ESP32-S3-DevKitC-1)
+// Cảm biến DHT11 (Chân GPIO15) & Màn hình LCD1602 I2C (SCL: GPIO9, SDA: GPIO8 — mặc định của ESP32-S3, KHÁC ESP32 thường dùng D21/D22)
 
 #include <LiquidCrystal.h>
 
@@ -226,26 +226,26 @@ void loop() {
   delay(600);
 }`,
     components: [
-      { id: 'esp1', type: 'ESP32', x: 60, y: 60, config: {} },
+      { id: 'esp1', type: 'ESP32_S3', x: 60, y: 60, config: {} },
       { id: 'dht1', type: 'DHT11', x: 420, y: 50, config: { value: 28, humidity: 65 } },
       { id: 'lcd1', type: 'LCD1602', x: 420, y: 240, config: { textLine1: 'Temp: 28 C', textLine2: 'Humi: 65 %' } }
     ],
     wires: [
-      { id: 'w1', from: { componentId: 'esp1', portId: 'VIN' }, to: { componentId: 'dht1', portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w1', from: { componentId: 'esp1', portId: '5V' }, to: { componentId: 'dht1', portId: 'VCC' }, color: '#EF4444' },
       { id: 'w2', from: { componentId: 'esp1', portId: 'GND1' }, to: { componentId: 'dht1', portId: 'GND' }, color: '#10B981' },
-      { id: 'w3', from: { componentId: 'esp1', portId: 'D15' }, to: { componentId: 'dht1', portId: 'DATA' }, color: '#F59E0B' },
-      { id: 'w4', from: { componentId: 'esp1', portId: 'VIN' }, to: { componentId: 'lcd1', portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w3', from: { componentId: 'esp1', portId: 'GPIO15' }, to: { componentId: 'dht1', portId: 'DATA' }, color: '#F59E0B' },
+      { id: 'w4', from: { componentId: 'esp1', portId: '5V' }, to: { componentId: 'lcd1', portId: 'VCC' }, color: '#EF4444' },
       { id: 'w5', from: { componentId: 'esp1', portId: 'GND2' }, to: { componentId: 'lcd1', portId: 'GND' }, color: '#10B981' },
-      { id: 'w6', from: { componentId: 'esp1', portId: 'D22' }, to: { componentId: 'lcd1', portId: 'SCL' }, color: '#3B82F6' },
-      { id: 'w7', from: { componentId: 'esp1', portId: 'D21' }, to: { componentId: 'lcd1', portId: 'SDA' }, color: '#8B5CF6' }
+      { id: 'w6', from: { componentId: 'esp1', portId: 'GPIO9' }, to: { componentId: 'lcd1', portId: 'SCL' }, color: '#3B82F6' },
+      { id: 'w7', from: { componentId: 'esp1', portId: 'GPIO8' }, to: { componentId: 'lcd1', portId: 'SDA' }, color: '#8B5CF6' }
     ]
   },
 
   env_lab2: {
     name: 'B2: Quan trắc Nước & Cảnh báo Ngập',
-    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 2: Đo mực nước (HC-SR04) & Nhiệt độ nguồn nước (DS18B20), hiển thị LCD1602 và phát cảnh báo ngập lụt.',
-    code: `// BUỔI 2: QUAN TRẮC NGUỒN NƯỚC & CẢNH BÁO NGẬP LỤT
-// Siêu âm HC-SR04 (Trig: D5, Echo: D18), DS18B20 (D4), LCD1602
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 2: Đo mực nước (HC-SR04) & Nhiệt độ nguồn nước (DS18B20), hiển thị LCD1602 và phát cảnh báo ngập lụt. Board: ESP32-S3-DevKitC-1.',
+    code: `// BUỔI 2: QUAN TRẮC NGUỒN NƯỚC & CẢNH BÁO NGẬP LỤT (board ESP32-S3-DevKitC-1)
+// Siêu âm HC-SR04 (Trig: GPIO5, Echo: GPIO18), DS18B20 (GPIO4), LCD1602 I2C (SCL: GPIO9, SDA: GPIO8)
 
 #include <LiquidCrystal.h>
 
@@ -303,36 +303,37 @@ void loop() {
   delay(600);
 }`,
     components: [
-      { id: 'esp1', type: 'ESP32', x: 60, y: 60, config: {} },
+      { id: 'esp1', type: 'ESP32_S3', x: 60, y: 60, config: {} },
       { id: 'sonar1', type: 'HC_SR04', x: 420, y: 40, config: { distance: 12 } },
       { id: 'ds18', type: 'DS18B20', x: 420, y: 200, config: { temp: 26 } },
       { id: 'lcd1', type: 'LCD1602', x: 420, y: 360, config: { textLine1: 'MucNuoc: 12 cm', textLine2: 'CANH BAO: NGAP!' } }
     ],
     wires: [
-      { id: 'w1', from: { componentId: 'esp1', portId: 'VIN' }, to: { componentId: 'sonar1', portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w1', from: { componentId: 'esp1', portId: '5V' }, to: { componentId: 'sonar1', portId: 'VCC' }, color: '#EF4444' },
       { id: 'w2', from: { componentId: 'esp1', portId: 'GND1' }, to: { componentId: 'sonar1', portId: 'GND' }, color: '#10B981' },
-      { id: 'w3', from: { componentId: 'esp1', portId: 'D5' }, to: { componentId: 'sonar1', portId: 'TRIG' }, color: '#3B82F6' },
-      { id: 'w4', from: { componentId: 'esp1', portId: 'D18' }, to: { componentId: 'sonar1', portId: 'ECHO' }, color: '#8B5CF6' },
-      { id: 'w5', from: { componentId: 'esp1', portId: '3V3' }, to: { componentId: 'ds18', portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w3', from: { componentId: 'esp1', portId: 'GPIO5' }, to: { componentId: 'sonar1', portId: 'TRIG' }, color: '#3B82F6' },
+      { id: 'w4', from: { componentId: 'esp1', portId: 'GPIO18' }, to: { componentId: 'sonar1', portId: 'ECHO' }, color: '#8B5CF6' },
+      { id: 'w5', from: { componentId: 'esp1', portId: '3V3_1' }, to: { componentId: 'ds18', portId: 'VCC' }, color: '#EF4444' },
       { id: 'w6', from: { componentId: 'esp1', portId: 'GND2' }, to: { componentId: 'ds18', portId: 'GND' }, color: '#10B981' },
-      { id: 'w7', from: { componentId: 'esp1', portId: 'D4' }, to: { componentId: 'ds18', portId: 'DQ' }, color: '#F59E0B' },
-      { id: 'w8', from: { componentId: 'esp1', portId: 'VIN' }, to: { componentId: 'lcd1', portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w7', from: { componentId: 'esp1', portId: 'GPIO4' }, to: { componentId: 'ds18', portId: 'DATA' }, color: '#F59E0B' },
+      { id: 'w8', from: { componentId: 'esp1', portId: '5V' }, to: { componentId: 'lcd1', portId: 'VCC' }, color: '#EF4444' },
       { id: 'w9', from: { componentId: 'esp1', portId: 'GND1' }, to: { componentId: 'lcd1', portId: 'GND' }, color: '#10B981' },
-      { id: 'w10', from: { componentId: 'esp1', portId: 'D22' }, to: { componentId: 'lcd1', portId: 'SCL' }, color: '#3B82F6' },
-      { id: 'w11', from: { componentId: 'esp1', portId: 'D21' }, to: { componentId: 'lcd1', portId: 'SDA' }, color: '#8B5CF6' }
+      { id: 'w10', from: { componentId: 'esp1', portId: 'GPIO9' }, to: { componentId: 'lcd1', portId: 'SCL' }, color: '#3B82F6' },
+      { id: 'w11', from: { componentId: 'esp1', portId: 'GPIO8' }, to: { componentId: 'lcd1', portId: 'SDA' }, color: '#8B5CF6' }
     ]
   },
 
   env_lab3: {
     name: 'B3: Tưới cây Tự động (Soil + Bơm Relay)',
-    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 3: Giám sát độ ẩm đất. Tự động bật Module Relay kích hoạt Máy bơm nước khi đất bị khô dưới ngưỡng cài đặt.',
-    code: `// BUỔI 3: QUAN TRẮC ĐẤT & HỆ THỐNG TƯỚI CÂY TỰ ĐỘNG
-// Cảm biến Độ ẩm đất (D34), Module Relay Bơm nước (D26), LCD1602
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 3: Giám sát độ ẩm đất. Tự động bật Module Relay kích hoạt Máy bơm nước khi đất bị khô dưới ngưỡng cài đặt. Board: ESP32-S3-DevKitC-1.',
+    code: `// BUỔI 3: QUAN TRẮC ĐẤT & HỆ THỐNG TƯỚI CÂY TỰ ĐỘNG (board ESP32-S3-DevKitC-1)
+// Cảm biến Độ ẩm đất (GPIO6), Module Relay Bơm nước (GPIO7), LCD1602 I2C (SCL: GPIO9, SDA: GPIO8)
+// Lưu ý: GPIO34/GPIO26 dùng trên ESP32 thường KHÔNG tồn tại trên ESP32-S3 nên đã đổi sang GPIO6/GPIO7.
 
 #include <LiquidCrystal.h>
 
-#define SOIL_PIN 34
-#define RELAY_PIN 26
+#define SOIL_PIN 6
+#define RELAY_PIN 7
 
 LiquidCrystal lcd;
 
@@ -373,38 +374,39 @@ void loop() {
   delay(600);
 }`,
     components: [
-      { id: 'esp1', type: 'ESP32', x: 60, y: 60, config: {} },
+      { id: 'esp1', type: 'ESP32_S3', x: 60, y: 60, config: {} },
       { id: 'soil1', type: 'SOIL_MOISTURE', x: 420, y: 40, config: { moisture: 250 } },
       { id: 'relay1', type: 'RELAY', x: 420, y: 200, config: {} },
       { id: 'pump1', type: 'DC_MOTOR', x: 680, y: 200, config: {} },
       { id: 'lcd1', type: 'LCD1602', x: 420, y: 360, config: { textLine1: 'DoAmDat: 250', textLine2: 'BOM: DANG TUOI!' } }
     ],
     wires: [
-      { id: 'w1', from: { componentId: 'esp1', portId: '3V3' }, to: { componentId: 'soil1', portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w1', from: { componentId: 'esp1', portId: '3V3_1' }, to: { componentId: 'soil1', portId: 'VCC' }, color: '#EF4444' },
       { id: 'w2', from: { componentId: 'esp1', portId: 'GND1' }, to: { componentId: 'soil1', portId: 'GND' }, color: '#10B981' },
-      { id: 'w3', from: { componentId: 'esp1', portId: 'D34' }, to: { componentId: 'soil1', portId: 'AO' }, color: '#F59E0B' },
-      { id: 'w4', from: { componentId: 'esp1', portId: 'VIN' }, to: { componentId: 'relay1', portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w3', from: { componentId: 'esp1', portId: 'GPIO6' }, to: { componentId: 'soil1', portId: 'AO' }, color: '#F59E0B' },
+      { id: 'w4', from: { componentId: 'esp1', portId: '5V' }, to: { componentId: 'relay1', portId: 'VCC' }, color: '#EF4444' },
       { id: 'w5', from: { componentId: 'esp1', portId: 'GND2' }, to: { componentId: 'relay1', portId: 'GND' }, color: '#10B981' },
-      { id: 'w6', from: { componentId: 'esp1', portId: 'D26' }, to: { componentId: 'relay1', portId: 'IN' }, color: '#3B82F6' },
-      { id: 'w7', from: { componentId: 'relay1', portId: 'OUT' }, to: { componentId: 'pump1', portId: 'VCC' }, color: '#EF4444' },
-      { id: 'w8', from: { componentId: 'esp1', portId: 'GND1' }, to: { componentId: 'pump1', portId: 'GND' }, color: '#10B981' },
-      { id: 'w9', from: { componentId: 'esp1', portId: 'VIN' }, to: { componentId: 'lcd1', portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w6', from: { componentId: 'esp1', portId: 'GPIO7' }, to: { componentId: 'relay1', portId: 'IN' }, color: '#3B82F6' },
+      { id: 'w7', from: { componentId: 'relay1', portId: 'OUT' }, to: { componentId: 'pump1', portId: 'POS' }, color: '#EF4444' },
+      { id: 'w8', from: { componentId: 'esp1', portId: 'GND1' }, to: { componentId: 'pump1', portId: 'NEG' }, color: '#10B981' },
+      { id: 'w9', from: { componentId: 'esp1', portId: '5V' }, to: { componentId: 'lcd1', portId: 'VCC' }, color: '#EF4444' },
       { id: 'w10', from: { componentId: 'esp1', portId: 'GND1' }, to: { componentId: 'lcd1', portId: 'GND' }, color: '#10B981' },
-      { id: 'w11', from: { componentId: 'esp1', portId: 'D22' }, to: { componentId: 'lcd1', portId: 'SCL' }, color: '#3B82F6' },
-      { id: 'w12', from: { componentId: 'esp1', portId: 'D21' }, to: { componentId: 'lcd1', portId: 'SDA' }, color: '#8B5CF6' }
+      { id: 'w11', from: { componentId: 'esp1', portId: 'GPIO9' }, to: { componentId: 'lcd1', portId: 'SCL' }, color: '#3B82F6' },
+      { id: 'w12', from: { componentId: 'esp1', portId: 'GPIO8' }, to: { componentId: 'lcd1', portId: 'SDA' }, color: '#8B5CF6' }
     ]
   },
 
   env_lab4: {
     name: 'B4: Cảnh báo Khí độc (MQ-2 + Còi + Quạt)',
-    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 4: Đo nồng độ Khí Gas/Khói bằng MQ-2. Bật Còi hú + Quạt thông gió qua Relay khi nồng độ nguy hiểm, tự tắt còi khi an toàn.',
-    code: `// BUỔI 4: CẢNH BÁO RÒ RỈ KHÍ ĐỘC & KHÓI THẢI MÔI TRƯỜNG
-// Cảm biến Gas MQ-2 (D35), Còi hú (D27), Relay Quạt (D14), LCD1602
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 4: Đo nồng độ Khí Gas/Khói bằng MQ-2. Bật Còi hú + Quạt thông gió qua Relay khi nồng độ nguy hiểm, tự tắt còi khi an toàn. Board: ESP32-S3-DevKitC-1.',
+    code: `// BUỔI 4: CẢNH BÁO RÒ RỈ KHÍ ĐỘC & KHÓI THẢI MÔI TRƯỜNG (board ESP32-S3-DevKitC-1)
+// Cảm biến Gas MQ-2 (GPIO11), Còi hú (GPIO12), Relay Quạt (GPIO14), LCD1602 I2C (SCL: GPIO9, SDA: GPIO8)
+// Lưu ý: GPIO35/GPIO27 dùng trên ESP32 thường KHÔNG tồn tại/bị hạn chế trên ESP32-S3 nên đã đổi sang GPIO11/GPIO12.
 
 #include <LiquidCrystal.h>
 
-#define GAS_PIN 35
-#define BUZZER_PIN 27
+#define GAS_PIN 11
+#define BUZZER_PIN 12
 #define FAN_RELAY_PIN 14
 
 LiquidCrystal lcd;
@@ -452,7 +454,7 @@ void loop() {
   delay(600);
 }`,
     components: [
-      { id: 'esp1',    type: 'ESP32',   x: 60,  y: 60,  config: {} },
+      { id: 'esp1',    type: 'ESP32_S3', x: 60,  y: 60,  config: {} },
       { id: 'mq2_1',  type: 'MQ2',     x: 420, y: 40,  config: { gasLevel: 650 } },
       { id: 'buzzer1',type: 'BUZZER',  x: 420, y: 200, config: {} },
       { id: 'relay1', type: 'RELAY',   x: 680, y: 200, config: {} },
@@ -460,39 +462,42 @@ void loop() {
       { id: 'lcd1',   type: 'LCD1602', x: 420, y: 360, config: { textLine1: 'Gas PPM: 650', textLine2: 'DANGER! FAN: ON' } }
     ],
     wires: [
-      { id: 'w1',  from: { componentId: 'esp1',    portId: 'VIN'  }, to: { componentId: 'mq2_1',  portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w1',  from: { componentId: 'esp1',    portId: '5V'    }, to: { componentId: 'mq2_1',  portId: 'VCC' }, color: '#EF4444' },
       { id: 'w2',  from: { componentId: 'esp1',    portId: 'GND1' }, to: { componentId: 'mq2_1',  portId: 'GND' }, color: '#10B981' },
-      { id: 'w3',  from: { componentId: 'esp1',    portId: 'D35'  }, to: { componentId: 'mq2_1',  portId: 'AO'  }, color: '#F59E0B' },
-      { id: 'w4',  from: { componentId: 'esp1',    portId: 'D27'  }, to: { componentId: 'buzzer1',portId: 'VCC' }, color: '#EF4444' },
-      { id: 'w5',  from: { componentId: 'esp1',    portId: 'GND2' }, to: { componentId: 'buzzer1',portId: 'GND' }, color: '#10B981' },
-      { id: 'w6',  from: { componentId: 'esp1',    portId: 'VIN'  }, to: { componentId: 'relay1', portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w3',  from: { componentId: 'esp1',    portId: 'GPIO11' }, to: { componentId: 'mq2_1',  portId: 'AO'  }, color: '#F59E0B' },
+      { id: 'w4',  from: { componentId: 'esp1',    portId: 'GPIO12' }, to: { componentId: 'buzzer1',portId: 'POS' }, color: '#EF4444' },
+      { id: 'w5',  from: { componentId: 'esp1',    portId: 'GND2' }, to: { componentId: 'buzzer1',portId: 'NEG' }, color: '#10B981' },
+      { id: 'w6',  from: { componentId: 'esp1',    portId: '5V'    }, to: { componentId: 'relay1', portId: 'VCC' }, color: '#EF4444' },
       { id: 'w7',  from: { componentId: 'esp1',    portId: 'GND1' }, to: { componentId: 'relay1', portId: 'GND' }, color: '#10B981' },
-      { id: 'w8',  from: { componentId: 'esp1',    portId: 'D14'  }, to: { componentId: 'relay1', portId: 'IN'  }, color: '#3B82F6' },
-      { id: 'w9',  from: { componentId: 'relay1',  portId: 'OUT'  }, to: { componentId: 'fan1',   portId: 'VCC' }, color: '#EF4444' },
-      { id: 'w10', from: { componentId: 'esp1',    portId: 'GND1' }, to: { componentId: 'fan1',   portId: 'GND' }, color: '#10B981' },
-      { id: 'w11', from: { componentId: 'esp1',    portId: 'VIN'  }, to: { componentId: 'lcd1',   portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w8',  from: { componentId: 'esp1',    portId: 'GPIO14' }, to: { componentId: 'relay1', portId: 'IN'  }, color: '#3B82F6' },
+      { id: 'w9',  from: { componentId: 'relay1',  portId: 'OUT'  }, to: { componentId: 'fan1',   portId: 'POS' }, color: '#EF4444' },
+      { id: 'w10', from: { componentId: 'esp1',    portId: 'GND1' }, to: { componentId: 'fan1',   portId: 'NEG' }, color: '#10B981' },
+      { id: 'w11', from: { componentId: 'esp1',    portId: '5V'    }, to: { componentId: 'lcd1',   portId: 'VCC' }, color: '#EF4444' },
       { id: 'w12', from: { componentId: 'esp1',    portId: 'GND1' }, to: { componentId: 'lcd1',   portId: 'GND' }, color: '#10B981' },
-      { id: 'w13', from: { componentId: 'esp1',    portId: 'D22'  }, to: { componentId: 'lcd1',   portId: 'SCL' }, color: '#3B82F6' },
-      { id: 'w14', from: { componentId: 'esp1',    portId: 'D21'  }, to: { componentId: 'lcd1',   portId: 'SDA' }, color: '#8B5CF6' }
+      { id: 'w13', from: { componentId: 'esp1',    portId: 'GPIO9'  }, to: { componentId: 'lcd1',   portId: 'SCL' }, color: '#3B82F6' },
+      { id: 'w14', from: { componentId: 'esp1',    portId: 'GPIO8'  }, to: { componentId: 'lcd1',   portId: 'SDA' }, color: '#8B5CF6' }
     ]
   },
 
   env_lab5: {
     name: 'B5: Trạm HMI Môi trường (LCD + CB)',
-    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 5: Xây dựng Giao diện Hiển thị HMI tại chỗ bằng Màn hình LCD1602 tích hợp cảm biến Khí độc MQ-2 & Nhiệt ẩm DHT11.',
-    code: `// BUỔI 5: GIAO DIỆN HMI TẠI CHỖ CHO TRẠM QUAN TRẮC MÔI TRƯỜNG
-// LCD1602 I2C (D21/D22), DHT11 (D15), MQ-2 (D34)
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 5: Xây dựng Giao diện Hiển thị HMI tại chỗ bằng Màn hình LCD1602 tích hợp cảm biến Khí độc MQ-2 & Nhiệt ẩm DHT11, có đèn LED cảnh báo khi khí gas vượt ngưỡng. Board: ESP32-S3-DevKitC-1.',
+    code: `// BUỔI 5: GIAO DIỆN HMI TẠI CHỖ CHO TRẠM QUAN TRẮC MÔI TRƯỜNG (board ESP32-S3-DevKitC-1)
+// LCD1602 I2C (SCL: GPIO9, SDA: GPIO8), DHT11 (GPIO15), MQ-2 (GPIO11), LED cảnh báo (GPIO16)
+// Lưu ý: GPIO34 dùng trên ESP32 thường KHÔNG tồn tại trên ESP32-S3 nên đã đổi sang GPIO11.
 
 #include <LiquidCrystal.h>
 
 #define DHT_PIN 15
-#define GAS_PIN 34
+#define GAS_PIN 11
+#define LED_PIN 16
 
 LiquidCrystal lcd;
 
 void setup() {
   Serial.begin(115200);
   pinMode(DHT_PIN, INPUT);
+  pinMode(LED_PIN, OUTPUT);
 
   lcd.begin(16, 2);
   lcd.setCursor(0, 0);
@@ -528,40 +533,55 @@ void loop() {
   lcd.print(gasPpm);
   lcd.print("   ");
 
+  // Đèn LED cảnh báo — bật khi nồng độ khí gas vượt ngưỡng an toàn
+  if (gasPpm > 300) {
+    digitalWrite(LED_PIN, HIGH);
+  } else {
+    digitalWrite(LED_PIN, LOW);
+  }
+
   delay(600);
 }`,
     components: [
-      { id: 'esp1', type: 'ESP32', x: 60, y: 60, config: {} },
+      { id: 'esp1', type: 'ESP32_S3', x: 60, y: 60, config: {} },
       { id: 'lcd1', type: 'LCD1602', x: 420, y: 40, config: { textLine1: 'T:29C H:60%', textLine2: 'Gas PPM: 180' } },
       { id: 'dht1', type: 'DHT11', x: 420, y: 220, config: { value: 29, humidity: 60 } },
-      { id: 'mq2_1', type: 'MQ2', x: 680, y: 220, config: { gasLevel: 180 } }
+      { id: 'mq2_1', type: 'MQ2', x: 680, y: 220, config: { gasLevel: 180 } },
+      { id: 'led1', type: 'LED', x: 680, y: 40, config: {} },
+      { id: 'r1', type: 'RESISTOR', x: 680, y: 130, config: {} }
     ],
     wires: [
-      { id: 'w1', from: { componentId: 'esp1', portId: 'VIN' }, to: { componentId: 'lcd1', portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w1', from: { componentId: 'esp1', portId: '5V' }, to: { componentId: 'lcd1', portId: 'VCC' }, color: '#EF4444' },
       { id: 'w2', from: { componentId: 'esp1', portId: 'GND1' }, to: { componentId: 'lcd1', portId: 'GND' }, color: '#10B981' },
-      { id: 'w3', from: { componentId: 'esp1', portId: 'D22' }, to: { componentId: 'lcd1', portId: 'SCL' }, color: '#3B82F6' },
-      { id: 'w4', from: { componentId: 'esp1', portId: 'D21' }, to: { componentId: 'lcd1', portId: 'SDA' }, color: '#8B5CF6' },
-      { id: 'w5', from: { componentId: 'esp1', portId: 'VIN' }, to: { componentId: 'dht1', portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w3', from: { componentId: 'esp1', portId: 'GPIO9' }, to: { componentId: 'lcd1', portId: 'SCL' }, color: '#3B82F6' },
+      { id: 'w4', from: { componentId: 'esp1', portId: 'GPIO8' }, to: { componentId: 'lcd1', portId: 'SDA' }, color: '#8B5CF6' },
+      { id: 'w5', from: { componentId: 'esp1', portId: '5V' }, to: { componentId: 'dht1', portId: 'VCC' }, color: '#EF4444' },
       { id: 'w6', from: { componentId: 'esp1', portId: 'GND2' }, to: { componentId: 'dht1', portId: 'GND' }, color: '#10B981' },
-      { id: 'w7', from: { componentId: 'esp1', portId: 'D15' }, to: { componentId: 'dht1', portId: 'DATA' }, color: '#F59E0B' },
-      { id: 'w8', from: { componentId: 'esp1', portId: 'VIN' }, to: { componentId: 'mq2_1', portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w7', from: { componentId: 'esp1', portId: 'GPIO15' }, to: { componentId: 'dht1', portId: 'DATA' }, color: '#F59E0B' },
+      { id: 'w8', from: { componentId: 'esp1', portId: '5V' }, to: { componentId: 'mq2_1', portId: 'VCC' }, color: '#EF4444' },
       { id: 'w9', from: { componentId: 'esp1', portId: 'GND1' }, to: { componentId: 'mq2_1', portId: 'GND' }, color: '#10B981' },
-      { id: 'w10', from: { componentId: 'esp1', portId: 'D34' }, to: { componentId: 'mq2_1', portId: 'AO' }, color: '#F59E0B' }
+      { id: 'w10', from: { componentId: 'esp1', portId: 'GPIO11' }, to: { componentId: 'mq2_1', portId: 'AO' }, color: '#F59E0B' },
+      { id: 'w11', from: { componentId: 'esp1', portId: 'GPIO16' }, to: { componentId: 'r1', portId: 'L' }, color: '#3B82F6' },
+      { id: 'w12', from: { componentId: 'r1', portId: 'R' }, to: { componentId: 'led1', portId: 'A' }, color: '#3B82F6' },
+      { id: 'w13', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'esp1', portId: 'GND3' }, color: '#10B981' }
     ]
   },
 
   env_lab6: {
     name: 'B6: Trạm Môi trường Đa thông số IoT',
-    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 6: Đồ án Đa cảm biến tổng hợp: Nhiệt ẩm, Mực nước, Khí độc. Hiển thị LCD1602 & đẩy Cloud Telemetry.',
-    code: `// BUỔI 6: ĐỒ ÁN TỔNG HỢP — TRẠM QUAN TRẮC MÔI TRƯỜNG ĐA THÔNG SỐ IOT
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 6: Đồ án Đa cảm biến tổng hợp: Nhiệt ẩm, Mực nước, Khí độc. Hiển thị LCD1602, đẩy Cloud Telemetry & bật đèn LED cảnh báo khi có thông số nguy hiểm. Board: ESP32-S3-DevKitC-1.',
+    code: `// BUỔI 6: ĐỒ ÁN TỔNG HỢP — TRẠM QUAN TRẮC MÔI TRƯỜNG ĐA THÔNG SỐ IOT (board ESP32-S3-DevKitC-1)
 // Tích hợp Đa cảm biến & Tự động đẩy dữ liệu Telemetry lên IoT Cloud
+// LCD1602 I2C (SCL: GPIO9, SDA: GPIO8), LED cảnh báo (GPIO16)
+// Lưu ý: GPIO35 dùng trên ESP32 thường KHÔNG tồn tại trên ESP32-S3 nên đã đổi sang GPIO11.
 
 #include <LiquidCrystal.h>
 
 #define DHT_PIN 15
-#define GAS_PIN 35
+#define GAS_PIN 11
 #define TRIG_PIN 5
 #define ECHO_PIN 18
+#define LED_PIN 16
 
 LiquidCrystal lcd;
 
@@ -569,6 +589,7 @@ void setup() {
   Serial.begin(115200);
   pinMode(TRIG_PIN, OUTPUT);
   pinMode(ECHO_PIN, INPUT);
+  pinMode(LED_PIN, OUTPUT);
 
   lcd.begin(16, 2);
   lcd.setCursor(0, 0);
@@ -616,30 +637,42 @@ void loop() {
   lcd.print(waterLevel);
   lcd.print("cm OK  ");
 
+  // Đèn LED cảnh báo — bật khi khí gas cao HOẶC mực nước dâng ngập (giống ngưỡng Buổi 2 & 4)
+  if (gasPpm > 300 || waterLevel < 15) {
+    digitalWrite(LED_PIN, HIGH);
+  } else {
+    digitalWrite(LED_PIN, LOW);
+  }
+
   delay(600);
 }`,
     components: [
-      { id: 'esp1', type: 'ESP32', x: 60, y: 60, config: {} },
+      { id: 'esp1', type: 'ESP32_S3', x: 60, y: 60, config: {} },
       { id: 'dht1', type: 'DHT11', x: 420, y: 40, config: { value: 28, humidity: 62 } },
       { id: 'mq2_1', type: 'MQ2', x: 680, y: 40, config: { gasLevel: 110 } },
       { id: 'sonar1', type: 'HC_SR04', x: 420, y: 230, config: { distance: 45 } },
-      { id: 'lcd1', type: 'LCD1602', x: 680, y: 230, config: { textLine1: 'T:28C H:62% G:110', textLine2: 'Water: 45cm OK' } }
+      { id: 'lcd1', type: 'LCD1602', x: 680, y: 230, config: { textLine1: 'T:28C H:62% G:110', textLine2: 'Water: 45cm OK' } },
+      { id: 'led1', type: 'LED', x: 940, y: 40, config: {} },
+      { id: 'r1', type: 'RESISTOR', x: 940, y: 130, config: {} }
     ],
     wires: [
-      { id: 'w1', from: { componentId: 'esp1', portId: 'VIN' }, to: { componentId: 'dht1', portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w1', from: { componentId: 'esp1', portId: '5V' }, to: { componentId: 'dht1', portId: 'VCC' }, color: '#EF4444' },
       { id: 'w2', from: { componentId: 'esp1', portId: 'GND1' }, to: { componentId: 'dht1', portId: 'GND' }, color: '#10B981' },
-      { id: 'w3', from: { componentId: 'esp1', portId: 'D15' }, to: { componentId: 'dht1', portId: 'DATA' }, color: '#F59E0B' },
-      { id: 'w4', from: { componentId: 'esp1', portId: 'VIN' }, to: { componentId: 'mq2_1', portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w3', from: { componentId: 'esp1', portId: 'GPIO15' }, to: { componentId: 'dht1', portId: 'DATA' }, color: '#F59E0B' },
+      { id: 'w4', from: { componentId: 'esp1', portId: '5V' }, to: { componentId: 'mq2_1', portId: 'VCC' }, color: '#EF4444' },
       { id: 'w5', from: { componentId: 'esp1', portId: 'GND2' }, to: { componentId: 'mq2_1', portId: 'GND' }, color: '#10B981' },
-      { id: 'w6', from: { componentId: 'esp1', portId: 'D35' }, to: { componentId: 'mq2_1', portId: 'AO' }, color: '#F59E0B' },
-      { id: 'w7', from: { componentId: 'esp1', portId: 'VIN' }, to: { componentId: 'sonar1', portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w6', from: { componentId: 'esp1', portId: 'GPIO11' }, to: { componentId: 'mq2_1', portId: 'AO' }, color: '#F59E0B' },
+      { id: 'w7', from: { componentId: 'esp1', portId: '5V' }, to: { componentId: 'sonar1', portId: 'VCC' }, color: '#EF4444' },
       { id: 'w8', from: { componentId: 'esp1', portId: 'GND1' }, to: { componentId: 'sonar1', portId: 'GND' }, color: '#10B981' },
-      { id: 'w9', from: { componentId: 'esp1', portId: 'D5' }, to: { componentId: 'sonar1', portId: 'TRIG' }, color: '#3B82F6' },
-      { id: 'w10', from: { componentId: 'esp1', portId: 'D18' }, to: { componentId: 'sonar1', portId: 'ECHO' }, color: '#8B5CF6' },
-      { id: 'w11', from: { componentId: 'esp1', portId: 'VIN' }, to: { componentId: 'lcd1', portId: 'VCC' }, color: '#EF4444' },
+      { id: 'w9', from: { componentId: 'esp1', portId: 'GPIO5' }, to: { componentId: 'sonar1', portId: 'TRIG' }, color: '#3B82F6' },
+      { id: 'w10', from: { componentId: 'esp1', portId: 'GPIO18' }, to: { componentId: 'sonar1', portId: 'ECHO' }, color: '#8B5CF6' },
+      { id: 'w11', from: { componentId: 'esp1', portId: '5V' }, to: { componentId: 'lcd1', portId: 'VCC' }, color: '#EF4444' },
       { id: 'w12', from: { componentId: 'esp1', portId: 'GND1' }, to: { componentId: 'lcd1', portId: 'GND' }, color: '#10B981' },
-      { id: 'w13', from: { componentId: 'esp1', portId: 'D22' }, to: { componentId: 'lcd1', portId: 'SCL' }, color: '#3B82F6' },
-      { id: 'w14', from: { componentId: 'esp1', portId: 'D21' }, to: { componentId: 'lcd1', portId: 'SDA' }, color: '#8B5CF6' }
+      { id: 'w13', from: { componentId: 'esp1', portId: 'GPIO9' }, to: { componentId: 'lcd1', portId: 'SCL' }, color: '#3B82F6' },
+      { id: 'w14', from: { componentId: 'esp1', portId: 'GPIO8' }, to: { componentId: 'lcd1', portId: 'SDA' }, color: '#8B5CF6' },
+      { id: 'w15', from: { componentId: 'esp1', portId: 'GPIO16' }, to: { componentId: 'r1', portId: 'L' }, color: '#3B82F6' },
+      { id: 'w16', from: { componentId: 'r1', portId: 'R' }, to: { componentId: 'led1', portId: 'A' }, color: '#3B82F6' },
+      { id: 'w17', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'esp1', portId: 'GND3' }, color: '#10B981' }
     ]
   }
 };
