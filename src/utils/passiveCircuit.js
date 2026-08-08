@@ -10,9 +10,11 @@
  * quả mới đủ điện áp — đây là điểm cần lưu ý khi giảng dạy.
  */
 import { COMPONENT_TYPES } from '../data/componentTypes';
+import { UnionFind, nodeKey } from './unionFind';
 
 // Các linh kiện thụ động dẫn điện xuyên qua 2 chân (coi như dây dẫn cho mục đích kiểm tra vòng kín)
-const PASS_THROUGH_PORTS = {
+// Export để activeCircuit.js dùng chung — cùng một tập linh kiện "dẫn điện xuyên chân".
+export const PASS_THROUGH_PORTS = {
   RESISTOR: ['L', 'R'],
   DIODE: ['A', 'K'],
   CAPACITOR: ['L', 'R'],
@@ -42,25 +44,6 @@ const GLOWING_LOAD_TYPES = {
   LED: { anodeType: 'gpio', cathodeType: 'gnd' },
   LIGHT_BULB: { anodeType: 'gpio', cathodeType: 'gnd' },
 };
-
-const nodeKey = (compId, portId) => `${compId}:${portId}`;
-
-class UnionFind {
-  constructor() { this.parent = new Map(); }
-  ensure(x) { if (!this.parent.has(x)) this.parent.set(x, x); }
-  find(x) {
-    this.ensure(x);
-    while (this.parent.get(x) !== x) {
-      this.parent.set(x, this.parent.get(this.parent.get(x)));
-      x = this.parent.get(x);
-    }
-    return x;
-  }
-  union(a, b) {
-    const ra = this.find(a), rb = this.find(b);
-    if (ra !== rb) this.parent.set(ra, rb);
-  }
-}
 
 /**
  * Trả về Set các id của LED đang sáng do mạch thụ động (nguồn pin) tạo thành vòng kín.

@@ -27,6 +27,7 @@ import { useCanvasInteractions } from './hooks/useCanvasInteractions';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useIntegrityGuard } from './hooks/useIntegrityGuard';
 import { computeLitLeds } from './utils/passiveCircuit';
+import { computeActiveOutputs } from './utils/activeCircuit';
 import { toPng } from 'html-to-image';
 
 const CONTROL_BOARD_TYPES = ['ESP32', 'ESP32_V4', 'ESP32_S3', 'ARDUINO_UNO', 'ARDUINO_NANO', 'ARDUINO_MEGA', 'ESP8266'];
@@ -337,6 +338,14 @@ export default function App() {
   const litLedIds = useMemo(
     () => computeLitLeds(canvas.components, canvas.wires),
     [canvas.components, canvas.wires]
+  );
+
+  // Trạng thái BẬT/TẮT thật của LED/RGB LED/Buzzer/Relay/Động cơ DC khi đang mô
+  // phỏng code — dựa trên chân board thật (digitalWrite/analogWrite) thay vì chỉ
+  // "sáng suốt lúc mô phỏng đang chạy". Xem src/utils/activeCircuit.js
+  const activeOutputs = useMemo(
+    () => (sim.isSimulating ? computeActiveOutputs(canvas.components, canvas.wires, sim.pinStates) : new Map()),
+    [canvas.components, canvas.wires, sim.pinStates, sim.isSimulating]
   );
 
   return (
@@ -699,7 +708,7 @@ export default function App() {
                       onMouseDown={(e) => handleMouseDownComponent(e, comp.id)}
                       onTouchStart={(e) => { e.stopPropagation(); handleMouseDownComponent(e, comp.id); }}
                     >
-                      <CanvasComponentRender comp={comp} allComps={canvas.components} isSelected={isSelected} isSimulating={sim.isSimulating} isLit={litLedIds.has(comp.id)} />
+                      <CanvasComponentRender comp={comp} allComps={canvas.components} isSelected={isSelected} isSimulating={sim.isSimulating} isLit={litLedIds.has(comp.id)} pinState={activeOutputs.get(comp.id)} />
                       {/* Port Pin Sockets — Dual Ring Hardware Socket System */}
                       {proto?.ports.map(p => {
                         const connectedWire = canvas.wires.find(w =>

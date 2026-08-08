@@ -36,7 +36,7 @@ const REAL_IMAGES = {
   LDR: `${ASSET_BASE}ldr.png`,
 };
 
-export default function CanvasComponentRender({ comp, allComps, isSelected, isSimulating, isLit }) {
+export default function CanvasComponentRender({ comp, allComps, isSelected, isSimulating, isLit, pinState }) {
   const proto = COMPONENT_TYPES[comp.type] || {
     name: comp.type,
     subtitle: 'Module',
@@ -47,6 +47,11 @@ export default function CanvasComponentRender({ comp, allComps, isSelected, isSi
 
   const cardWidth = proto.width;
   const cardHeight = proto.height;
+
+  // Trạng thái BẬT thật theo chân board (xem src/utils/activeCircuit.js) — chỉ có
+  // giá trị khi đang mô phỏng code; dùng cho LED/LIGHT_BULB/BUZZER/RELAY/DC_MOTOR
+  // thay vì sáng/kêu/quay suốt lúc mô phỏng đang chạy bất kể trạng thái chân.
+  const pinActive = isSimulating && !!pinState;
 
   const leftPorts = proto.ports.filter(p => p.side === 'left');
   const rightPorts = proto.ports.filter(p => p.side === 'right');
@@ -176,14 +181,14 @@ export default function CanvasComponentRender({ comp, allComps, isSelected, isSi
             <rect width="75" height="55" rx="4" fill="#2563EB" />
             <rect x="8" y="8" width="59" height="39" rx="3" fill="#1E40AF" />
             {/* Active Indicator LED */}
-            <circle cx="20" cy="20" r="4" fill={isSimulating ? "#22C55E" : "#64748B"} className={isSimulating ? "led-glow" : ""} style={{ '--glow-color': '#22C55E' }} />
+            <circle cx="20" cy="20" r="4" fill={pinActive ? "#22C55E" : "#64748B"} className={pinActive ? "led-glow" : ""} style={{ '--glow-color': '#22C55E' }} />
             <text x="42" y="32" fill="#FFF" fontSize="9" fontWeight="bold" textAnchor="middle">RELAY 5V</text>
           </g>
         ) : comp.type === 'DC_MOTOR' ? (
           <g>
             <circle cx="35" cy="25" r="20" fill="#64748B" stroke="#334155" strokeWidth="2" />
             {/* Animated Propeller Blade */}
-            <g className={isSimulating ? "animate-spin-fast" : ""} style={{ transformOrigin: '35px 25px' }}>
+            <g className={pinActive ? "animate-spin-fast" : ""} style={{ transformOrigin: '35px 25px' }}>
               <path d="M 35 25 L 35 8 A 8 8 0 0 1 43 16 Z" fill="#38BDF8" />
               <path d="M 35 25 L 50 32 A 8 8 0 0 1 43 40 Z" fill="#38BDF8" />
               <path d="M 35 25 L 20 35 A 8 8 0 0 1 18 24 Z" fill="#38BDF8" />
@@ -209,12 +214,12 @@ export default function CanvasComponentRender({ comp, allComps, isSelected, isSi
                 <stop offset="100%" stopColor={comp.config.color || '#EF4444'} stopOpacity="0.82" />
               </radialGradient>
             </defs>
-            {/* Aura Glow — khi mô phỏng code Arduino ĐANG chạy, HOẶC mạch thụ động (pin/khoai tây/chanh) kín */}
-            {(isSimulating || isLit) && (
+            {/* Aura Glow — khi chân board nối tới đang HIGH (code Arduino thật sự bật), HOẶC mạch thụ động (pin/khoai tây/chanh) kín */}
+            {(pinActive || isLit) && (
               <circle cx="30" cy="20" r="27" fill={comp.config.color || '#EF4444'} opacity="0.4" className="led-glow" style={{ '--glow-color': comp.config.color || '#EF4444' }} />
             )}
             {/* Vòm LED — gradient bóng thay vì màu phẳng, giống LED 5mm thật */}
-            <circle cx="30" cy="20" r="18" fill={`url(#ledDome-${comp.id})`} stroke="#334155" strokeWidth="2" className={(isSimulating || isLit) ? 'led-glow' : ''} style={{ '--glow-color': comp.config.color || '#EF4444' }} />
+            <circle cx="30" cy="20" r="18" fill={`url(#ledDome-${comp.id})`} stroke="#334155" strokeWidth="2" className={(pinActive || isLit) ? 'led-glow' : ''} style={{ '--glow-color': comp.config.color || '#EF4444' }} />
             {/* Điểm sáng bóng (highlight) */}
             <ellipse cx="24" cy="13" rx="5" ry="3" fill="#FFFFFF" opacity="0.6" transform="rotate(-30 24 13)" />
             {/* 2 chân — chân Anode (phải) dài hơn chân Cathode (trái), giống LED thật */}
@@ -222,19 +227,27 @@ export default function CanvasComponentRender({ comp, allComps, isSelected, isSi
             <rect x="31" y="38" width="4" height="16" fill="#94A3B8" />
           </g>
         ) : comp.type === 'RGB_LED' ? (
-          <g>
-            <circle cx="35" cy="25" r="20" fill="#F8FAFC" stroke="#64748B" strokeWidth="2" />
-            {isSimulating && (
-              <circle cx="35" cy="25" r="26" fill="#3B82F6" opacity="0.35" className="led-glow" style={{ '--glow-color': '#3B82F6' }} />
-            )}
-            <circle cx="28" cy="22" r="6" fill="#EF4444" opacity={isSimulating ? 1 : 0.6} className={isSimulating ? "led-glow" : ""} style={{ '--glow-color': '#EF4444' }} />
-            <circle cx="42" cy="22" r="6" fill="#22C55E" opacity={isSimulating ? 1 : 0.6} className={isSimulating ? "led-glow" : ""} style={{ '--glow-color': '#22C55E' }} />
-            <circle cx="35" cy="30" r="6" fill="#3B82F6" opacity={isSimulating ? 1 : 0.6} className={isSimulating ? "led-glow" : ""} style={{ '--glow-color': '#3B82F6' }} />
-          </g>
+          (() => {
+            const rOn = isSimulating && !!pinState?.R;
+            const gOn = isSimulating && !!pinState?.G;
+            const bOn = isSimulating && !!pinState?.B;
+            const anyOn = rOn || gOn || bOn;
+            return (
+              <g>
+                <circle cx="35" cy="25" r="20" fill="#F8FAFC" stroke="#64748B" strokeWidth="2" />
+                {anyOn && (
+                  <circle cx="35" cy="25" r="26" fill="#3B82F6" opacity="0.35" className="led-glow" style={{ '--glow-color': '#3B82F6' }} />
+                )}
+                <circle cx="28" cy="22" r="6" fill="#EF4444" opacity={rOn ? 1 : 0.6} className={rOn ? "led-glow" : ""} style={{ '--glow-color': '#EF4444' }} />
+                <circle cx="42" cy="22" r="6" fill="#22C55E" opacity={gOn ? 1 : 0.6} className={gOn ? "led-glow" : ""} style={{ '--glow-color': '#22C55E' }} />
+                <circle cx="35" cy="30" r="6" fill="#3B82F6" opacity={bOn ? 1 : 0.6} className={bOn ? "led-glow" : ""} style={{ '--glow-color': '#3B82F6' }} />
+              </g>
+            );
+          })()
         ) : comp.type === 'BUZZER' ? (
           <g>
             <circle cx="35" cy="25" r="20" fill="#1E293B" stroke="#0F172A" strokeWidth="2" />
-            {isSimulating && (
+            {pinActive && (
               <g>
                 <circle cx="35" cy="25" r="28" fill="none" stroke="#F59E0B" strokeWidth="2" className="buzzer-ripple" />
                 <circle cx="35" cy="25" r="36" fill="none" stroke="#F59E0B" strokeWidth="1.5" className="buzzer-ripple" style={{ animationDelay: '0.3s' }} />
@@ -471,10 +484,10 @@ export default function CanvasComponentRender({ comp, allComps, isSelected, isSi
           </g>
         ) : comp.type === 'LIGHT_BULB' ? (
           <g transform="translate(5, 2)">
-            {(isSimulating || isLit) && (
+            {(pinActive || isLit) && (
               <circle cx="30" cy="18" r="26" fill="#FBBF24" opacity="0.4" className="led-glow" style={{ '--glow-color': '#FBBF24' }} />
             )}
-            <circle cx="30" cy="18" r="17" fill={(isSimulating || isLit) ? '#FEF3C7' : '#F8FAFC'} stroke="#94A3B8" strokeWidth="1.5" />
+            <circle cx="30" cy="18" r="17" fill={(pinActive || isLit) ? '#FEF3C7' : '#F8FAFC'} stroke="#94A3B8" strokeWidth="1.5" />
             <path d="M 22 18 Q 30 10 38 18 M 24 22 L 36 22" stroke="#D97706" strokeWidth="1.5" fill="none" />
             <rect x="24" y="34" width="12" height="10" fill="#94A3B8" />
             <path d="M 22 44 L 38 44 L 34 50 L 26 50 Z" fill="#64748B" />
