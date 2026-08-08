@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Code, Terminal, Sliders, ZoomIn, ZoomOut, Maximize2,
   ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Copy, FileCode, Lock,
-  BookOpen, FlaskConical, Layers,
+  BookOpen, FlaskConical, Layers, Boxes,
 } from 'lucide-react';
 import { COMPONENT_TYPES } from './data/componentTypes';
 import { PROJECT_PRESETS } from './data/projectPresets';
@@ -20,6 +20,7 @@ import ProjectManager from './components/ProjectManager';
 import TutorialOverlay from './components/TutorialOverlay';
 import StudentModal from './components/StudentModal';
 import TheoryTab from './components/TheoryTab';
+import ComponentGuideTab from './components/ComponentGuideTab';
 import MyLibrarySidebar from './components/MyLibrarySidebar';
 import { useSimulationEngine } from './hooks/useSimulationEngine';
 import { useCanvasInteractions } from './hooks/useCanvasInteractions';
@@ -85,7 +86,7 @@ const getWireFlowDirection = (w, start, end, components) => {
 const BLANK_CODE_TEMPLATE = 'void setup() {\n\n}\n\nvoid loop() {\n\n}\n';
 
 export default function App() {
-  const [mainTab, setMainTab] = useState('practice'); // 'theory' | 'practice'
+  const [mainTab, setMainTab] = useState('practice'); // 'theory' | 'components' | 'practice'
   const [leftDockTab, setLeftDockTab] = useState('wiring'); // 'wiring' | 'library'
   const [code, setCode] = useState(BLANK_CODE_TEMPLATE);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
@@ -381,6 +382,22 @@ export default function App() {
           Lý thuyết
         </button>
         <button
+          id="tab-components"
+          onClick={() => setMainTab('components')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-t-lg text-sm font-semibold transition-all border-b-2 ${
+            mainTab === 'components'
+              ? ui.isDarkMode
+                ? 'bg-[#0B0F19] border-violet-500 text-violet-400'
+                : 'bg-white border-violet-500 text-violet-600'
+              : ui.isDarkMode
+                ? 'border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-600'
+                : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+          }`}
+        >
+          <Boxes className="w-4 h-4" />
+          Thư viện linh kiện
+        </button>
+        <button
           id="tab-practice"
           onClick={() => setMainTab('practice')}
           className={`flex items-center gap-2 px-4 py-2 rounded-t-lg text-sm font-semibold transition-all border-b-2 ${
@@ -402,6 +419,13 @@ export default function App() {
       {mainTab === 'theory' && (
         <div className="flex-1 overflow-hidden">
           <TheoryTab isDarkMode={ui.isDarkMode} />
+        </div>
+      )}
+
+      {/* ═══ COMPONENT LIBRARY TAB ═══ */}
+      {mainTab === 'components' && (
+        <div className="flex-1 overflow-hidden">
+          <ComponentGuideTab isDarkMode={ui.isDarkMode} />
         </div>
       )}
 
