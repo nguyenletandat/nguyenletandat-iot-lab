@@ -62,6 +62,15 @@ export default function HardwareThumbnail({ type }) {
           <rect x="18" y="38" width="12" height="6" rx="1.5" fill="#475569" />
         </svg>
       );
+    case 'ESP32_S3':
+      return (
+        <svg viewBox="0 0 48 48" className="w-full h-full">
+          <rect x="8" y="4" width="32" height="40" rx="4" fill="#1E293B" stroke="#7C3AED" strokeWidth="1.5" />
+          <rect x="14" y="10" width="20" height="16" rx="2" fill="#94A3B8" opacity="0.4" />
+          <rect x="19" y="30" width="10" height="5" rx="1.5" fill="#94A3B8" />
+          <text x="24" y="42" fill="#A78BFA" fontSize="4" fontWeight="bold" textAnchor="middle">ESP32-S3</text>
+        </svg>
+      );
     case 'DHT22':
       return (
         <svg viewBox="0 0 48 48" className="w-full h-full">

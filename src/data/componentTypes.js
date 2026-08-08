@@ -127,6 +127,66 @@ export const COMPONENT_TYPES = {
     ]
   },
 
+  // ESP32-S3-DevKitC-1 v1.1 (44 chân) — pin layout lấy đúng theo tài liệu chính thức
+  // Espressif (docs.espressif.com/projects/esp-dev-kits), khác ESP32 thường ở chỗ:
+  // I2C mặc định là GPIO8(SDA)/GPIO9(SCL) thay vì GPIO21/22; có cổng USB gốc trên
+  // GPIO19/20; GPIO0/3/45/46 là strapping pin cần cẩn thận; GPIO35-37 dành cho
+  // Octal PSRAM/Flash nội bộ, không nên dùng ở các module WROOM-1/WROOM-2 bản Octal.
+  ESP32_S3: {
+    name: 'ESP32-S3-DevKitC-1 (44 chân)',
+    subtitle: 'Board',
+    category: 'Boards',
+    tags: ['ESP32-S3', 'WiFi', 'BLE', 'USB', '44P'],
+    width: 270, height: 430,
+    ports: [
+      { id: '3V3_1', name: '3V3', x: 8, y: 22, side: 'left', type: 'power', voltage: 3.3 },
+      { id: '3V3_2', name: '3V3', x: 8, y: 40, side: 'left', type: 'power', voltage: 3.3 },
+      { id: 'RST', name: 'RST (EN)', x: 8, y: 58, side: 'left', type: 'gpio' },
+      { id: 'GPIO4', name: 'GPIO4', x: 8, y: 76, side: 'left', type: 'gpio', pin: 4 },
+      { id: 'GPIO5', name: 'GPIO5', x: 8, y: 94, side: 'left', type: 'gpio', pin: 5 },
+      { id: 'GPIO6', name: 'GPIO6', x: 8, y: 112, side: 'left', type: 'gpio', pin: 6 },
+      { id: 'GPIO7', name: 'GPIO7', x: 8, y: 130, side: 'left', type: 'gpio', pin: 7 },
+      { id: 'GPIO15', name: 'GPIO15', x: 8, y: 148, side: 'left', type: 'gpio', pin: 15 },
+      { id: 'GPIO16', name: 'GPIO16', x: 8, y: 166, side: 'left', type: 'gpio', pin: 16 },
+      { id: 'GPIO17', name: 'GPIO17', x: 8, y: 184, side: 'left', type: 'gpio', pin: 17 },
+      { id: 'GPIO18', name: 'GPIO18', x: 8, y: 202, side: 'left', type: 'gpio', pin: 18 },
+      { id: 'GPIO8', name: 'GPIO8 (SDA*)', x: 8, y: 220, side: 'left', type: 'gpio', pin: 8 },
+      { id: 'GPIO3', name: 'GPIO3 ⚠', x: 8, y: 238, side: 'left', type: 'gpio', pin: 3 },
+      { id: 'GPIO46', name: 'GPIO46 ⚠', x: 8, y: 256, side: 'left', type: 'gpio', pin: 46 },
+      { id: 'GPIO9', name: 'GPIO9 (SCL*)', x: 8, y: 274, side: 'left', type: 'gpio', pin: 9 },
+      { id: 'GPIO10', name: 'GPIO10', x: 8, y: 292, side: 'left', type: 'gpio', pin: 10 },
+      { id: 'GPIO11', name: 'GPIO11', x: 8, y: 310, side: 'left', type: 'gpio', pin: 11 },
+      { id: 'GPIO12', name: 'GPIO12', x: 8, y: 328, side: 'left', type: 'gpio', pin: 12 },
+      { id: 'GPIO13', name: 'GPIO13', x: 8, y: 346, side: 'left', type: 'gpio', pin: 13 },
+      { id: 'GPIO14', name: 'GPIO14', x: 8, y: 364, side: 'left', type: 'gpio', pin: 14 },
+      { id: '5V', name: '5V', x: 8, y: 382, side: 'left', type: 'power', voltage: 5 },
+      { id: 'GND1', name: 'GND', x: 8, y: 400, side: 'left', type: 'gnd' },
+
+      { id: 'GND2', name: 'GND', x: 262, y: 22, side: 'right', type: 'gnd' },
+      { id: 'TX0', name: 'TX0 (43)', x: 262, y: 40, side: 'right', type: 'gpio', pin: 43 },
+      { id: 'RX0', name: 'RX0 (44)', x: 262, y: 58, side: 'right', type: 'gpio', pin: 44 },
+      { id: 'GPIO1', name: 'GPIO1', x: 262, y: 76, side: 'right', type: 'gpio', pin: 1 },
+      { id: 'GPIO2', name: 'GPIO2', x: 262, y: 94, side: 'right', type: 'gpio', pin: 2 },
+      { id: 'GPIO42', name: 'GPIO42 (JTAG)', x: 262, y: 112, side: 'right', type: 'gpio', pin: 42 },
+      { id: 'GPIO41', name: 'GPIO41 (JTAG)', x: 262, y: 130, side: 'right', type: 'gpio', pin: 41 },
+      { id: 'GPIO40', name: 'GPIO40 (JTAG)', x: 262, y: 148, side: 'right', type: 'gpio', pin: 40 },
+      { id: 'GPIO39', name: 'GPIO39 (JTAG)', x: 262, y: 166, side: 'right', type: 'gpio', pin: 39 },
+      { id: 'GPIO38', name: 'GPIO38 (RGB LED)', x: 262, y: 184, side: 'right', type: 'gpio', pin: 38 },
+      { id: 'GPIO37', name: 'GPIO37 🚫', x: 262, y: 202, side: 'right', type: 'gpio', pin: 37 },
+      { id: 'GPIO36', name: 'GPIO36 🚫', x: 262, y: 220, side: 'right', type: 'gpio', pin: 36 },
+      { id: 'GPIO35', name: 'GPIO35 🚫', x: 262, y: 238, side: 'right', type: 'gpio', pin: 35 },
+      { id: 'GPIO0', name: 'GPIO0 ⚠ (BOOT)', x: 262, y: 256, side: 'right', type: 'gpio', pin: 0 },
+      { id: 'GPIO45', name: 'GPIO45 ⚠', x: 262, y: 274, side: 'right', type: 'gpio', pin: 45 },
+      { id: 'GPIO48', name: 'GPIO48', x: 262, y: 292, side: 'right', type: 'gpio', pin: 48 },
+      { id: 'GPIO47', name: 'GPIO47', x: 262, y: 310, side: 'right', type: 'gpio', pin: 47 },
+      { id: 'GPIO21', name: 'GPIO21', x: 262, y: 328, side: 'right', type: 'gpio', pin: 21 },
+      { id: 'GPIO20', name: 'GPIO20 (USB D+)', x: 262, y: 346, side: 'right', type: 'gpio', pin: 20 },
+      { id: 'GPIO19', name: 'GPIO19 (USB D-)', x: 262, y: 364, side: 'right', type: 'gpio', pin: 19 },
+      { id: 'GND3', name: 'GND', x: 262, y: 382, side: 'right', type: 'gnd' },
+      { id: 'GND4', name: 'GND', x: 262, y: 400, side: 'right', type: 'gnd' }
+    ]
+  },
+
   ARDUINO_UNO: {
     name: 'Arduino Uno R3',
     subtitle: 'Board',

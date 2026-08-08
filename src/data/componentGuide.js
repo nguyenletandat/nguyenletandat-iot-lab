@@ -7,6 +7,7 @@ export const COMPONENT_GUIDE = {
   // Boards
   ESP32: { en: 'ESP32 DevKit V1 (30-pin)', vi: 'ESP32 DevKit V1 (30 chân)', descEn: 'Dual-core Wi-Fi & Bluetooth microcontroller board — the most common brain for IoT projects.', descVi: 'Vi điều khiển 2 lõi tích hợp WiFi & Bluetooth — bo mạch phổ biến nhất cho các dự án IoT.' },
   ESP32_V4: { en: 'ESP32 DevKit V4 (38-pin)', vi: 'ESP32 DevKit V4 (38 chân)', descEn: 'Newer ESP32 variant with more exposed GPIO pins in a wider layout.', descVi: 'Phiên bản ESP32 mới hơn, nhiều chân GPIO hơn, bố trí chân rộng hơn.' },
+  ESP32_S3: { en: 'ESP32-S3-DevKitC-1 (44-pin)', vi: 'ESP32-S3-DevKitC-1 (44 chân)', descEn: 'Newer dual-core board with native USB and AI acceleration; I2C defaults to GPIO8/9 instead of 21/22.', descVi: 'Bo mạch 2 lõi thế hệ mới có cổng USB gốc và tăng tốc AI; chân I2C mặc định là GPIO8/9 thay vì 21/22 như ESP32 thường.' },
   ARDUINO_UNO: { en: 'Arduino Uno R3', vi: 'Arduino Uno R3', descEn: 'The classic beginner-friendly AVR board — ideal for learning digital/analog I/O.', descVi: 'Bo mạch AVR kinh điển, dễ học — lý tưởng để làm quen vào/ra số và tương tự.' },
   ARDUINO_NANO: { en: 'Arduino Nano V3', vi: 'Arduino Nano V3', descEn: 'A tiny breadboard-friendly Arduino with the same chip as the Uno.', descVi: 'Arduino nhỏ gọn, cắm vừa breadboard, dùng chung chip với Uno.' },
   ARDUINO_MEGA: { en: 'Arduino Mega 2560', vi: 'Arduino Mega 2560', descEn: 'Larger Arduino with many more I/O pins for complex projects.', descVi: 'Arduino cỡ lớn với nhiều chân vào/ra hơn, dùng cho dự án phức tạp.' },

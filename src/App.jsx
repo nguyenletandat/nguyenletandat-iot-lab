@@ -29,7 +29,7 @@ import { useIntegrityGuard } from './hooks/useIntegrityGuard';
 import { computeLitLeds } from './utils/passiveCircuit';
 import { toPng } from 'html-to-image';
 
-const CONTROL_BOARD_TYPES = ['ESP32', 'ESP32_V4', 'ARDUINO_UNO', 'ARDUINO_NANO', 'ARDUINO_MEGA', 'ESP8266'];
+const CONTROL_BOARD_TYPES = ['ESP32', 'ESP32_V4', 'ESP32_S3', 'ARDUINO_UNO', 'ARDUINO_NANO', 'ARDUINO_MEGA', 'ESP8266'];
 
 const getWireFlowDirection = (w, start, end, components) => {
   const fromComp = components.find(c => c.id === w.from.componentId);

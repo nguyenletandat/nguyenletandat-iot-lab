@@ -128,6 +128,15 @@ export default function CanvasComponentRender({ comp, allComps, isSelected, isSi
             <rect x="25" y="15" width="30" height="15" rx="2" fill="#64748B" />
             <text x="40" y="47" fill="#38BDF8" fontSize="7" fontWeight="bold" textAnchor="middle">ESP8266</text>
           </g>
+        ) : comp.type === 'ESP32_S3' ? (
+          <g>
+            <rect width="80" height="55" rx="4" fill="#1E293B" stroke="#7C3AED" strokeWidth="1.2" />
+            <rect x="24" y="6" width="32" height="26" rx="3" fill="#94A3B8" opacity="0.35" />
+            <rect x="30" y="11" width="20" height="16" rx="2" fill="#475569" />
+            {/* Cổng USB-C gốc (native USB) — điểm khác biệt lớn nhất so với ESP32 thường */}
+            <rect x="34" y="34" width="12" height="6" rx="2" fill="#94A3B8" />
+            <text x="40" y="49" fill="#A78BFA" fontSize="7" fontWeight="bold" textAnchor="middle">ESP32-S3</text>
+          </g>
         ) : comp.type === 'DHT22' ? (
           <g>
             <rect width="70" height="55" rx="5" fill="#0EA5E9" stroke="#0284C7" strokeWidth="1" />

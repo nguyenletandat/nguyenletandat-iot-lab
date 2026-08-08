@@ -8,7 +8,7 @@ import { COMPONENT_TYPES } from '../data/componentTypes';
 import { useCanvasStore } from '../stores/canvasStore';
 
 const I2C_MODULE_TYPES = ['OLED_SSD1306', 'LCD1602', 'BMP280', 'DS3231', 'ADXL345'];
-const CONTROL_BOARD_TYPES = ['ESP32', 'ESP32_V4', 'ARDUINO_UNO', 'ARDUINO_NANO', 'ARDUINO_MEGA', 'ESP8266'];
+const CONTROL_BOARD_TYPES = ['ESP32', 'ESP32_V4', 'ESP32_S3', 'ARDUINO_UNO', 'ARDUINO_NANO', 'ARDUINO_MEGA', 'ESP8266'];
 
 export function useCanvasInteractions({ canvas, sim, isReadOnly = false }) {
   const canvasRef = useRef(null);
@@ -62,11 +62,18 @@ export function useCanvasInteractions({ canvas, sim, isReadOnly = false }) {
         }
       };
 
-      if (board.type.startsWith('ESP32')) {
+      if (board.type === 'ESP32' || board.type === 'ESP32_V4') {
         addIfMissing('VIN', vccPort, '#EF4444');
         addIfMissing('GND1', gndPort, '#10B981');
         addIfMissing('D22', 'SCL', '#3B82F6');
         addIfMissing('D21', 'SDA', '#8B5CF6');
+      } else if (board.type === 'ESP32_S3') {
+        // ESP32-S3 không có chân I2C phần cứng cố định; mặc định của Arduino core
+        // là Wire.begin() dùng GPIO8 = SDA, GPIO9 = SCL (khác hẳn ESP32 thường).
+        addIfMissing('5V', vccPort, '#EF4444');
+        addIfMissing('GND1', gndPort, '#10B981');
+        addIfMissing('GPIO9', 'SCL', '#3B82F6');
+        addIfMissing('GPIO8', 'SDA', '#8B5CF6');
       } else if (board.type === 'ARDUINO_UNO') {
         addIfMissing('5V', vccPort, '#EF4444');
         addIfMissing('GND_A', gndPort, '#10B981');
