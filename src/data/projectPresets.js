@@ -27,7 +27,7 @@ export const PROJECT_PRESETS = {
       { id: 'w2', from: { componentId: 'p2', portId: 'CU' }, to: { componentId: 'p3', portId: 'NAIL' }, color: '#1F2937' },
       { id: 'w3', from: { componentId: 'p3', portId: 'CU' }, to: { componentId: 'p4', portId: 'NAIL' }, color: '#1F2937' },
       { id: 'w4', from: { componentId: 'p4', portId: 'CU' }, to: { componentId: 'led1', portId: 'A' }, color: '#EF4444' },
-      { id: 'w5', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'p1', portId: 'NAIL' }, color: '#1F2937' }
+      { id: 'w5', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'p1', portId: 'NAIL' }, color: '#1F2937', waypoints: [{ x: 1232, y: 340 }, { x: 20, y: 340 }, { x: 20, y: 220 }] }
     ]
   },
 
@@ -101,31 +101,31 @@ void loop() {
     wires: [
       { id: 'w1a', from: { componentId: 'uno1', portId: 'D2' }, to: { componentId: 'r1', portId: 'L' }, color: '#F59E0B' },
       { id: 'w1b', from: { componentId: 'r1', portId: 'R' }, to: { componentId: 'led1', portId: 'A' }, color: '#F59E0B' },
-      { id: 'w1c', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#10B981' },
+      { id: 'w1c', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#10B981', waypoints: [{ x: 672, y: 260 }, { x: 8, y: 260 }, { x: 8, y: 124 }] },
 
       { id: 'w2a', from: { componentId: 'uno1', portId: 'D3' }, to: { componentId: 'r2', portId: 'L' }, color: '#3B82F6' },
       { id: 'w2b', from: { componentId: 'r2', portId: 'R' }, to: { componentId: 'led2', portId: 'A' }, color: '#3B82F6' },
-      { id: 'w2c', from: { componentId: 'led2', portId: 'K' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#10B981' },
+      { id: 'w2c', from: { componentId: 'led2', portId: 'K' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#10B981', waypoints: [{ x: 932, y: 275 }, { x: 16, y: 275 }, { x: 16, y: 124 }] },
 
       { id: 'w3a', from: { componentId: 'uno1', portId: 'D4' }, to: { componentId: 'r3', portId: 'L' }, color: '#8B5CF6' },
       { id: 'w3b', from: { componentId: 'r3', portId: 'R' }, to: { componentId: 'led3', portId: 'A' }, color: '#8B5CF6' },
-      { id: 'w3c', from: { componentId: 'led3', portId: 'K' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#10B981' },
+      { id: 'w3c', from: { componentId: 'led3', portId: 'K' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#10B981', waypoints: [{ x: 1192, y: 290 }, { x: 24, y: 290 }, { x: 24, y: 124 }] },
 
       { id: 'w4a', from: { componentId: 'uno1', portId: 'D5' }, to: { componentId: 'r4', portId: 'L' }, color: '#06B6D4' },
       { id: 'w4b', from: { componentId: 'r4', portId: 'R' }, to: { componentId: 'led4', portId: 'A' }, color: '#06B6D4' },
-      { id: 'w4c', from: { componentId: 'led4', portId: 'K' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#10B981' },
+      { id: 'w4c', from: { componentId: 'led4', portId: 'K' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#10B981', waypoints: [{ x: 1452, y: 305 }, { x: 32, y: 305 }, { x: 32, y: 124 }] },
 
       { id: 'w5a', from: { componentId: 'uno1', portId: 'D6' }, to: { componentId: 'r5', portId: 'L' }, color: '#EC4899' },
       { id: 'w5b', from: { componentId: 'r5', portId: 'R' }, to: { componentId: 'led5', portId: 'A' }, color: '#EC4899' },
-      { id: 'w5c', from: { componentId: 'led5', portId: 'K' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#10B981' },
+      { id: 'w5c', from: { componentId: 'led5', portId: 'K' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#10B981', waypoints: [{ x: 1712, y: 320 }, { x: 40, y: 320 }, { x: 40, y: 124 }] },
 
       { id: 'w6a', from: { componentId: 'uno1', portId: 'D7' }, to: { componentId: 'r6', portId: 'L' }, color: '#14B8A6' },
       { id: 'w6b', from: { componentId: 'r6', portId: 'R' }, to: { componentId: 'led6', portId: 'A' }, color: '#14B8A6' },
-      { id: 'w6c', from: { componentId: 'led6', portId: 'K' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#10B981' },
+      { id: 'w6c', from: { componentId: 'led6', portId: 'K' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#10B981', waypoints: [{ x: 1972, y: 335 }, { x: 48, y: 335 }, { x: 48, y: 124 }] },
 
       { id: 'w7a', from: { componentId: 'uno1', portId: 'D8' }, to: { componentId: 'r7', portId: 'L' }, color: '#6366F1' },
       { id: 'w7b', from: { componentId: 'r7', portId: 'R' }, to: { componentId: 'led7', portId: 'A' }, color: '#6366F1' },
-      { id: 'w7c', from: { componentId: 'led7', portId: 'K' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#10B981' }
+      { id: 'w7c', from: { componentId: 'led7', portId: 'K' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#10B981', waypoints: [{ x: 2232, y: 350 }, { x: 56, y: 350 }, { x: 56, y: 124 }] }
     ]
   },
 
@@ -174,7 +174,7 @@ void loop() {
       { id: 'w1', from: { componentId: 'l1', portId: 'CU' }, to: { componentId: 'l2', portId: 'NAIL' }, color: '#1F2937' },
       { id: 'w2', from: { componentId: 'l2', portId: 'CU' }, to: { componentId: 'l3', portId: 'NAIL' }, color: '#1F2937' },
       { id: 'w3', from: { componentId: 'l3', portId: 'CU' }, to: { componentId: 'led1', portId: 'A' }, color: '#EF4444' },
-      { id: 'w4', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'l1', portId: 'NAIL' }, color: '#1F2937' }
+      { id: 'w4', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'l1', portId: 'NAIL' }, color: '#1F2937', waypoints: [{ x: 992, y: 330 }, { x: 20, y: 330 }, { x: 20, y: 218 }] }
     ]
   },
 
