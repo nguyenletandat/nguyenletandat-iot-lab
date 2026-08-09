@@ -17,17 +17,17 @@ export const PROJECT_PRESETS = {
 // tiếp mới đủ thắp sáng LED thật — mô phỏng này đơn giản hoá, chỉ kiểm tra vòng kín.`,
     components: [
       { id: 'p1', type: 'POTATO', x: 60, y: 180, config: {} },
-      { id: 'p2', type: 'POTATO', x: 300, y: 180, config: {} },
-      { id: 'p3', type: 'POTATO', x: 540, y: 180, config: {} },
-      { id: 'p4', type: 'POTATO', x: 780, y: 180, config: {} },
-      { id: 'led1', type: 'LED', x: 1020, y: 100, config: {} }
+      { id: 'p2', type: 'POTATO', x: 410, y: 180, config: {} },
+      { id: 'p3', type: 'POTATO', x: 760, y: 180, config: {} },
+      { id: 'p4', type: 'POTATO', x: 1110, y: 180, config: {} },
+      { id: 'led1', type: 'LED', x: 1460, y: 100, config: {} }
     ],
     wires: [
       { id: 'w1', from: { componentId: 'p1', portId: 'CU' }, to: { componentId: 'p2', portId: 'NAIL' }, color: '#1F2937' },
       { id: 'w2', from: { componentId: 'p2', portId: 'CU' }, to: { componentId: 'p3', portId: 'NAIL' }, color: '#1F2937' },
       { id: 'w3', from: { componentId: 'p3', portId: 'CU' }, to: { componentId: 'p4', portId: 'NAIL' }, color: '#1F2937' },
       { id: 'w4', from: { componentId: 'p4', portId: 'CU' }, to: { componentId: 'led1', portId: 'A' }, color: '#EF4444' },
-      { id: 'w5', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'p1', portId: 'NAIL' }, color: '#1F2937', waypoints: [{ x: 1232, y: 340 }, { x: 20, y: 340 }, { x: 20, y: 220 }] }
+      { id: 'w5', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'p1', portId: 'NAIL' }, color: '#1F2937', waypoints: [{ x: 1672, y: 340 }, { x: 20, y: 340 }, { x: 20, y: 220 }] }
     ]
   },
 
@@ -166,15 +166,15 @@ void loop() {
 // Lưu ý thực tế: mô phỏng này đơn giản hoá, chỉ kiểm tra vòng kín, không tính điện áp.`,
     components: [
       { id: 'l1', type: 'LEMON', x: 60, y: 180, config: {} },
-      { id: 'l2', type: 'LEMON', x: 300, y: 180, config: {} },
-      { id: 'l3', type: 'LEMON', x: 540, y: 180, config: {} },
-      { id: 'led1', type: 'LED', x: 780, y: 100, config: {} }
+      { id: 'l2', type: 'LEMON', x: 410, y: 180, config: {} },
+      { id: 'l3', type: 'LEMON', x: 760, y: 180, config: {} },
+      { id: 'led1', type: 'LED', x: 1110, y: 100, config: {} }
     ],
     wires: [
       { id: 'w1', from: { componentId: 'l1', portId: 'CU' }, to: { componentId: 'l2', portId: 'NAIL' }, color: '#1F2937' },
       { id: 'w2', from: { componentId: 'l2', portId: 'CU' }, to: { componentId: 'l3', portId: 'NAIL' }, color: '#1F2937' },
       { id: 'w3', from: { componentId: 'l3', portId: 'CU' }, to: { componentId: 'led1', portId: 'A' }, color: '#EF4444' },
-      { id: 'w4', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'l1', portId: 'NAIL' }, color: '#1F2937', waypoints: [{ x: 992, y: 330 }, { x: 20, y: 330 }, { x: 20, y: 218 }] }
+      { id: 'w4', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'l1', portId: 'NAIL' }, color: '#1F2937', waypoints: [{ x: 1322, y: 330 }, { x: 20, y: 330 }, { x: 20, y: 218 }] }
     ]
   },
 
@@ -375,10 +375,10 @@ void loop() {
 }`,
     components: [
       { id: 'esp1', type: 'ESP32_S3', x: 60, y: 60, config: {} },
-      { id: 'soil1', type: 'SOIL_MOISTURE', x: 420, y: 40, config: { moisture: 250 } },
-      { id: 'relay1', type: 'RELAY', x: 500, y: 200, config: {} },
-      { id: 'pump1', type: 'DC_MOTOR', x: 800, y: 200, config: {} },
-      { id: 'lcd1', type: 'LCD1602', x: 420, y: 360, config: { textLine1: 'DoAmDat: 250', textLine2: 'BOM: DANG TUOI!' } }
+      { id: 'soil1', type: 'SOIL_MOISTURE', x: 460, y: 40, config: { moisture: 250 } },
+      { id: 'relay1', type: 'RELAY', x: 460, y: 340, config: {} },
+      { id: 'pump1', type: 'DC_MOTOR', x: 760, y: 340, config: {} },
+      { id: 'lcd1', type: 'LCD1602', x: 460, y: 680, config: { textLine1: 'DoAmDat: 250', textLine2: 'BOM: DANG TUOI!' } }
     ],
     wires: [
       { id: 'w1', from: { componentId: 'esp1', portId: '3V3_1' }, to: { componentId: 'soil1', portId: 'VCC' }, color: '#EF4444' },
@@ -455,11 +455,11 @@ void loop() {
 }`,
     components: [
       { id: 'esp1',    type: 'ESP32_S3', x: 60,  y: 60,  config: {} },
-      { id: 'mq2_1',  type: 'MQ2',     x: 420, y: 40,  config: { gasLevel: 650 } },
-      { id: 'buzzer1',type: 'BUZZER',  x: 460, y: 200, config: {} },
-      { id: 'relay1', type: 'RELAY',   x: 680, y: 200, config: {} },
-      { id: 'fan1',   type: 'DC_MOTOR',x: 740, y: 360, config: {} },
-      { id: 'lcd1',   type: 'LCD1602', x: 420, y: 360, config: { textLine1: 'Gas PPM: 650', textLine2: 'DANGER! FAN: ON' } }
+      { id: 'mq2_1',  type: 'MQ2',     x: 460, y: 40,  config: { gasLevel: 650 } },
+      { id: 'buzzer1',type: 'BUZZER',  x: 460, y: 340, config: {} },
+      { id: 'relay1', type: 'RELAY',   x: 460, y: 680, config: {} },
+      { id: 'fan1',   type: 'DC_MOTOR',x: 760, y: 680, config: {} },
+      { id: 'lcd1',   type: 'LCD1602', x: 460, y: 1020, config: { textLine1: 'Gas PPM: 650', textLine2: 'DANGER! FAN: ON' } }
     ],
     wires: [
       { id: 'w1',  from: { componentId: 'esp1',    portId: '5V'    }, to: { componentId: 'mq2_1',  portId: 'VCC' }, color: '#EF4444' },
@@ -544,11 +544,11 @@ void loop() {
 }`,
     components: [
       { id: 'esp1', type: 'ESP32_S3', x: 60, y: 60, config: {} },
-      { id: 'lcd1', type: 'LCD1602', x: 420, y: 40, config: { textLine1: 'T:29C H:60%', textLine2: 'Gas PPM: 180' } },
-      { id: 'dht1', type: 'DHT11', x: 500, y: 380, config: { value: 29, humidity: 60 } },
-      { id: 'mq2_1', type: 'MQ2', x: 740, y: 120, config: { gasLevel: 180 } },
-      { id: 'r1', type: 'RESISTOR', x: 1020, y: 40, config: {} },
-      { id: 'led1', type: 'LED', x: 1020, y: 170, config: {} }
+      { id: 'lcd1', type: 'LCD1602', x: 460, y: 40, config: { textLine1: 'T:29C H:60%', textLine2: 'Gas PPM: 180' } },
+      { id: 'dht1', type: 'DHT11', x: 460, y: 370, config: { value: 29, humidity: 60 } },
+      { id: 'mq2_1', type: 'MQ2', x: 460, y: 680, config: { gasLevel: 180 } },
+      { id: 'r1', type: 'RESISTOR', x: 460, y: 1020, config: {} },
+      { id: 'led1', type: 'LED', x: 460, y: 1150, config: {} }
     ],
     wires: [
       { id: 'w1', from: { componentId: 'esp1', portId: '5V' }, to: { componentId: 'lcd1', portId: 'VCC' }, color: '#EF4444' },
@@ -648,12 +648,12 @@ void loop() {
 }`,
     components: [
       { id: 'esp1', type: 'ESP32_S3', x: 60, y: 60, config: {} },
-      { id: 'dht1', type: 'DHT11', x: 420, y: 40, config: { value: 28, humidity: 62 } },
-      { id: 'mq2_1', type: 'MQ2', x: 680, y: 40, config: { gasLevel: 110 } },
-      { id: 'sonar1', type: 'HC_SR04', x: 680, y: 300, config: { distance: 45 } },
-      { id: 'lcd1', type: 'LCD1602', x: 420, y: 460, config: { textLine1: 'T:28C H:62% G:110', textLine2: 'Water: 45cm OK' } },
-      { id: 'r1', type: 'RESISTOR', x: 1020, y: 40, config: {} },
-      { id: 'led1', type: 'LED', x: 1020, y: 170, config: {} }
+      { id: 'dht1', type: 'DHT11', x: 460, y: 40, config: { value: 28, humidity: 62 } },
+      { id: 'mq2_1', type: 'MQ2', x: 460, y: 340, config: { gasLevel: 110 } },
+      { id: 'sonar1', type: 'HC_SR04', x: 460, y: 680, config: { distance: 45 } },
+      { id: 'lcd1', type: 'LCD1602', x: 460, y: 1020, config: { textLine1: 'T:28C H:62% G:110', textLine2: 'Water: 45cm OK' } },
+      { id: 'r1', type: 'RESISTOR', x: 460, y: 1280, config: {} },
+      { id: 'led1', type: 'LED', x: 460, y: 1410, config: {} }
     ],
     wires: [
       { id: 'w1', from: { componentId: 'esp1', portId: '5V' }, to: { componentId: 'dht1', portId: 'VCC' }, color: '#EF4444' },
