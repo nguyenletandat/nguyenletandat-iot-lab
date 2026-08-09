@@ -32,6 +32,11 @@ import { toPng } from 'html-to-image';
 
 const CONTROL_BOARD_TYPES = ['ESP32', 'ESP32_V4', 'ESP32_S3', 'ARDUINO_UNO', 'ARDUINO_NANO', 'ARDUINO_MEGA', 'ESP8266'];
 
+// Mật khẩu mở khoá chỉnh sửa bài mẫu Giảng viên (để giảng dạy trực tiếp trên bài mẫu) —
+// lưu trong localStorage nên giảng viên tự đổi được, không cố định trong code.
+const GV_UNLOCK_PASSWORD_KEY = 'iot_labs_gv_unlock_password';
+const DEFAULT_GV_UNLOCK_PASSWORD = 'giangvien2026';
+
 const getWireFlowDirection = (w, start, end, components) => {
   const fromComp = components.find(c => c.id === w.from.componentId);
   const toComp = components.find(c => c.id === w.to.componentId);
@@ -93,6 +98,12 @@ export default function App() {
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   // true khi đang xem 1 bài mẫu của giảng viên (chỉ xem, không sửa được) thay vì canvas thực hành của sinh viên
   const [isViewingGvSample, setIsViewingGvSample] = useState(false);
+  // true khi giảng viên đã nhập đúng mật khẩu để tạm mở khoá chỉnh sửa bài mẫu (phục vụ giảng dạy trực tiếp)
+  const [isGvUnlocked, setIsGvUnlocked] = useState(false);
+  const [gvUnlockModalMode, setGvUnlockModalMode] = useState(null); // null | 'unlock' | 'change'
+  const [gvUnlockInput, setGvUnlockInput] = useState('');
+  const [gvUnlockInput2, setGvUnlockInput2] = useState('');
+  const [gvUnlockError, setGvUnlockError] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleString('vi-VN'));
 
   // Two-way arrow panel collapse states
@@ -127,7 +138,9 @@ export default function App() {
   const { startSimulation, stopSimulation } = useSimulationEngine(code);
 
   // Khi đang xem bài mẫu GV: khoá toàn bộ thao tác chỉnh sửa canvas (kéo thả, nối dây, xoá, undo/redo...)
-  const isEditingBlocked = sim.isSimulating || isViewingGvSample;
+  // — trừ khi giảng viên đã nhập đúng mật khẩu mở khoá (isGvUnlocked) để giảng dạy trực tiếp trên bài mẫu.
+  const isGvReadOnly = isViewingGvSample && !isGvUnlocked;
+  const isEditingBlocked = sim.isSimulating || isGvReadOnly;
 
   // Tương tác canvas (pan/zoom/kéo thả/nối dây/auto-tools) — xem src/hooks/useCanvasInteractions.js
   const {
@@ -135,7 +148,7 @@ export default function App() {
     handleMouseDownWaypoint, handleMouseMove, handleMouseUp, handleWheel, handleTouchStart, handleTouchMove,
     addComponentToCanvas, deleteSelected, getPortCanvasCoords, handlePortClick, selectWire,
     handleDoubleClickWire, handleDoubleClickWaypoint, generateWirePath, getWireHandles,
-  } = useCanvasInteractions({ canvas, sim, isReadOnly: isViewingGvSample });
+  } = useCanvasInteractions({ canvas, sim, isReadOnly: isGvReadOnly });
 
   // Initialize on mount — mặc định canvas THỰC HÀNH trống, không load sẵn mạch bài mẫu nào
   useEffect(() => {
@@ -246,7 +259,7 @@ export default function App() {
     ui.exportIno(code, ui.currentProjectName);
   };
 
-  useKeyboardShortcuts({ canvas, sim, startSimulation, stopSimulation, deleteSelected, handleQuickSave, isReadOnly: isViewingGvSample });
+  useKeyboardShortcuts({ canvas, sim, startSimulation, stopSimulation, deleteSelected, handleQuickSave, isReadOnly: isGvReadOnly });
 
   // ─── Export Canvas as High-Contrast PNG ──────────────────────
   const handleExportPNG = async () => {
@@ -313,6 +326,32 @@ export default function App() {
     sim.resetSimulation();
     if (sim.isSimulating) stopSimulation();
     sim.logToConsole('✏️ Đã quay lại bài thực hành của bạn.');
+  };
+
+  // Xác nhận mật khẩu mở khoá / đổi mật khẩu chỉnh sửa bài mẫu GV (lưu trong localStorage máy giảng viên)
+  const handleGvUnlockSubmit = () => {
+    if (gvUnlockModalMode === 'unlock') {
+      const currentPassword = localStorage.getItem(GV_UNLOCK_PASSWORD_KEY) || DEFAULT_GV_UNLOCK_PASSWORD;
+      if (gvUnlockInput === currentPassword) {
+        setIsGvUnlocked(true);
+        setGvUnlockModalMode(null);
+        sim.logToConsole('🔓 Đã mở khoá chỉnh sửa bài mẫu Giảng viên (chế độ giảng dạy).');
+      } else {
+        setGvUnlockError('Sai mật khẩu, vui lòng thử lại.');
+      }
+    } else if (gvUnlockModalMode === 'change') {
+      if (!gvUnlockInput.trim()) {
+        setGvUnlockError('Mật khẩu mới không được để trống.');
+        return;
+      }
+      if (gvUnlockInput !== gvUnlockInput2) {
+        setGvUnlockError('Xác nhận mật khẩu không khớp.');
+        return;
+      }
+      localStorage.setItem(GV_UNLOCK_PASSWORD_KEY, gvUnlockInput);
+      setGvUnlockModalMode(null);
+      sim.logToConsole('🔑 Đã đổi mật khẩu mở khoá bài mẫu Giảng viên.');
+    }
   };
 
   // Bắt đầu 1 bài thực hành mới, hoàn toàn trống (nút "Tạo mới" trong Thư viện của tôi).
@@ -500,9 +539,27 @@ export default function App() {
 
           {/* Canvas Help Banner / Chế độ Xem bài mẫu GV */}
           {isViewingGvSample ? (
-            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 px-4 py-2 rounded-2xl shadow-lg border no-export bg-amber-500 border-amber-400 text-white">
+            <div className={`absolute top-3 left-1/2 -translate-x-1/2 z-30 flex items-center gap-3 px-4 py-2 rounded-2xl shadow-lg border no-export ${
+              isGvUnlocked ? 'bg-emerald-600 border-emerald-500 text-white' : 'bg-amber-500 border-amber-400 text-white'
+            }`}>
               <Lock className="w-4 h-4 shrink-0" />
-              <span className="text-xs font-bold">Đang xem bài mẫu Giảng viên — chỉ xem, không chỉnh sửa được</span>
+              <span className="text-xs font-bold">
+                {isGvUnlocked ? 'Chế độ giảng dạy — đã mở khoá chỉnh sửa bài mẫu GV' : 'Đang xem bài mẫu Giảng viên — chỉ xem, không chỉnh sửa được'}
+              </span>
+              {isGvUnlocked ? (
+                <>
+                  <button onClick={() => { setGvUnlockModalMode('change'); setGvUnlockInput(''); setGvUnlockInput2(''); setGvUnlockError(''); }} className="px-3 py-1 text-xs font-bold bg-white text-emerald-700 rounded-lg hover:bg-emerald-50 transition-all shrink-0">
+                    🔑 Đổi mật khẩu
+                  </button>
+                  <button onClick={() => { setIsGvUnlocked(false); sim.logToConsole('🔒 Đã khoá lại bài mẫu Giảng viên.'); }} className="px-3 py-1 text-xs font-bold bg-white/20 text-white rounded-lg hover:bg-white/30 transition-all shrink-0">
+                    Khoá lại
+                  </button>
+                </>
+              ) : (
+                <button onClick={() => { setGvUnlockModalMode('unlock'); setGvUnlockInput(''); setGvUnlockError(''); }} className="px-3 py-1 text-xs font-bold bg-white/90 text-amber-700 rounded-lg hover:bg-white transition-all shrink-0">
+                  🔓 Mở khoá (giảng dạy)
+                </button>
+              )}
               <button onClick={exitGvPreview} className="px-3 py-1 text-xs font-bold bg-white text-amber-700 rounded-lg hover:bg-amber-50 transition-all shrink-0">
                 ✏️ Bắt đầu làm bài thực hành
               </button>
@@ -959,6 +1016,65 @@ export default function App() {
       </div>}
 
       {/* ═══ MODALS ═══ */}
+      {gvUnlockModalMode && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm">
+          <div className="w-full max-w-sm bg-white dark:bg-[#131929] rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 p-5">
+            <div className="flex items-center gap-2 mb-1 text-emerald-600 dark:text-emerald-400">
+              <Lock className="w-5 h-5" />
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                {gvUnlockModalMode === 'unlock' ? 'Mở khoá chỉnh sửa bài mẫu (Giảng viên)' : 'Đổi mật khẩu mở khoá'}
+              </h3>
+            </div>
+            <p className="text-[11px] text-slate-500 dark:text-gray-400 mb-3">
+              {gvUnlockModalMode === 'unlock'
+                ? 'Nhập mật khẩu để tạm mở khoá kéo thả linh kiện và sửa code trên bài mẫu — phục vụ giảng dạy trực tiếp.'
+                : 'Đặt mật khẩu mới cho lần mở khoá sau. Mật khẩu lưu trên máy này (localStorage), không đồng bộ máy khác.'}
+            </p>
+
+            {gvUnlockModalMode === 'unlock' ? (
+              <input
+                type="password"
+                autoFocus
+                value={gvUnlockInput}
+                onChange={(e) => { setGvUnlockInput(e.target.value); setGvUnlockError(''); }}
+                onKeyDown={(e) => e.key === 'Enter' && handleGvUnlockSubmit()}
+                placeholder="Mật khẩu"
+                className="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0C101D] text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+            ) : (
+              <div className="space-y-2">
+                <input
+                  type="password"
+                  autoFocus
+                  value={gvUnlockInput}
+                  onChange={(e) => { setGvUnlockInput(e.target.value); setGvUnlockError(''); }}
+                  placeholder="Mật khẩu mới"
+                  className="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0C101D] text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+                <input
+                  type="password"
+                  value={gvUnlockInput2}
+                  onChange={(e) => { setGvUnlockInput2(e.target.value); setGvUnlockError(''); }}
+                  onKeyDown={(e) => e.key === 'Enter' && handleGvUnlockSubmit()}
+                  placeholder="Xác nhận mật khẩu mới"
+                  className="w-full px-3 py-2 text-sm rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0C101D] text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+            )}
+            {gvUnlockError && <p className="text-[11px] text-rose-500 font-semibold mt-2">{gvUnlockError}</p>}
+
+            <div className="flex items-center justify-end gap-2 mt-4">
+              <button onClick={() => setGvUnlockModalMode(null)} className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-gray-300 hover:bg-slate-200 dark:hover:bg-white/20 transition-all">
+                Huỷ
+              </button>
+              <button onClick={handleGvUnlockSubmit} className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 transition-all">
+                {gvUnlockModalMode === 'unlock' ? 'Mở khoá' : 'Lưu mật khẩu'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <StudentModal
         isOpen={ui.isStudentModalOpen}
         onClose={() => ui.setStudentModalOpen(false)}
