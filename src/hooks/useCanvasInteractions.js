@@ -99,6 +99,15 @@ export function useCanvasInteractions({ canvas, sim, isReadOnly = false }) {
   // ─── Canvas Interactions ──────────────────────
   const handleMouseDownCanvas = (e) => {
     if (e.target.tagName === 'svg' || e.target.classList.contains('canvas-grid')) {
+      // Đang giữ 1 đầu dây chờ nối (wireStart) — bấm vào khoảng trống sẽ TẠO GẤP KHÚC
+      // cho dây đó tại điểm bấm, thay vì huỷ dây đang vẽ dở, giống Tinkercad/Wokwi.
+      if (canvas.wireStart && !isReadOnly && canvasRef.current) {
+        const rect = canvasRef.current.getBoundingClientRect();
+        const rawX = (e.clientX - rect.left - canvas.pan.x) / canvas.zoom;
+        const rawY = (e.clientY - rect.top - canvas.pan.y) / canvas.zoom;
+        canvas.addWireDraftPoint({ x: Math.round(rawX / 10) * 10, y: Math.round(rawY / 10) * 10 });
+        return;
+      }
       if (canvas.isPlacingNote && !isReadOnly && canvasRef.current) {
         const rect = canvasRef.current.getBoundingClientRect();
         const rawX = (e.clientX - rect.left - canvas.pan.x) / canvas.zoom;
@@ -261,7 +270,7 @@ export function useCanvasInteractions({ canvas, sim, isReadOnly = false }) {
         id: `wire_${Date.now()}`,
         from: { componentId: canvas.wireStart.componentId, portId: canvas.wireStart.portId },
         to: { componentId, portId },
-        waypoints: [],
+        waypoints: canvas.wireDraftPoints,
         color: canvas.wireStart.portType === 'gnd' ? '#10B981' : canvas.wireStart.portType === 'power' ? '#EF4444' : '#2563EB',
       });
       canvas.setWireStart(null);

@@ -10,6 +10,10 @@ export const PROJECT_PRESETS = {
   intro4: {
     name: 'N1: Pin Khoai tây nối tiếp',
     desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 1: Ghép nối tiếp 4 củ khoai tây (đinh kẽm + cuộn dây đồng) thành 1 nguồn điện sinh học, thắp sáng đèn LED. KHÔNG cần vi điều khiển hay viết code.',
+    longDesc: `Mục tiêu: Làm quen mạch điện đơn giản nhất — hiểu nguyên lý "pin sinh học" trước khi học vi điều khiển.
+Linh kiện: 4 củ khoai tây (mỗi củ là 1 nguồn điện nhỏ), 1 đèn LED.
+Nguyên lý: Đinh kẽm (cực âm) và dây đồng (cực dương) cắm vào khoai tây tạo phản ứng hoá học sinh ra dòng điện (~0.5V/củ). Ghép nối tiếp — nối cực đồng củ này sang đinh kẽm củ kế tiếp — để cộng dồn điện áp đủ thắp sáng LED.
+Không cần viết code: hãy quan sát đèn LED tự sáng ngay khi bạn nối đúng vòng kín trên canvas.`,
     code: `// Bài này KHÔNG dùng vi điều khiển — không cần viết code!
 // Mỗi củ khoai tây là 1 "pin sinh học" nhỏ (phản ứng hoá học giữa đinh kẽm và dây đồng).
 // Ghép nối tiếp nhiều củ (cực đồng củ này -> đinh kẽm củ kế tiếp) để cộng dồn điện áp.
@@ -34,6 +38,10 @@ export const PROJECT_PRESETS = {
   intro1: {
     name: 'N2: Đèn LED sáng với Pin 9V',
     desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 2: Mạch điện cơ bản nhất — Pin 9V, điện trở và đèn LED, KHÔNG cần vi điều khiển hay viết code. Đèn LED tự sáng khi nối đúng vòng kín.',
+    longDesc: `Mục tiêu: Bài mạch điện cơ bản nhất — hiểu định luật mạch kín và vai trò của điện trở hạn dòng.
+Linh kiện: Pin 9V, 1 điện trở 330Ω, 1 đèn LED.
+Nguyên lý: Dòng điện chỉ chạy khi mạch tạo thành vòng kín: Pin(+) → Điện trở → LED (chân dài Anode → chân ngắn Cathode) → Pin(-). Điện trở có nhiệm vụ giới hạn dòng điện qua LED để không làm cháy LED.
+Không cần viết code — kéo dây nối đúng là đèn tự sáng.`,
     code: `// Bài này KHÔNG dùng vi điều khiển — không cần viết code!
 // Đèn LED sẽ tự sáng khi bạn nối đúng mạch kín:
 // Pin 9V (+) -> Điện trở -> LED (chân dài: Anode) -> LED (chân ngắn: Cathode) -> Pin 9V (-)
@@ -53,6 +61,10 @@ export const PROJECT_PRESETS = {
   intro2: {
     name: 'N3: Dãy 7 đèn LED chạy (LED Chaser)',
     desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 3: Điều khiển 7 đèn LED sáng đuổi nhau lần lượt bằng Arduino Uno — làm quen digitalWrite() và pinMode() trên nhiều chân cùng lúc.',
+    longDesc: `Mục tiêu: Làm quen digitalWrite() và pinMode() khi điều khiển NHIỀU chân cùng lúc bằng Arduino.
+Linh kiện: Arduino Uno R3, 7 đèn LED, 7 điện trở (chân D2-D8).
+Nguyên lý: Mỗi LED nối vào 1 chân số của Arduino qua 1 điện trở hạn dòng, chân còn lại (Cathode) về GND chung.
+Giải thích code: Trong loop(), lần lượt bật rồi tắt từng LED theo thứ tự D2→D8, mỗi đèn sáng 100ms rồi tắt trước khi đèn kế tiếp sáng — tạo hiệu ứng "đèn chạy" (chaser).`,
     code: `// BÀI MỞ ĐẦU 3: DÃY 7 ĐÈN LED CHẠY (LED CHASER)
 #define LED1 2
 #define LED2 3
@@ -132,6 +144,10 @@ void loop() {
   intro3: {
     name: 'N4: Đèn LED nhấp nháy cơ bản (chân 13)',
     desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 4: Mạch "Blink" kinh điển — 1 đèn LED nhấp nháy qua chân số 13 của Arduino Uno, bài đầu tiên khi học lập trình vi điều khiển.',
+    longDesc: `Mục tiêu: Bài "Hello World" của lập trình vi điều khiển — điều khiển 1 chân số cơ bản nhất.
+Linh kiện: Arduino Uno R3, 1 đèn LED, 1 điện trở (chân D13).
+Nguyên lý: digitalWrite(pin, HIGH) đưa chân lên 5V làm LED sáng; digitalWrite(pin, LOW) đưa chân về 0V làm LED tắt.
+Giải thích code: loop() lặp lại vô hạn: bật LED → chờ 500ms → tắt LED → chờ 500ms, tạo hiệu ứng nhấp nháy đều đặn 1 giây/chu kỳ.`,
     code: `// BÀI MỞ ĐẦU 4: BLINK - ĐÈN LED NHẤP NHÁY CƠ BẢN
 #define LED_PIN 13
 
@@ -160,6 +176,10 @@ void loop() {
   intro5: {
     name: 'N5: Pin Chanh nối tiếp thắp sáng LED',
     desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 5: Ghép nối tiếp 3 quả chanh thành nguồn điện sinh học, thắp sáng đèn LED — cùng nguyên lý pin khoai tây nhưng dùng axit citric trong chanh.',
+    longDesc: `Mục tiêu: Củng cố nguyên lý pin sinh học với vật liệu khác — chanh (dùng axit citric thay vì phản ứng khoáng chất như khoai tây).
+Linh kiện: 3 quả chanh, 1 đèn LED.
+Nguyên lý: Axit citric trong chanh phản ứng với đinh kẽm và dây đồng sinh dòng điện nhỏ (~0.7V/quả) — cao hơn khoai tây nên chỉ cần 3 quả (thay vì 4 củ khoai tây) là đủ sáng LED.
+Không cần viết code — mạch tự hoạt động khi nối đúng vòng kín.`,
     code: `// Bài này KHÔNG dùng vi điều khiển — không cần viết code!
 // Axit citric trong chanh phản ứng với đinh kẽm và dây đồng, sinh ra dòng điện nhỏ.
 // Ghép nối tiếp 3 quả chanh (cực đồng quả này -> đinh kẽm quả kế tiếp) để đủ thắp LED.
@@ -181,6 +201,10 @@ void loop() {
   env_lab1: {
     name: 'B1: Quan trắc Khí hậu (DHT11 + LCD)',
     desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 1: Đọc Nhiệt độ & Độ ẩm không khí bằng DHT11, hiển thị chỉ số liên tục lên màn hình LCD1602 và Serial Monitor. Board: ESP32-S3-DevKitC-1.',
+    longDesc: `Mục tiêu: Buổi mở đầu chuỗi 6 buổi IoT — đọc cảm biến số (DHT11) và hiển thị lên màn hình LCD.
+Linh kiện: ESP32-S3, DHT11 (GPIO15), LCD1602 I2C (SCL: GPIO9, SDA: GPIO8).
+Giải thích code: setup() khởi tạo Serial + LCD và hiện màn hình chào. loop() đọc nhiệt độ/độ ẩm từ DHT11 mỗi 600ms, in ra Serial Monitor VÀ cập nhật 2 dòng trên LCD.
+Lưu ý giảng dạy: dhtReadHumidity() là hàm mô phỏng riêng của trình giả lập này (không có trong thư viện DHT thật) để đơn giản hoá việc đọc độ ẩm.`,
     code: `// BUỔI 1: TỔNG QUAN IOT & QUAN TRẮC KHÍ HẬU CƠ BẢN (board ESP32-S3-DevKitC-1)
 // Cảm biến DHT11 (Chân GPIO15) & Màn hình LCD1602 I2C (SCL: GPIO9, SDA: GPIO8 — mặc định của ESP32-S3, KHÁC ESP32 thường dùng D21/D22)
 
@@ -244,6 +268,10 @@ void loop() {
   env_lab2: {
     name: 'B2: Quan trắc Nước & Cảnh báo Ngập',
     desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 2: Đo mực nước (HC-SR04) & Nhiệt độ nguồn nước (DS18B20), hiển thị LCD1602 và phát cảnh báo ngập lụt. Board: ESP32-S3-DevKitC-1.',
+    longDesc: `Mục tiêu: Đo khoảng cách bằng sóng siêu âm (HC-SR04) kết hợp cảm biến nhiệt độ chống nước (DS18B20), phát cảnh báo khi mực nước dâng cao.
+Linh kiện: ESP32-S3, HC-SR04 (Trig: GPIO5, Echo: GPIO18), DS18B20 (GPIO4), LCD1602 I2C.
+Nguyên lý HC-SR04: phát xung TRIG 10µs, đo thời gian ECHO trả về (pulseIn), suy ra khoảng cách = thời gian × 0.034 / 2 (vận tốc âm thanh).
+Giải thích code: nếu khoảng cách < 15cm (mực nước dâng cao, cảm biến gần mặt nước) → LCD hiện "CẢNH BÁO: NGẬP!", ngược lại hiện nhiệt độ nước bình thường.`,
     code: `// BUỔI 2: QUAN TRẮC NGUỒN NƯỚC & CẢNH BÁO NGẬP LỤT (board ESP32-S3-DevKitC-1)
 // Siêu âm HC-SR04 (Trig: GPIO5, Echo: GPIO18), DS18B20 (GPIO4), LCD1602 I2C (SCL: GPIO9, SDA: GPIO8)
 
@@ -326,6 +354,10 @@ void loop() {
   env_lab3: {
     name: 'B3: Tưới cây Tự động (Soil + Bơm Relay)',
     desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 3: Giám sát độ ẩm đất. Tự động bật Module Relay kích hoạt Máy bơm nước khi đất bị khô dưới ngưỡng cài đặt. Board: ESP32-S3-DevKitC-1.',
+    longDesc: `Mục tiêu: Hệ thống tưới cây tự động — cảm biến độ ẩm đất điều khiển Relay đóng/ngắt máy bơm.
+Linh kiện: ESP32-S3, cảm biến độ ẩm đất (GPIO6), Relay 5V (GPIO7) điều khiển máy bơm DC.
+Nguyên lý Relay: là công tắc điện tử — chân IN nhận tín hiệu digitalWrite từ ESP32 (dòng nhỏ) để đóng/ngắt tiếp điểm công suất lớn (an toàn cho vi điều khiển).
+Giải thích code: nếu độ ẩm đất < 400 (đất khô) → bật Relay (bơm chạy); ngược lại tắt Relay (đất đã đủ ẩm).`,
     code: `// BUỔI 3: QUAN TRẮC ĐẤT & HỆ THỐNG TƯỚI CÂY TỰ ĐỘNG (board ESP32-S3-DevKitC-1)
 // Cảm biến Độ ẩm đất (GPIO6), Module Relay Bơm nước (GPIO7), LCD1602 I2C (SCL: GPIO9, SDA: GPIO8)
 // Lưu ý: GPIO34/GPIO26 dùng trên ESP32 thường KHÔNG tồn tại trên ESP32-S3 nên đã đổi sang GPIO6/GPIO7.
@@ -399,6 +431,10 @@ void loop() {
   env_lab4: {
     name: 'B4: Cảnh báo Khí độc (MQ-2 + Còi + Quạt)',
     desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 4: Đo nồng độ Khí Gas/Khói bằng MQ-2. Bật Còi hú + Quạt thông gió qua Relay khi nồng độ nguy hiểm, tự tắt còi khi an toàn. Board: ESP32-S3-DevKitC-1.',
+    longDesc: `Mục tiêu: Cảnh báo khí độc — đo nồng độ khí Gas/Khói (MQ-2), bật còi + quạt thông gió khi nguy hiểm.
+Linh kiện: ESP32-S3, MQ-2 (GPIO11), Buzzer (GPIO12), Relay điều khiển Quạt (GPIO14), LCD1602 I2C.
+Giải thích code: nếu nồng độ Gas > 300 PPM → bật còi hú (digitalWrite HIGH) VÀ bật Relay quạt hút thông gió; khi nồng độ trở lại an toàn thì tắt cả 2 (kèm noTone() tắt hẳn còi).
+Lưu ý giảng dạy: đây là ngưỡng minh hoạ (300 PPM), thực tế cần tra theo datasheet MQ-2 và hiệu chuẩn cảm biến.`,
     code: `// BUỔI 4: CẢNH BÁO RÒ RỈ KHÍ ĐỘC & KHÓI THẢI MÔI TRƯỜNG (board ESP32-S3-DevKitC-1)
 // Cảm biến Gas MQ-2 (GPIO11), Còi hú (GPIO12), Relay Quạt (GPIO14), LCD1602 I2C (SCL: GPIO9, SDA: GPIO8)
 // Lưu ý: GPIO35/GPIO27 dùng trên ESP32 thường KHÔNG tồn tại/bị hạn chế trên ESP32-S3 nên đã đổi sang GPIO11/GPIO12.
@@ -482,6 +518,10 @@ void loop() {
   env_lab5: {
     name: 'B5: Trạm HMI Môi trường (LCD + CB)',
     desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 5: Xây dựng Giao diện Hiển thị HMI tại chỗ bằng Màn hình LCD1602 tích hợp cảm biến Khí độc MQ-2 & Nhiệt ẩm DHT11, có đèn LED cảnh báo khi khí gas vượt ngưỡng. Board: ESP32-S3-DevKitC-1.',
+    longDesc: `Mục tiêu: Xây dựng màn hình HMI (Human-Machine Interface) tại chỗ — gộp nhiều cảm biến hiển thị trên 1 màn hình LCD, có đèn cảnh báo.
+Linh kiện: ESP32-S3, LCD1602 I2C, DHT11 (GPIO15), MQ-2 (GPIO11), LED cảnh báo qua điện trở (GPIO16).
+Giải thích code: loop() đọc đồng thời cả 3 cảm biến, hiển thị gộp trên 2 dòng LCD (dòng 1: nhiệt độ + độ ẩm, dòng 2: nồng độ gas), đồng thời bật LED cảnh báo khi Gas > 300 PPM.
+Đây là bước đệm cho Buổi 6 — nơi số lượng cảm biến tăng lên và có thêm gửi dữ liệu Cloud.`,
     code: `// BUỔI 5: GIAO DIỆN HMI TẠI CHỖ CHO TRẠM QUAN TRẮC MÔI TRƯỜNG (board ESP32-S3-DevKitC-1)
 // LCD1602 I2C (SCL: GPIO9, SDA: GPIO8), DHT11 (GPIO15), MQ-2 (GPIO11), LED cảnh báo (GPIO16)
 // Lưu ý: GPIO34 dùng trên ESP32 thường KHÔNG tồn tại trên ESP32-S3 nên đã đổi sang GPIO11.
@@ -570,6 +610,10 @@ void loop() {
   env_lab6: {
     name: 'B6: Trạm Môi trường Đa thông số IoT',
     desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Buổi 6: Đồ án Đa cảm biến tổng hợp: Nhiệt ẩm, Mực nước, Khí độc. Hiển thị LCD1602, đẩy Cloud Telemetry & bật đèn LED cảnh báo khi có thông số nguy hiểm. Board: ESP32-S3-DevKitC-1.',
+    longDesc: `Mục tiêu: Đồ án tổng hợp cuối khoá — trạm IoT đa cảm biến hoàn chỉnh, đẩy dữ liệu telemetry lên Cloud.
+Linh kiện: ESP32-S3, DHT11 (GPIO15), MQ-2 (GPIO11), HC-SR04 (Trig: GPIO5, Echo: GPIO18), LCD1602 I2C, LED cảnh báo (GPIO16).
+Giải thích code: loop() đọc tất cả cảm biến, in ra Serial Monitor dưới dạng chuỗi JSON (mô phỏng gói tin gửi lên MQTT/HTTP Cloud thật), đồng thời hiện tóm tắt trên LCD và bật LED nếu Gas cao HOẶC mực nước dâng ngập.
+Lưu ý giảng dạy: phần "gửi Cloud" ở đây chỉ in JSON ra Serial để minh hoạ cấu trúc gói tin — kết nối MQTT/HTTP thật cần thêm thư viện WiFi + PubSubClient ngoài phạm vi bài mô phỏng.`,
     code: `// BUỔI 6: ĐỒ ÁN TỔNG HỢP — TRẠM QUAN TRẮC MÔI TRƯỜNG ĐA THÔNG SỐ IOT (board ESP32-S3-DevKitC-1)
 // Tích hợp Đa cảm biến & Tự động đẩy dữ liệu Telemetry lên IoT Cloud
 // LCD1602 I2C (SCL: GPIO9, SDA: GPIO8), LED cảnh báo (GPIO16)

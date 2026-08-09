@@ -134,7 +134,12 @@ export const useCanvasStore = create((set, get) => ({
   setDraggingCompId: (v) => set({ draggingCompId: v }),
   setDragOffset: (v) => set({ dragOffset: v }),
   setDraggingWaypoint: (v) => set({ draggingWaypoint: v }),
-  setWireStart: (v) => set({ wireStart: v }),
+  // wireStart != null nghia la dang giu chuot ve day; wireDraftPoints tich luy cac
+  // diem gap khuc nguoi dung bam vao khoang trong trong luc do (xem handleMouseDownCanvas).
+  // Xoa het khi wireStart ve null (huy hoac hoan tat day) de khong ron sang lan ve tiep theo.
+  wireDraftPoints: [],
+  setWireStart: (v) => set(s => ({ wireStart: v, wireDraftPoints: v ? s.wireDraftPoints : [] })),
+  addWireDraftPoint: (pt) => set(s => ({ wireDraftPoints: [...s.wireDraftPoints, pt] })),
   setMousePos: (v) => set({ mousePos: v }),
 
   // Multi-select

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Code, Terminal, Sliders, ZoomIn, ZoomOut, Maximize2,
   ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Copy, FileCode, Lock,
-  BookOpen, FlaskConical, Layers, Boxes,
+  BookOpen, FlaskConical, Layers, Boxes, Info,
 } from 'lucide-react';
 import { COMPONENT_TYPES } from './data/componentTypes';
 import { PROJECT_PRESETS } from './data/projectPresets';
@@ -99,6 +99,7 @@ export default function App() {
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
   const [isRightPanelCollapsed, setIsRightPanelCollapsed] = useState(false);
   const [isMonitorCollapsed, setIsMonitorCollapsed] = useState(false);
+  const [isDescCollapsed, setIsDescCollapsed] = useState(false);
 
   // Live real-time clock tick (every 1 second)
   useEffect(() => {
@@ -694,9 +695,14 @@ export default function App() {
                   );
                 })}
 
-                {/* Wire Creation Preview */}
+                {/* Wire Creation Preview — đi qua các điểm gấp khúc đã bấm (wireDraftPoints), rồi tới vị trí chuột */}
                 {canvas.wireStart && (
-                  <path d={generateWirePath(canvas.wireStart, canvas.mousePos, [])} fill="none" stroke="#2563EB" strokeWidth="2.5" strokeDasharray="4,4" />
+                  <>
+                    <path d={generateWirePath(canvas.wireStart, canvas.mousePos, canvas.wireDraftPoints)} fill="none" stroke="#2563EB" strokeWidth="2.5" strokeDasharray="4,4" />
+                    {canvas.wireDraftPoints.map((p, i) => (
+                      <circle key={i} cx={p.x} cy={p.y} r="4" fill="#2563EB" stroke="#FFFFFF" strokeWidth="1.5" />
+                    ))}
+                  </>
                 )}
 
                 {/* Components */}
@@ -882,6 +888,29 @@ export default function App() {
                 </button>
               </div>
             </div>
+
+            {/* MÔ TẢ CHI TIẾT BÀI HỌC — chỉ hiện khi đang mở 1 bài mẫu (N1-N5/B1-B6) */}
+            {selectedProjectId && PROJECT_PRESETS[selectedProjectId]?.longDesc && (
+              <div className={`border-b flex flex-col overflow-hidden transition-all duration-300 ${
+                isDescCollapsed ? '' : 'max-h-64'
+              } ${ui.isDarkMode ? 'bg-[#0A0D18] border-white/5' : 'bg-amber-50/60 border-slate-200'}`}>
+                <div
+                  className={`flex items-center justify-between px-4 py-1.5 cursor-pointer select-none ${ui.isDarkMode ? 'hover:bg-white/5' : 'hover:bg-amber-100/60'}`}
+                  onClick={() => setIsDescCollapsed(!isDescCollapsed)}
+                >
+                  <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
+                    <Info className="w-3.5 h-3.5" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider">Mô tả chi tiết bài học</span>
+                  </div>
+                  {isDescCollapsed ? <ChevronDown className="w-3.5 h-3.5 text-slate-400" /> : <ChevronUp className="w-3.5 h-3.5 text-slate-400" />}
+                </div>
+                {!isDescCollapsed && (
+                  <div className={`px-4 pb-3 overflow-y-auto text-[11px] leading-relaxed whitespace-pre-line ${ui.isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+                    {PROJECT_PRESETS[selectedProjectId].longDesc}
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="flex-1 relative">
               <CodeEditor code={code} onChange={setCode} isSimulating={isEditingBlocked} isDarkMode={ui.isDarkMode} />
