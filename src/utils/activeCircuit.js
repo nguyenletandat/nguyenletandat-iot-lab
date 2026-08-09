@@ -62,6 +62,20 @@ export function computeActiveOutputs(components, wires, pinStates) {
 
   const isPortHot = (compId, portId) => hotRoots.has(uf.find(nodeKey(compId, portId)));
 
+  // Relay: chân IN (cuộn dây điều khiển) và chân OUT/NO (tiếp điểm công suất) CÁCH ĐIỆN
+  // với nhau trong thực tế nên không nằm trong PASS_THROUGH_PORTS — nhưng khi cuộn dây
+  // được cấp điện (IN đang HIGH), relay đóng tiếp điểm nên tải phía OUT cũng được coi
+  // là "có điện", cần lan truyền thủ công thay vì dựa vào tính liên thông dây dẫn.
+  for (const c of components) {
+    if (c.type === 'RELAY' && isPortHot(c.id, 'IN')) {
+      hotRoots.add(uf.find(nodeKey(c.id, 'OUT')));
+    }
+    if (c.type === 'RELAY_DPDT' && isPortHot(c.id, 'IN')) {
+      hotRoots.add(uf.find(nodeKey(c.id, 'NO1')));
+      hotRoots.add(uf.find(nodeKey(c.id, 'NO2')));
+    }
+  }
+
   for (const c of components) {
     const rgbPorts = RGB_CONTROL_PORTS[c.type];
     if (rgbPorts) {

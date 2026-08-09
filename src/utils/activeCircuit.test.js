@@ -80,6 +80,26 @@ describe('computeActiveOutputs — trạng thái thực của linh kiện đầu
     expect(out.get('relay1')).toBe(true);
   });
 
+  it('Động cơ DC nối QUA Relay (relay.OUT -> motor.POS) vẫn quay đúng khi relay.IN HIGH (B3: đất khô -> bật bơm)', () => {
+    const components = [
+      { id: 'esp1', type: 'ESP32_S3', x: 0, y: 0, config: {} },
+      { id: 'relay1', type: 'RELAY', x: 0, y: 0, config: {} },
+      { id: 'pump1', type: 'DC_MOTOR', x: 0, y: 0, config: {} },
+    ];
+    const wires = [
+      wire('w1', 'esp1', 'GPIO7', 'relay1', 'IN'),
+      wire('w2', 'relay1', 'OUT', 'pump1', 'POS'),
+      wire('w3', 'esp1', 'GND1', 'pump1', 'NEG'),
+    ];
+    const outOn = computeActiveOutputs(components, wires, { 7: { val: 1 } });
+    expect(outOn.get('relay1')).toBe(true);
+    expect(outOn.get('pump1')).toBe(true);
+
+    const outOff = computeActiveOutputs(components, wires, { 7: { val: 0 } });
+    expect(outOff.get('relay1')).toBe(false);
+    expect(outOff.get('pump1')).toBe(false);
+  });
+
   it('Linh kiện chưa nối dây tới board nào thì không bật dù có pinStates khác đang HIGH', () => {
     const components = [
       { id: 'esp1', type: 'ARDUINO_UNO', x: 0, y: 0, config: {} },
