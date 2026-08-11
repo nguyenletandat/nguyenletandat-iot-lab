@@ -65,7 +65,7 @@ export const COMPONENT_GUIDE = {
   RELAY_DPDT: { en: 'DPDT Relay', vi: 'Relay DPDT', descEn: 'Relay with two independently switched circuits for more complex switching.', descVi: 'Relay có 2 mạch đóng/ngắt độc lập, dùng cho các mạch chuyển mạch phức tạp hơn.' },
 
   // Displays
-  LCD1602: { en: '16×2 LCD (I2C/HD44780)', vi: 'LCD 16x2 I2C / HD44780', descEn: 'Character display showing 2 lines of 16 characters of text.', descVi: 'Màn hình ký tự hiển thị 2 dòng, mỗi dòng 16 ký tự.' },
+  LCD1602: { en: '16×2 LCD (HD44780, parallel)', vi: 'LCD1602A – 16 chân song song', descEn: 'Character display showing 2 lines of 16 characters, wired directly via 4-bit parallel mode (RS/E/D4-D7) — no I2C backpack needed.', descVi: 'Màn hình ký tự 2 dòng x 16 ký tự, đấu trực tiếp kiểu song song 4-bit (RS/E/D4-D7) — không cần module chuyển I2C.' },
   OLED_SSD1306: { en: '0.96" OLED Display (SSD1306)', vi: 'OLED 0.96" SSD1306', descEn: 'Small graphic OLED screen for text and simple graphics over I2C.', descVi: 'Màn hình OLED đồ họa nhỏ, hiển thị chữ và hình đơn giản qua I2C.' },
   SEVEN_SEGMENT: { en: '7-Segment Display', vi: '7-Segment Display', descEn: 'Shows a single digit (0–9) using 7 individually lit segments.', descVi: 'Hiển thị một chữ số (0–9) bằng 7 đoạn LED riêng biệt.' },
 

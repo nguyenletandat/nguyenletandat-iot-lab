@@ -655,23 +655,28 @@ export const COMPONENT_TYPES = {
     defaultConfig: { pressed: false, label: 'Button' }
   },
 
+  // LCD1602A tran (16 chan song song HD44780 — dung khi KHONG co module I2C
+  // gan them) — dung 4-bit mode chuan (chi can D4-D7, khong dung D0-D3), RW noi
+  // GND vi chi ghi (khong doc), V0 noi GND de tuong phan co dinh o muc ro nhat.
   LCD1602: {
-    name: 'LCD 16x2 I2C / HD44780',
+    name: 'LCD1602A – 16 chân song song (HD44780)',
     subtitle: 'Display',
-    category: 'Displays', tags: ['Display', 'LCD', 'I2C'],
+    category: 'Displays', tags: ['Display', 'LCD', 'HD44780', 'Parallel'],
     width: 280, height: 160,
     ports: [
-      { id: 'VCC', name: 'VCC', x: 8, y: 24, side: 'left', type: 'power' },
-      { id: 'GND', name: 'GND', x: 8, y: 44, side: 'left', type: 'gnd' },
-      { id: 'SCL', name: 'SCL', x: 8, y: 64, side: 'left', type: 'gpio' },
-      { id: 'SDA', name: 'SDA', x: 8, y: 84, side: 'left', type: 'gpio' },
+      { id: 'VSS', name: 'VSS', x: 8, y: 24, side: 'left', type: 'gnd' },
+      { id: 'VDD', name: 'VDD', x: 8, y: 44, side: 'left', type: 'power' },
+      { id: 'V0', name: 'V0', x: 8, y: 64, side: 'left', type: 'gnd' },
+      { id: 'RS', name: 'RS', x: 8, y: 84, side: 'left', type: 'gpio' },
+      { id: 'RW', name: 'RW', x: 8, y: 104, side: 'left', type: 'gnd' },
+      { id: 'E', name: 'E', x: 8, y: 124, side: 'left', type: 'gpio' },
 
-      { id: 'VSS', name: 'VSS', x: 272, y: 24, side: 'right', type: 'gnd' },
-      { id: 'VDD', name: 'VDD', x: 272, y: 44, side: 'right', type: 'power' },
-      { id: 'RS', name: 'RS', x: 272, y: 64, side: 'right', type: 'gpio' },
-      { id: 'EN', name: 'EN', x: 272, y: 84, side: 'right', type: 'gpio' },
-      { id: 'D4', name: 'D4', x: 272, y: 104, side: 'right', type: 'gpio' },
-      { id: 'D5', name: 'D5', x: 272, y: 124, side: 'right', type: 'gpio' }
+      { id: 'D4', name: 'D4', x: 272, y: 24, side: 'right', type: 'gpio' },
+      { id: 'D5', name: 'D5', x: 272, y: 44, side: 'right', type: 'gpio' },
+      { id: 'D6', name: 'D6', x: 272, y: 64, side: 'right', type: 'gpio' },
+      { id: 'D7', name: 'D7', x: 272, y: 84, side: 'right', type: 'gpio' },
+      { id: 'A', name: 'A (đèn nền +)', x: 272, y: 104, side: 'right', type: 'power' },
+      { id: 'K', name: 'K (đèn nền -)', x: 272, y: 124, side: 'right', type: 'gnd' }
     ],
     defaultConfig: { textLine1: 'IoT Labs Maker', textLine2: 'Virtual Hardware', label: 'LCD' }
   },
