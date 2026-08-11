@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Search, Boxes } from 'lucide-react';
+import { Search, Boxes, Info } from 'lucide-react';
 import { COMPONENT_TYPES, COMPONENT_CATEGORIES } from '../data/componentTypes';
 import { COMPONENT_GUIDE } from '../data/componentGuide';
 import CanvasComponentRender from './CanvasComponentRenders';
+import ComponentDetailModal from './ComponentDetailModal';
 
 // Nhãn song ngữ cho danh mục (COMPONENT_CATEGORIES vốn chỉ có tên tiếng Việt)
 const CATEGORY_EN = {
@@ -35,9 +36,10 @@ function ComponentThumbnail({ typeKey }) {
  * có trong bộ mô phỏng (không phải catalog của bên thứ ba) để sinh viên tra cứu
  * công dụng trước khi kéo thả vào bài thực hành.
  */
-export default function ComponentGuideTab({ isDarkMode }) {
+export default function ComponentGuideTab({ isDarkMode, onJumpToLesson }) {
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTypeKey, setSelectedTypeKey] = useState(null);
 
   const typeKeys = Object.keys(COMPONENT_TYPES).filter(typeKey => {
     const proto = COMPONENT_TYPES[typeKey];
@@ -127,14 +129,21 @@ export default function ComponentGuideTab({ isDarkMode }) {
                 const proto = COMPONENT_TYPES[typeKey];
                 const guide = COMPONENT_GUIDE[typeKey];
                 return (
-                  <div
+                  <button
                     key={typeKey}
-                    className={`flex flex-col p-3.5 rounded-2xl border shadow-sm transition-all ${
-                      isDarkMode ? 'bg-[#131929] border-white/5 hover:border-emerald-500/60' : 'bg-white border-slate-200/80 hover:border-emerald-400 hover:shadow-md'
+                    type="button"
+                    onClick={() => setSelectedTypeKey(typeKey)}
+                    className={`group flex flex-col p-3.5 rounded-2xl border shadow-sm transition-all text-left cursor-pointer ${
+                      isDarkMode ? 'bg-[#131929] border-white/5 hover:border-emerald-500/60 hover:shadow-lg hover:shadow-emerald-500/5' : 'bg-white border-slate-200/80 hover:border-emerald-400 hover:shadow-md'
                     }`}
                   >
-                    <div className={`w-full h-28 mb-3 rounded-xl flex items-center justify-center p-2 border ${isDarkMode ? 'bg-[#090C15] border-white/5' : 'bg-slate-50 border-slate-100'}`}>
+                    <div className={`relative w-full h-28 mb-3 rounded-xl flex items-center justify-center p-2 border ${isDarkMode ? 'bg-[#090C15] border-white/5' : 'bg-slate-50 border-slate-100'}`}>
                       <ComponentThumbnail typeKey={typeKey} />
+                      <span className={`absolute top-1.5 right-1.5 flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-semibold opacity-0 group-hover:opacity-100 transition-opacity ${
+                        isDarkMode ? 'bg-emerald-500/20 text-emerald-300' : 'bg-emerald-600 text-white'
+                      }`}>
+                        <Info className="w-2.5 h-2.5" /> Chi tiết
+                      </span>
                     </div>
 
                     <h3 className={`text-xs font-bold leading-snug ${isDarkMode ? 'text-white' : 'text-slate-800'}`}>
@@ -156,13 +165,23 @@ export default function ComponentGuideTab({ isDarkMode }) {
                     }`}>
                       {proto.subtitle}
                     </span>
-                  </div>
+                  </button>
                 );
               })}
             </div>
           )}
         </div>
       </div>
+
+      <ComponentDetailModal
+        typeKey={selectedTypeKey}
+        isDarkMode={isDarkMode}
+        onClose={() => setSelectedTypeKey(null)}
+        onJumpToLesson={(id) => {
+          setSelectedTypeKey(null);
+          onJumpToLesson?.(id);
+        }}
+      />
     </div>
   );
 }

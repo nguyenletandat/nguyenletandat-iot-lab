@@ -474,7 +474,10 @@ export default function App() {
       {/* ═══ COMPONENT LIBRARY TAB ═══ */}
       {mainTab === 'components' && (
         <div className="flex-1 overflow-hidden">
-          <ComponentGuideTab isDarkMode={ui.isDarkMode} />
+          <ComponentGuideTab
+            isDarkMode={ui.isDarkMode}
+            onJumpToLesson={(id) => { loadProject(id); setMainTab('practice'); }}
+          />
         </div>
       )}
 
