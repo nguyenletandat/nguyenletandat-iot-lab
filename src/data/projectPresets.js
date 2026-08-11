@@ -35,9 +35,34 @@ Không cần viết code: hãy quan sát đèn LED tự sáng ngay khi bạn n�
     ]
   },
 
+  intro5: {
+    name: 'N2: Pin Chanh nối tiếp thắp sáng LED',
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 2: Ghép nối tiếp 3 quả chanh thành nguồn điện sinh học, thắp sáng đèn LED — cùng nguyên lý pin khoai tây nhưng dùng axit citric trong chanh.',
+    longDesc: `Mục tiêu: Củng cố nguyên lý pin sinh học với vật liệu khác — chanh (dùng axit citric thay vì phản ứng khoáng chất như khoai tây).
+Linh kiện: 3 quả chanh, 1 đèn LED.
+Nguyên lý: Axit citric trong chanh phản ứng với đinh kẽm và dây đồng sinh dòng điện nhỏ (~0.7V/quả) — cao hơn khoai tây nên chỉ cần 3 quả (thay vì 4 củ khoai tây) là đủ sáng LED.
+Không cần viết code — mạch tự hoạt động khi nối đúng vòng kín.`,
+    code: `// Bài này KHÔNG dùng vi điều khiển — không cần viết code!
+// Axit citric trong chanh phản ứng với đinh kẽm và dây đồng, sinh ra dòng điện nhỏ.
+// Ghép nối tiếp 3 quả chanh (cực đồng quả này -> đinh kẽm quả kế tiếp) để đủ thắp LED.
+// Lưu ý thực tế: mô phỏng này đơn giản hoá, chỉ kiểm tra vòng kín, không tính điện áp.`,
+    components: [
+      { id: 'l1', type: 'LEMON', x: 60, y: 180, config: {} },
+      { id: 'l2', type: 'LEMON', x: 410, y: 180, config: {} },
+      { id: 'l3', type: 'LEMON', x: 760, y: 180, config: {} },
+      { id: 'led1', type: 'LED', x: 1110, y: 100, config: {} }
+    ],
+    wires: [
+      { id: 'w1', from: { componentId: 'l1', portId: 'CU' }, to: { componentId: 'l2', portId: 'NAIL' }, color: '#1F2937' },
+      { id: 'w2', from: { componentId: 'l2', portId: 'CU' }, to: { componentId: 'l3', portId: 'NAIL' }, color: '#1F2937' },
+      { id: 'w3', from: { componentId: 'l3', portId: 'CU' }, to: { componentId: 'led1', portId: 'A' }, color: '#EF4444' },
+      { id: 'w4', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'l1', portId: 'NAIL' }, color: '#1F2937', waypoints: [{ x: 1322, y: 330 }, { x: 20, y: 330 }, { x: 20, y: 218 }] }
+    ]
+  },
+
   intro1: {
-    name: 'N2: Đèn LED sáng với Pin 9V',
-    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 2: Mạch điện cơ bản nhất — Pin 9V, điện trở và đèn LED, KHÔNG cần vi điều khiển hay viết code. Đèn LED tự sáng khi nối đúng vòng kín.',
+    name: 'N3: Đèn LED sáng với Pin 9V',
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 3: Mạch điện cơ bản nhất — Pin 9V, điện trở và đèn LED, KHÔNG cần vi điều khiển hay viết code. Đèn LED tự sáng khi nối đúng vòng kín.',
     longDesc: `Mục tiêu: Bài mạch điện cơ bản nhất — hiểu định luật mạch kín và vai trò của điện trở hạn dòng.
 Linh kiện: Pin 9V, 1 điện trở 330Ω, 1 đèn LED.
 Nguyên lý: Dòng điện chỉ chạy khi mạch tạo thành vòng kín: Pin(+) → Điện trở → LED (chân dài Anode → chân ngắn Cathode) → Pin(-). Điện trở có nhiệm vụ giới hạn dòng điện qua LED để không làm cháy LED.
@@ -59,13 +84,13 @@ Không cần viết code — kéo dây nối đúng là đèn tự sáng.`,
   },
 
   intro2: {
-    name: 'N3: Dãy 7 đèn LED chạy (LED Chaser)',
-    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 3: Điều khiển 7 đèn LED sáng đuổi nhau lần lượt bằng Arduino Uno — làm quen digitalWrite() và pinMode() trên nhiều chân cùng lúc.',
+    name: 'N4: Dãy 7 đèn LED chạy (LED Chaser)',
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 4: Điều khiển 7 đèn LED sáng đuổi nhau lần lượt bằng Arduino Uno — làm quen digitalWrite() và pinMode() trên nhiều chân cùng lúc.',
     longDesc: `Mục tiêu: Làm quen digitalWrite() và pinMode() khi điều khiển NHIỀU chân cùng lúc bằng Arduino.
 Linh kiện: Arduino Uno R3, 7 đèn LED, 7 điện trở (chân D2-D8).
 Nguyên lý: Mỗi LED nối vào 1 chân số của Arduino qua 1 điện trở hạn dòng, chân còn lại (Cathode) về GND chung.
 Giải thích code: Trong loop(), lần lượt bật rồi tắt từng LED theo thứ tự D2→D8, mỗi đèn sáng 100ms rồi tắt trước khi đèn kế tiếp sáng — tạo hiệu ứng "đèn chạy" (chaser).`,
-    code: `// BÀI MỞ ĐẦU 3: DÃY 7 ĐÈN LED CHẠY (LED CHASER)
+    code: `// BÀI MỞ ĐẦU 4: DÃY 7 ĐÈN LED CHẠY (LED CHASER)
 #define LED1 2
 #define LED2 3
 #define LED3 4
@@ -142,13 +167,13 @@ void loop() {
   },
 
   intro3: {
-    name: 'N4: Đèn LED nhấp nháy cơ bản (chân 13)',
-    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 4: Mạch "Blink" kinh điển — 1 đèn LED nhấp nháy qua chân số 13 của Arduino Uno, bài đầu tiên khi học lập trình vi điều khiển.',
+    name: 'N5: Đèn LED nhấp nháy cơ bản (chân 13)',
+    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 5: Mạch "Blink" kinh điển — 1 đèn LED nhấp nháy qua chân số 13 của Arduino Uno, bài đầu tiên khi học lập trình vi điều khiển.',
     longDesc: `Mục tiêu: Bài "Hello World" của lập trình vi điều khiển — điều khiển 1 chân số cơ bản nhất.
 Linh kiện: Arduino Uno R3, 1 đèn LED, 1 điện trở (chân D13).
 Nguyên lý: digitalWrite(pin, HIGH) đưa chân lên 5V làm LED sáng; digitalWrite(pin, LOW) đưa chân về 0V làm LED tắt.
 Giải thích code: loop() lặp lại vô hạn: bật LED → chờ 500ms → tắt LED → chờ 500ms, tạo hiệu ứng nhấp nháy đều đặn 1 giây/chu kỳ.`,
-    code: `// BÀI MỞ ĐẦU 4: BLINK - ĐÈN LED NHẤP NHÁY CƠ BẢN
+    code: `// BÀI MỞ ĐẦU 5: BLINK - ĐÈN LED NHẤP NHÁY CƠ BẢN
 #define LED_PIN 13
 
 void setup() {
@@ -170,31 +195,6 @@ void loop() {
       { id: 'w1', from: { componentId: 'uno1', portId: 'D13' }, to: { componentId: 'led1', portId: 'A' }, color: '#EF4444' },
       { id: 'w2', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'r1', portId: 'L' }, color: '#1F2937' },
       { id: 'w3', from: { componentId: 'r1', portId: 'R' }, to: { componentId: 'uno1', portId: 'GND_A' }, color: '#1F2937' }
-    ]
-  },
-
-  intro5: {
-    name: 'N5: Pin Chanh nối tiếp thắp sáng LED',
-    desc: 'Giảng viên hướng dẫn: Nguyễn Lê Tấn Đạt. Bài mở đầu 5: Ghép nối tiếp 3 quả chanh thành nguồn điện sinh học, thắp sáng đèn LED — cùng nguyên lý pin khoai tây nhưng dùng axit citric trong chanh.',
-    longDesc: `Mục tiêu: Củng cố nguyên lý pin sinh học với vật liệu khác — chanh (dùng axit citric thay vì phản ứng khoáng chất như khoai tây).
-Linh kiện: 3 quả chanh, 1 đèn LED.
-Nguyên lý: Axit citric trong chanh phản ứng với đinh kẽm và dây đồng sinh dòng điện nhỏ (~0.7V/quả) — cao hơn khoai tây nên chỉ cần 3 quả (thay vì 4 củ khoai tây) là đủ sáng LED.
-Không cần viết code — mạch tự hoạt động khi nối đúng vòng kín.`,
-    code: `// Bài này KHÔNG dùng vi điều khiển — không cần viết code!
-// Axit citric trong chanh phản ứng với đinh kẽm và dây đồng, sinh ra dòng điện nhỏ.
-// Ghép nối tiếp 3 quả chanh (cực đồng quả này -> đinh kẽm quả kế tiếp) để đủ thắp LED.
-// Lưu ý thực tế: mô phỏng này đơn giản hoá, chỉ kiểm tra vòng kín, không tính điện áp.`,
-    components: [
-      { id: 'l1', type: 'LEMON', x: 60, y: 180, config: {} },
-      { id: 'l2', type: 'LEMON', x: 410, y: 180, config: {} },
-      { id: 'l3', type: 'LEMON', x: 760, y: 180, config: {} },
-      { id: 'led1', type: 'LED', x: 1110, y: 100, config: {} }
-    ],
-    wires: [
-      { id: 'w1', from: { componentId: 'l1', portId: 'CU' }, to: { componentId: 'l2', portId: 'NAIL' }, color: '#1F2937' },
-      { id: 'w2', from: { componentId: 'l2', portId: 'CU' }, to: { componentId: 'l3', portId: 'NAIL' }, color: '#1F2937' },
-      { id: 'w3', from: { componentId: 'l3', portId: 'CU' }, to: { componentId: 'led1', portId: 'A' }, color: '#EF4444' },
-      { id: 'w4', from: { componentId: 'led1', portId: 'K' }, to: { componentId: 'l1', portId: 'NAIL' }, color: '#1F2937', waypoints: [{ x: 1322, y: 330 }, { x: 20, y: 330 }, { x: 20, y: 218 }] }
     ]
   },
 
