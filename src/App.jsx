@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Code, Terminal, Sliders, ZoomIn, ZoomOut, Maximize2,
   ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Copy, FileCode, Lock,
-  BookOpen, FlaskConical, Layers, Boxes, Info,
+  BookOpen, FlaskConical, Layers, Boxes, Info, Cable, ArrowRight,
 } from 'lucide-react';
 import { COMPONENT_TYPES } from './data/componentTypes';
 import { PROJECT_PRESETS } from './data/projectPresets';
@@ -387,6 +387,26 @@ export default function App() {
     () => (sim.isSimulating ? computeActiveOutputs(canvas.components, canvas.wires, sim.pinStates) : new Map()),
     [canvas.components, canvas.wires, sim.pinStates, sim.isSimulating]
   );
+
+  // Bảng đấu nối chi tiết (chân nào của linh kiện nào nối vào chân nào của linh
+  // kiện nào) — tính trực tiếp từ canvas.wires hiện tại (không phải chép tay), nên
+  // luôn khớp 100% với sơ đồ đang hiển thị kể cả khi GV đã mở khoá và sửa dây.
+  const wiringList = useMemo(() => {
+    const compById = {};
+    canvas.components.forEach(c => { compById[c.id] = c; });
+    const describe = (compId, portId) => {
+      const comp = compById[compId];
+      const proto = comp && COMPONENT_TYPES[comp.type];
+      const port = proto?.ports.find(p => p.id === portId);
+      return (proto?.name || comp?.type || compId) + ' · ' + (port?.name || portId);
+    };
+    return canvas.wires.map(w => ({
+      id: w.id,
+      from: describe(w.from.componentId, w.from.portId),
+      to: describe(w.to.componentId, w.to.portId),
+      color: w.color || '#94A3B8',
+    }));
+  }, [canvas.components, canvas.wires]);
 
   return (
     <div className={`flex flex-col h-full w-full ${ui.isDarkMode ? 'bg-[#0B0F19] text-gray-100' : 'bg-slate-50 text-slate-800'} overflow-hidden transition-colors duration-300`}>
@@ -952,10 +972,10 @@ export default function App() {
             {/* MÔ TẢ CHI TIẾT BÀI HỌC — chỉ hiện khi đang mở 1 bài mẫu (N1-N5/B1-B6) */}
             {selectedProjectId && PROJECT_PRESETS[selectedProjectId]?.longDesc && (
               <div className={`border-b flex flex-col overflow-hidden transition-all duration-300 ${
-                isDescCollapsed ? '' : 'max-h-64'
+                isDescCollapsed ? '' : 'max-h-96'
               } ${ui.isDarkMode ? 'bg-[#0A0D18] border-white/5' : 'bg-amber-50/60 border-slate-200'}`}>
                 <div
-                  className={`flex items-center justify-between px-4 py-1.5 cursor-pointer select-none ${ui.isDarkMode ? 'hover:bg-white/5' : 'hover:bg-amber-100/60'}`}
+                  className={`flex items-center justify-between px-4 py-1.5 cursor-pointer select-none shrink-0 ${ui.isDarkMode ? 'hover:bg-white/5' : 'hover:bg-amber-100/60'}`}
                   onClick={() => setIsDescCollapsed(!isDescCollapsed)}
                 >
                   <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
@@ -965,8 +985,32 @@ export default function App() {
                   {isDescCollapsed ? <ChevronDown className="w-3.5 h-3.5 text-slate-400" /> : <ChevronUp className="w-3.5 h-3.5 text-slate-400" />}
                 </div>
                 {!isDescCollapsed && (
-                  <div className={`px-4 pb-3 overflow-y-auto text-[11px] leading-relaxed whitespace-pre-line ${ui.isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
-                    {PROJECT_PRESETS[selectedProjectId].longDesc}
+                  <div className="overflow-y-auto px-4 pb-3">
+                    <div className={`text-[11px] leading-relaxed whitespace-pre-line ${ui.isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+                      {PROJECT_PRESETS[selectedProjectId].longDesc}
+                    </div>
+                    {wiringList.length > 0 && (
+                      <div className="mt-2.5 pt-2.5 border-t border-dashed border-amber-500/25">
+                        <div className="flex items-center gap-1.5 mb-1.5 text-amber-600 dark:text-amber-400">
+                          <Cable className="w-3 h-3" />
+                          <span className="text-[10px] font-bold uppercase tracking-wider">
+                            Bảng đấu nối chi tiết ({wiringList.length} dây)
+                          </span>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          {wiringList.map(w => (
+                            <div key={w.id} className="flex items-start gap-1.5 text-[10.5px] leading-tight">
+                              <span className="w-2 h-2 mt-0.5 rounded-full shrink-0" style={{ backgroundColor: w.color }} />
+                              <span className={`min-w-0 ${ui.isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
+                                {w.from}
+                                <ArrowRight className="w-2.5 h-2.5 inline-block mx-1 -mt-0.5 text-slate-400" />
+                                {w.to}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
