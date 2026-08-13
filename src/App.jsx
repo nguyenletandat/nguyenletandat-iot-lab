@@ -22,6 +22,7 @@ import StudentModal from './components/StudentModal';
 import TheoryTab from './components/TheoryTab';
 import ComponentGuideTab from './components/ComponentGuideTab';
 import MyLibrarySidebar from './components/MyLibrarySidebar';
+import SchematicSheetModal from './components/SchematicSheetModal';
 import { useSimulationEngine } from './hooks/useSimulationEngine';
 import { useCanvasInteractions } from './hooks/useCanvasInteractions';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
@@ -105,6 +106,7 @@ export default function App() {
   const [gvUnlockInput2, setGvUnlockInput2] = useState('');
   const [gvUnlockError, setGvUnlockError] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleString('vi-VN'));
+  const [isSchematicExportOpen, setIsSchematicExportOpen] = useState(false);
 
   // Two-way arrow panel collapse states
   const [isLeftPanelCollapsed, setIsLeftPanelCollapsed] = useState(false);
@@ -428,6 +430,7 @@ export default function App() {
         onAutoConnectI2C={handleAutoConnectI2C}
         isViewingGvSample={isViewingGvSample}
         onGoToPractice={exitGvPreview}
+        onOpenSchematicExport={() => setIsSchematicExportOpen(true)}
       />
 
       {/* ═══ MAIN TAB BAR ═══ */}
@@ -1133,6 +1136,16 @@ export default function App() {
       />
 
       <CatalogModal isOpen={ui.isCatalogModalOpen} onClose={() => ui.setCatalogModalOpen(false)} onAddComponent={addComponentToCanvas} />
+
+      <SchematicSheetModal
+        isOpen={isSchematicExportOpen}
+        onClose={() => setIsSchematicExportOpen(false)}
+        components={canvas.components}
+        wires={canvas.wires}
+        lessonTitle={(selectedProjectId && PROJECT_PRESETS[selectedProjectId]?.name) || ui.currentProjectName}
+        studentInfo={ui.studentInfo}
+        isDarkMode={ui.isDarkMode}
+      />
 
       <ProjectManager
         isOpen={ui.isProjectManagerOpen}

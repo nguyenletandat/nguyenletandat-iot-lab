@@ -182,6 +182,22 @@ body.dark ::-webkit-scrollbar-thumb {
   animation: laser-pulse 0.4s ease-in-out infinite;
 }
 
+/* In trang "Xuất sơ đồ" (SchematicSheetModal): ẩn toàn bộ UI, chỉ in đúng tờ sơ đồ */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #schematic-print-sheet,
+  #schematic-print-sheet * {
+    visibility: visible;
+  }
+  #schematic-print-sheet {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+}
+
 /* Monaco-like Custom Code Editor Styling */
 .code-editor {
   font-family: var(--font-mono);

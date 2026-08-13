@@ -2,7 +2,7 @@ import React from 'react';
 import {
   Play, Square, Trash2, StickyNote, Eye, EyeOff, Volume2, VolumeX,
   Moon, Sun, Cpu, Save, Package, Download, HelpCircle, Undo2, Redo2, Clock, GraduationCap, Lock, Zap, PencilRuler,
-  Workflow,
+  Workflow, FileText,
 } from 'lucide-react';
 import { COMPONENT_TYPES } from '../data/componentTypes';
 import { PROJECT_PRESETS } from '../data/projectPresets';
@@ -18,6 +18,7 @@ export default function AppHeader({
   ui, sim, canvas, selectedProjectId, currentTime, studentHeaderRef,
   onLoadProject, onQuickSave, onExportPNG, onStartSimulation, onStopSimulation,
   onDeleteSelected, onAutoLine, onAutoConnectI2C, isViewingGvSample, onGoToPractice,
+  onOpenSchematicExport,
 }) {
   const darkBtn = ui.isDarkMode
     ? 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10'
@@ -198,6 +199,13 @@ export default function AppHeader({
           }`}
         >
           <Workflow className="w-3.5 h-3.5" /> {canvas.isSchematicView ? 'Schematic' : 'Trực quan'}
+        </button>
+        <button
+          onClick={onOpenSchematicExport}
+          title="Xuất sơ đồ nguyên lý dạng bản vẽ kỹ thuật (khung viền + toạ độ lưới + khung tên) để in/tải ảnh"
+          className={`flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-lg border transition-all ${darkBtn}`}
+        >
+          <FileText className="w-3.5 h-3.5" /> Xuất sơ đồ
         </button>
 
         <div className={`w-px h-4 mx-1 shrink-0 ${ui.isDarkMode ? 'bg-white/10' : 'bg-slate-200'}`} />
