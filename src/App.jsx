@@ -664,12 +664,13 @@ export default function App() {
                 {canvas.wires.map((w, index) => {
                   const start = getPortCanvasCoords(w.from.componentId, w.from.portId);
                   const end = getPortCanvasCoords(w.to.componentId, w.to.portId);
-                  const pathData = generateWirePath(start, end, w.waypoints, index);
+                  const cornerRadius = canvas.isSchematicView ? 0 : 7;
+                  const pathData = generateWirePath(start, end, w.waypoints, index, cornerRadius);
                   const isSelected = canvas.selectedWireIds.includes(w.id);
                   const handles = getWireHandles(w, start, end);
 
                   const flow = getWireFlowDirection(w, start, end, canvas.components);
-                  const flowPathData = generateWirePath(flow.start, flow.end, flow.waypoints, index);
+                  const flowPathData = generateWirePath(flow.start, flow.end, flow.waypoints, index, cornerRadius);
 
                   return (
                     <g key={w.id} onClick={(e) => selectWire(e, w.id)} onDoubleClick={(e) => handleDoubleClickWire(e, w.id)}>
@@ -778,7 +779,7 @@ export default function App() {
                 {/* Wire Creation Preview — đi qua các điểm gấp khúc đã bấm (wireDraftPoints), rồi tới vị trí chuột */}
                 {canvas.wireStart && (
                   <>
-                    <path d={generateWirePath(canvas.wireStart, canvas.mousePos, canvas.wireDraftPoints)} fill="none" stroke="#2563EB" strokeWidth="2.5" strokeDasharray="4,4" />
+                    <path d={generateWirePath(canvas.wireStart, canvas.mousePos, canvas.wireDraftPoints, 0, canvas.isSchematicView ? 0 : 7)} fill="none" stroke="#2563EB" strokeWidth="2.5" strokeDasharray="4,4" />
                     {canvas.wireDraftPoints.map((p, i) => (
                       <circle key={i} cx={p.x} cy={p.y} r="4" fill="#2563EB" stroke="#FFFFFF" strokeWidth="1.5" />
                     ))}
@@ -794,7 +795,7 @@ export default function App() {
                       onMouseDown={(e) => handleMouseDownComponent(e, comp.id)}
                       onTouchStart={(e) => { e.stopPropagation(); handleMouseDownComponent(e, comp.id); }}
                     >
-                      <CanvasComponentRender comp={comp} allComps={canvas.components} isSelected={isSelected} isSimulating={sim.isSimulating} isLit={litLedIds.has(comp.id)} pinState={activeOutputs.get(comp.id)} />
+                      <CanvasComponentRender comp={comp} allComps={canvas.components} isSelected={isSelected} isSimulating={sim.isSimulating} isLit={litLedIds.has(comp.id)} pinState={activeOutputs.get(comp.id)} isSchematicView={canvas.isSchematicView} />
                       {/* Port Pin Sockets — Dual Ring Hardware Socket System */}
                       {proto?.ports.map(p => {
                         const connectedWire = canvas.wires.find(w =>

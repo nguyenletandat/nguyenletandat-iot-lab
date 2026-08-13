@@ -332,7 +332,7 @@ export function useCanvasInteractions({ canvas, sim, isReadOnly = false }) {
     return d;
   };
 
-  const generateWirePath = (start, end, waypoints = [], wireIndex = 0) => {
+  const generateWirePath = (start, end, waypoints = [], wireIndex = 0, cornerRadius = 7) => {
     let points;
 
     if (!waypoints || waypoints.length === 0) {
@@ -373,7 +373,7 @@ export function useCanvasInteractions({ canvas, sim, isReadOnly = false }) {
       points = [{ x: start.x, y: start.y }, ...waypoints, { x: end.x, y: end.y }];
     }
 
-    return roundedPathFromPoints(points);
+    return roundedPathFromPoints(points, cornerRadius);
   };
 
   const getWireHandles = (wire, start, end) => {

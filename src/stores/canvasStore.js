@@ -23,8 +23,14 @@ export const useCanvasStore = create((set, get) => ({
   isPlacingNote: false,
   notesVisible: true,
 
+  // Chuyển đổi giữa xem mạch kiểu trực quan (ảnh/hình vẽ thật) và Schematic
+  // (ký hiệu điện tử chuẩn + dây góc vuông) — chỉ đổi cách VẼ, không đổi dữ
+  // liệu mạch (components/wires giữ nguyên).
+  isSchematicView: false,
+
   togglePlacingNote: () => set(s => ({ isPlacingNote: !s.isPlacingNote })),
   toggleNotesVisibility: () => set(s => ({ notesVisible: !s.notesVisible })),
+  toggleSchematicView: () => set(s => ({ isSchematicView: !s.isSchematicView })),
   addNote: (note) => {
     get().pushHistory();
     set(s => ({ notes: [...s.notes, note], isPlacingNote: false }));

@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Play, Square, Trash2, StickyNote, Eye, EyeOff, Volume2, VolumeX,
   Moon, Sun, Cpu, Save, Package, Download, HelpCircle, Undo2, Redo2, Clock, GraduationCap, Lock, Zap, PencilRuler,
+  Workflow,
 } from 'lucide-react';
 import { COMPONENT_TYPES } from '../data/componentTypes';
 import { PROJECT_PRESETS } from '../data/projectPresets';
@@ -184,6 +185,20 @@ export default function AppHeader({
         <div className={`w-px h-4 mx-1 shrink-0 ${ui.isDarkMode ? 'bg-white/10' : 'bg-slate-200'}`} />
 
         <WireStyleSelector />
+
+        <div className={`w-px h-4 mx-1 shrink-0 ${ui.isDarkMode ? 'bg-white/10' : 'bg-slate-200'}`} />
+
+        <button
+          onClick={() => canvas.toggleSchematicView()}
+          title={canvas.isSchematicView ? 'Đang xem: Schematic (ký hiệu điện tử chuẩn) — bấm để về xem Trực quan' : 'Đang xem: Trực quan — bấm để chuyển sang Schematic (ký hiệu điện tử chuẩn)'}
+          className={`flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-lg border transition-all ${
+            canvas.isSchematicView
+              ? 'bg-indigo-500 text-white border-indigo-400 shadow-md ring-2 ring-indigo-300'
+              : ui.isDarkMode ? 'bg-white/5 border-white/10 text-indigo-400 hover:bg-white/10' : 'bg-slate-100 border-slate-200 text-indigo-600 hover:bg-slate-200'
+          }`}
+        >
+          <Workflow className="w-3.5 h-3.5" /> {canvas.isSchematicView ? 'Schematic' : 'Trực quan'}
+        </button>
 
         <div className={`w-px h-4 mx-1 shrink-0 ${ui.isDarkMode ? 'bg-white/10' : 'bg-slate-200'}`} />
 

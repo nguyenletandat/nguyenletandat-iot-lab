@@ -20,6 +20,202 @@ const CHIP_BODY_TYPES = new Set([
   'MOTOR_DRIVER_L293D', 'REGULATOR_5V', 'REGULATOR_3V3', 'ATTINY85',
 ]);
 
+/**
+ * ═══════════════════════════════════════════════════════════════════════
+ * SCHEMATIC VIEW — ký hiệu điện tử chuẩn (IEC-style) cho linh kiện rời rạc
+ * phổ biến (Passive/Actuator cơ bản). Các module phức tạp (board, cảm biến,
+ * màn hình, IC...) KHÔNG có ký hiệu chuẩn riêng — thực tế sơ đồ nguyên lý
+ * cũng chỉ vẽ chúng dưới dạng khối chữ nhật ghi tên + tên chân (đã có sẵn ở
+ * phần "PIN HEADERS" bên dưới, không phụ thuộc chế độ xem) nên dùng chung 1
+ * khối nhãn đơn giản (renderGenericSchematicBox) làm phương án mặc định.
+ * ═══════════════════════════════════════════════════════════════════════
+ */
+const SCH_STROKE = '#1E293B';
+
+function renderGenericSchematicBox(comp, proto) {
+  // Chỉ tách theo dấu gạch ngang DÀI "–" (quy ước đặt tên: tên model – mô tả),
+  // KHÔNG tách theo dấu gạch nối thường "-" vì đó là 1 phần của model number
+  // thật (vd "HC-SR04", "MQ-2", "ESP32-S3-DevKitC-1") — tách nhầm sẽ cụt tên.
+  const label = (proto.name || comp.type).split('–')[0].trim();
+  return (
+    <g>
+      <rect x="4" y="6" width="72" height="44" rx="2" fill="#F8FAFC" stroke={SCH_STROKE} strokeWidth="1.5" />
+      <text x="40" y="26" fontSize="7.5" fontWeight="bold" textAnchor="middle" fill={SCH_STROKE}>
+        {label.length > 16 ? label.slice(0, 15) + '…' : label}
+      </text>
+      <text x="40" y="38" fontSize="7" textAnchor="middle" fill="#64748B">
+        {proto.subtitle || 'Module'}
+      </text>
+    </g>
+  );
+}
+
+const SCHEMATIC_RENDERERS = {
+  RESISTOR: (comp) => (
+    <g>
+      <g stroke={SCH_STROKE} strokeWidth="2" fill="none" strokeLinecap="round">
+        <line x1="5" y1="27" x2="22" y2="27" />
+        <rect x="22" y="17" width="36" height="20" fill="#FFFFFF" />
+        <line x1="58" y1="27" x2="75" y2="27" />
+      </g>
+      <text x="40" y="13" fontSize="8" fontWeight="bold" textAnchor="middle" fill="#475569">
+        {comp.config?.resistance ?? 220}Ω
+      </text>
+    </g>
+  ),
+  CAPACITOR: () => (
+    <g stroke={SCH_STROKE} strokeWidth="2.5" fill="none" strokeLinecap="round">
+      <line x1="5" y1="27" x2="36" y2="27" />
+      <line x1="36" y1="10" x2="36" y2="44" />
+      <line x1="44" y1="10" x2="44" y2="44" />
+      <line x1="44" y1="27" x2="75" y2="27" />
+    </g>
+  ),
+  CAP_ELECTROLYTIC: () => (
+    <g strokeLinecap="round">
+      <g stroke={SCH_STROKE} strokeWidth="2.5" fill="none">
+        <line x1="5" y1="27" x2="35" y2="27" />
+        <line x1="35" y1="10" x2="35" y2="44" />
+        <path d="M43,10 Q51,27 43,44" />
+        <line x1="49" y1="27" x2="75" y2="27" />
+      </g>
+      <text x="26" y="12" fontSize="10" fontWeight="bold" fill={SCH_STROKE}>+</text>
+    </g>
+  ),
+  DIODE: () => (
+    <g stroke={SCH_STROKE} strokeLinecap="round">
+      <line x1="5" y1="27" x2="30" y2="27" strokeWidth="2" fill="none" />
+      <polygon points="30,15 30,39 52,27" fill={SCH_STROKE} />
+      <line x1="52" y1="14" x2="52" y2="40" strokeWidth="3" />
+      <line x1="52" y1="27" x2="75" y2="27" strokeWidth="2" fill="none" />
+    </g>
+  ),
+  ZENER_DIODE: () => (
+    <g stroke={SCH_STROKE} strokeLinecap="round" fill="none">
+      <line x1="5" y1="27" x2="30" y2="27" strokeWidth="2" />
+      <polygon points="30,15 30,39 52,27" fill={SCH_STROKE} />
+      <path d="M47,13 L52,13 L52,41 L57,41" strokeWidth="3" />
+      <line x1="57" y1="27" x2="75" y2="27" strokeWidth="2" />
+    </g>
+  ),
+  INDUCTOR: () => (
+    <g stroke={SCH_STROKE} strokeWidth="2" fill="none" strokeLinecap="round">
+      <line x1="5" y1="27" x2="15" y2="27" />
+      <path d="M15,27 a6,9 0 0 1 12,0 a6,9 0 0 1 12,0 a6,9 0 0 1 12,0 a6,9 0 0 1 12,0" />
+      <line x1="63" y1="27" x2="75" y2="27" />
+    </g>
+  ),
+  LED: (comp, proto, ctx) => {
+    const on = ctx.pinActive || ctx.isLit;
+    const color = comp.config?.color || proto.defaultConfig?.color || '#EF4444';
+    return (
+      <g>
+        <g stroke={SCH_STROKE} strokeWidth="2" fill="none" strokeLinecap="round">
+          <line x1="5" y1="30" x2="28" y2="30" />
+          <line x1="52" y1="30" x2="75" y2="30" />
+        </g>
+        <polygon points="28,18 28,42 50,30" fill={on ? color : '#E2E8F0'} stroke={SCH_STROKE} strokeWidth="1.5" />
+        <line x1="50" y1="17" x2="50" y2="43" stroke={SCH_STROKE} strokeWidth="3" />
+        <g stroke={on ? color : '#94A3B8'} strokeWidth="1.5" strokeLinecap="round" fill="none">
+          <path d="M55,13 L63,5 M59,5 L63,5 L63,9" />
+          <path d="M61,19 L69,11 M65,11 L69,11 L69,15" />
+        </g>
+      </g>
+    );
+  },
+  RGB_LED: (comp, proto, ctx) => (
+    <g>
+      <g stroke={SCH_STROKE} strokeWidth="2" fill="none" strokeLinecap="round">
+        <line x1="5" y1="30" x2="28" y2="30" />
+        <line x1="52" y1="30" x2="75" y2="30" />
+      </g>
+      <polygon points="28,18 28,42 50,30" fill="#E2E8F0" stroke={SCH_STROKE} strokeWidth="1.5" />
+      <line x1="50" y1="17" x2="50" y2="43" stroke={SCH_STROKE} strokeWidth="3" />
+      {['#EF4444', '#22C55E', '#3B82F6'].map((c, i) => (
+        <circle key={c} cx={58 + i * 6} cy="10" r="2.4" fill={c} opacity={ctx.isSimulating ? 1 : 0.45} />
+      ))}
+    </g>
+  ),
+  BATTERY_9V: () => (
+    <g stroke={SCH_STROKE} strokeWidth="2" fill="none" strokeLinecap="round">
+      <line x1="5" y1="27" x2="25" y2="27" />
+      <line x1="25" y1="12" x2="25" y2="42" strokeWidth="3.5" />
+      <line x1="32" y1="19" x2="32" y2="35" strokeWidth="1.5" />
+      <line x1="39" y1="12" x2="39" y2="42" strokeWidth="3.5" />
+      <line x1="46" y1="19" x2="46" y2="35" strokeWidth="1.5" />
+      <line x1="46" y1="27" x2="75" y2="27" />
+      <text x="18" y="10" fontSize="9" fontWeight="bold" fill={SCH_STROKE} stroke="none">+</text>
+      <text x="42" y="10" fontSize="11" fontWeight="bold" fill={SCH_STROKE} stroke="none">−</text>
+    </g>
+  ),
+  BUZZER: () => (
+    <g stroke={SCH_STROKE} fill="none" strokeLinecap="round">
+      <circle cx="34" cy="27" r="15" strokeWidth="2" fill="#F1F5F9" />
+      <path d="M27,19 L27,35 M34,14 L34,40" strokeWidth="2" />
+      <path d="M42,19 a10,9 0 0 1 0,16 M47,13 a17,15 0 0 1 0,28" strokeWidth="1.5" />
+    </g>
+  ),
+  RELAY: (comp, proto, ctx) => (
+    <g stroke={SCH_STROKE} strokeWidth="1.8" fill="none" strokeLinecap="round">
+      <rect x="4" y="14" width="24" height="26" rx="2" />
+      <text x="16" y="30" fontSize="6.5" fontWeight="bold" textAnchor="middle" fill={SCH_STROKE} stroke="none">COIL</text>
+      <line x1="32" y1="8" x2="32" y2="46" strokeDasharray="2,3" strokeWidth="1.2" />
+      <circle cx="38" cy="38" r="2" fill={SCH_STROKE} stroke="none" />
+      <circle cx="38" cy="12" r="2" fill={SCH_STROKE} stroke="none" />
+      <circle cx="66" cy="12" r="2" fill={SCH_STROKE} stroke="none" />
+      <line x1="38" y1="38" x2={ctx.pinActive ? 64 : 60} y2={ctx.pinActive ? 13 : 20} stroke={ctx.pinActive ? '#10B981' : SCH_STROKE} strokeWidth="2" />
+      <line x1="66" y1="12" x2="66" y2="4" />
+      <line x1="38" y1="46" x2="38" y2="52" />
+    </g>
+  ),
+  DC_MOTOR: (comp, proto, ctx) => (
+    <g>
+      <circle cx="40" cy="27" r="17" stroke={SCH_STROKE} strokeWidth="2" fill={ctx.pinActive ? '#DBEAFE' : 'none'} />
+      <text x="40" y="33" fontSize="16" fontWeight="bold" textAnchor="middle" fill={SCH_STROKE}>M</text>
+    </g>
+  ),
+  PUSHBUTTON: () => (
+    <g stroke={SCH_STROKE} strokeWidth="2" fill="none" strokeLinecap="round">
+      <line x1="5" y1="27" x2="26" y2="27" />
+      <circle cx="28" cy="27" r="2.2" fill={SCH_STROKE} />
+      <line x1="30" y1="19" x2="49" y2="13" />
+      <circle cx="52" cy="27" r="2.2" fill={SCH_STROKE} />
+      <line x1="54" y1="27" x2="75" y2="27" />
+    </g>
+  ),
+  SLIDESWITCH: () => (
+    <g stroke={SCH_STROKE} strokeWidth="2" fill="none" strokeLinecap="round">
+      <line x1="5" y1="27" x2="26" y2="27" />
+      <circle cx="28" cy="27" r="2.2" fill={SCH_STROKE} />
+      <line x1="30" y1="19" x2="49" y2="13" />
+      <circle cx="52" cy="27" r="2.2" fill={SCH_STROKE} />
+      <line x1="54" y1="27" x2="75" y2="27" />
+    </g>
+  ),
+  POTENTIOMETER: () => (
+    <g stroke={SCH_STROKE} strokeWidth="2" fill="none" strokeLinecap="round">
+      <line x1="5" y1="34" x2="22" y2="34" />
+      <rect x="22" y="26" width="36" height="16" fill="#FFFFFF" />
+      <line x1="58" y1="34" x2="75" y2="34" />
+      <line x1="40" y1="10" x2="40" y2="26" />
+      <path d="M35,15 L40,8 L45,15" />
+    </g>
+  ),
+  LDR: () => (
+    <g stroke={SCH_STROKE} strokeWidth="2" fill="none" strokeLinecap="round">
+      <line x1="5" y1="34" x2="22" y2="34" />
+      <rect x="22" y="26" width="36" height="16" fill="#FFFFFF" />
+      <line x1="58" y1="34" x2="75" y2="34" />
+      <path d="M58,10 L50,18 M62,6 L54,14" strokeWidth="1.5" />
+    </g>
+  ),
+};
+
+function renderSchematicIcon(comp, proto, ctx) {
+  const fn = SCHEMATIC_RENDERERS[comp.type];
+  return fn ? fn(comp, proto, ctx) : renderGenericSchematicBox(comp, proto);
+}
+
 const REAL_IMAGES = {
   ESP32: `${ASSET_BASE}esp32.png`,
   ESP32_V4: `${ASSET_BASE}esp32.png`,
@@ -36,7 +232,7 @@ const REAL_IMAGES = {
   LDR: `${ASSET_BASE}ldr.png`,
 };
 
-export default function CanvasComponentRender({ comp, allComps, isSelected, isSimulating, isLit, pinState }) {
+export default function CanvasComponentRender({ comp, allComps, isSelected, isSimulating, isLit, pinState, isSchematicView = false }) {
   const proto = COMPONENT_TYPES[comp.type] || {
     name: comp.type,
     subtitle: 'Module',
@@ -88,7 +284,9 @@ export default function CanvasComponentRender({ comp, allComps, isSelected, isSi
 
       {/* ══ 2. CENTER HARDWARE IMAGE / DETAILED GRAPHIC ══ */}
       <g transform={`translate(${cardWidth / 2 - 40}, 14)`}>
-        {REAL_IMAGES[comp.type] ? (
+        {isSchematicView ? (
+          renderSchematicIcon(comp, proto, { isSimulating, pinActive, isLit })
+        ) : REAL_IMAGES[comp.type] ? (
           <g>
             <image
               href={REAL_IMAGES[comp.type]}
