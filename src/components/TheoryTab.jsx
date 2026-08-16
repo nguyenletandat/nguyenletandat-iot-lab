@@ -45,32 +45,33 @@ const SESSIONS = [
   Buổi 6 — Các nhóm trình bày đồ án & tổng hợp giải đáp`,
       },
       {
-        title: '1.2 Vi điều khiển ESP32-S3 — Trái tim của Trạm IoT',
+        title: '1.2 Vi điều khiển ESP32 — Trái tim của Trạm IoT',
         image: imgESP32,
-        imageCaption: 'Sơ đồ chân minh hoạ dòng ESP32 nói chung — board thực tế dùng trong khoá học là ESP32-S3-DevKitC-1 (xem bảng GPIO thực tế bên dưới)',
-        content: `ESP32-S3 là vi điều khiển 32-bit lưỡng nhân (Dual-Core) của Espressif Systems, tích hợp sẵn WiFi & Bluetooth — bản dùng trong khoá học này là ESP32-S3-DevKitC-1 (44 chân).
+        imageCaption: 'Sơ đồ chân ESP32 DevKit V1 (30 chân) — board thực tế trong bộ Kit "ESP32 Basic Starter Kit"',
+        content: `ESP32 là vi điều khiển 32-bit lưỡng nhân (Dual-Core) của Espressif Systems, tích hợp sẵn WiFi & Bluetooth — board dùng trong khoá học này là ESP32 DevKit V1 (30 chân), có sẵn trong bộ Kit thực hành.
 
 📋 Thông số kỹ thuật quan trọng:
-• CPU: Xtensa LX7 Dual-Core, xung nhịp tới 240 MHz
-• Flash: 16 MB | PSRAM: 8 MB (bản N16R8)
-• GPIO: 44 chân, nhiều chân hỗ trợ ADC 12-bit (0–4095)
-• Kết nối: WiFi 802.11 b/g/n, Bluetooth 5 (LE)
-• Nguồn điện: 3.3V logic, cấp nguồn qua cổng USB-C 5V
+• CPU: Xtensa LX6 Dual-Core, xung nhịp tới 240 MHz
+• RAM: 520 KB SRAM | Flash: 4 MB
+• GPIO: 30 chân, nhiều chân hỗ trợ ADC 12-bit (0–4095)
+• Kết nối: WiFi 802.11 b/g/n, Bluetooth 4.2/5.0
+• Nguồn điện: 3.3V logic, cấp nguồn qua cổng Micro-USB 5V
 
 🔌 Các chân GPIO dùng xuyên suốt 4 bài thực hành (Buổi 2-5):
 ┌─────────────────────────────────────────────┐
-│ 5V / 3V3 / GND → Cấp nguồn qua Breadboard   │
-│ GPIO1, GPIO2   → LCD1602A: chân RS, E       │
-│ GPIO8,9,10,13  → LCD1602A: chân D4-D7       │
-│ GPIO4, GPIO5   → DS18B20 DATA, HC-SR04 TRIG │
-│ GPIO18         → HC-SR04 ECHO               │
-│ GPIO6, GPIO7   → Cảm biến Đất, Relay Bơm    │
-│ GPIO11,12,14   → MQ-2, Còi, Relay Quạt      │
-│ GPIO15         → DHT11 DATA                 │
+│ VIN(5V) / 3V3 / GND → Cấp nguồn qua Breadboard│
+│ GPIO21, GPIO22 → OLED SSD1306: chân SDA, SCL │
+│ GPIO4, GPIO5   → DS18B20 DATA, HC-SR04 TRIG  │
+│ GPIO18         → HC-SR04 ECHO                │
+│ GPIO34         → Cảm biến Đất (ADC, chỉ đọc) │
+│ GPIO26         → Relay Bơm nước              │
+│ GPIO35         → MQ-2 Gas (ADC, chỉ đọc)     │
+│ GPIO27, GPIO14 → Còi báo, Relay Quạt         │
+│ GPIO15         → DHT11 DATA                  │
 └─────────────────────────────────────────────┘
 
 ⚠️ Lưu ý quan trọng:
-Board ESP32-S3-DevKitC-1 bản N16R8 dành riêng GPIO35-37 cho bộ nhớ Octal PSRAM nội bộ — KHÔNG được dùng làm GPIO thường. Toàn bộ 4 bài thực hành trong khoá học đã chọn sẵn các chân GPIO an toàn ở trên, không xung đột.`,
+Các chân GPIO34, GPIO35, GPIO36, GPIO39 của ESP32 là INPUT ONLY — không dùng làm OUTPUT (relay, còi, LED...), chỉ dùng để đọc tín hiệu Analog từ cảm biến. Toàn bộ 4 bài thực hành trong khoá học đã chọn sẵn các chân GPIO an toàn ở trên, không xung đột.`,
       },
       {
         title: '1.3 Làm quen Mạch điện Cơ bản — 5 Bài khởi động (N1-N5)',
@@ -186,33 +187,35 @@ void loop() {
 ⚠️ Trên phần cứng thật: không có điện trở 4.7kΩ → DS18B20 không hoạt động!`,
       },
     ],
-    code: `// BUỔI 2: HỆ THỐNG QUAN TRẮC MỰC NƯỚC & CẢNH BÁO NGẬP (board ESP32-S3-DevKitC-1)
-// Siêu âm HC-SR04 (Trig: GPIO5, Echo: GPIO18), DS18B20 (GPIO4), LCD1602A 16 chân song song (RS:1, E:2, D4-D7: 8/9/10/13)
+    code: `// BUỔI 2: HỆ THỐNG QUAN TRẮC MỰC NƯỚC & CẢNH BÁO NGẬP (board ESP32 DevKit V1)
+// Siêu âm HC-SR04 (Trig: GPIO5, Echo: GPIO18), DS18B20 (GPIO4), OLED SSD1306 I2C (SDA: GPIO21, SCL: GPIO22)
 
-#include <LiquidCrystal.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
 #define TRIG_PIN 5
 #define ECHO_PIN 18
 #define TEMP_PIN 4
-#define LCD_RS 1
-#define LCD_E  2
-#define LCD_D4 8
-#define LCD_D5 9
-#define LCD_D6 10
-#define LCD_D7 13
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
 
-LiquidCrystal lcd(LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 void setup() {
   Serial.begin(115200);
   pinMode(TRIG_PIN, OUTPUT);
   pinMode(ECHO_PIN, INPUT);
 
-  lcd.begin(16, 2);
-  lcd.setCursor(0, 0);
-  lcd.print("QUAN TRAC NUOC");
-  lcd.setCursor(0, 1);
-  lcd.print("KMT WATER LAB");
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0, 0);
+  display.println("QUAN TRAC NUOC");
+  display.setCursor(0, 20);
+  display.println("KMT WATER LAB");
+  display.display();
   delay(1500);
 }
 
@@ -234,28 +237,30 @@ void loop() {
   Serial.print(waterTemp);
   Serial.println(" C");
 
-  lcd.setCursor(0, 0);
-  lcd.print("MucNuoc: ");
-  lcd.print(distanceCm);
-  lcd.print(" cm   ");
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.print("MucNuoc: ");
+  display.print(distanceCm);
+  display.println(" cm");
 
-  lcd.setCursor(0, 1);
+  display.setCursor(0, 20);
   if (distanceCm < 15) {
-    lcd.print("CANH BAO: NGAP! ");
+    display.println("CANH BAO: NGAP!");
   } else {
-    lcd.print("NhietDo: ");
-    lcd.print(waterTemp);
-    lcd.print(" C ");
+    display.print("NhietDo: ");
+    display.print(waterTemp);
+    display.println(" C");
   }
+  display.display();
 
   delay(600);
 }`,
-    components: ['ESP32-S3-DevKitC-1', 'HC-SR04 Ultrasonic Sensor', 'DS18B20 (chống nước)', 'LCD1602A 16 chân (song song)', 'Breadboard'],
+    components: ['ESP32 DevKit V1', 'HC-SR04 Ultrasonic Sensor', 'DS18B20 (chống nước)', 'OLED SSD1306 0.96" I2C', 'Breadboard'],
     wiring: [
       'HC-SR04.VCC/GND → Breadboard rail 5V/GND | HC-SR04.TRIG → ESP32.GPIO5 | ECHO → ESP32.GPIO18',
       'DS18B20.VCC/GND → Breadboard rail 3V3/GND | DS18B20.DATA → ESP32.GPIO4',
-      'LCD1602A.RS → ESP32.GPIO1 | LCD.E → ESP32.GPIO2 | LCD.D4-D7 → ESP32.GPIO8/9/10/13',
-      'LCD.VDD, LCD.A (đèn nền +) → Breadboard rail 5V | LCD.VSS, LCD.RW, LCD.V0, LCD.K → Breadboard rail GND',
+      'OLED.VCC/GND → Breadboard rail 3V3/GND',
+      'OLED.SDA → ESP32.GPIO21 | OLED.SCL → ESP32.GPIO22',
     ],
     practiceHint: 'B1',
   },
@@ -298,11 +303,11 @@ void loop() {
 
 🔌 Đấu nối Cảm biến Đất (qua Breadboard):
   Soil.VCC/GND → Breadboard rail 3V3/GND
-  Soil.AO  → ESP32.GPIO6 (ADC Analog Input)
+  Soil.AO  → ESP32.GPIO34 (ADC Analog Input — chỉ đọc)
 
 🔌 Đấu nối Relay + Bơm:
   Relay.VCC/GND → Breadboard rail 5V/GND
-  Relay.IN  → ESP32.GPIO7 (tín hiệu điều khiển)
+  Relay.IN  → ESP32.GPIO26 (tín hiệu điều khiển)
   Relay.OUT → Cực (+) nguồn Bơm (đóng/ngắt qua rơ-le)
   Bơm.(−) → Breadboard rail GND`,
       },
@@ -332,33 +337,34 @@ void loop() {
   • Luôn ngắt nguồn 220V trước khi đấu nối`,
       },
     ],
-    code: `// BUỔI 3: HỆ THỐNG TƯỚI CÂY TỰ ĐỘNG (board ESP32-S3-DevKitC-1)
-// Cảm biến Độ ẩm đất (GPIO6), Module Relay Bơm nước (GPIO7), LCD1602A 16 chân song song (RS:1, E:2, D4-D7: 8/9/10/13)
-// Lưu ý: GPIO34/GPIO26 dùng trên ESP32 thường KHÔNG tồn tại trên ESP32-S3 nên đã đổi sang GPIO6/GPIO7.
+    code: `// BUỔI 3: HỆ THỐNG TƯỚI CÂY TỰ ĐỘNG (board ESP32 DevKit V1)
+// Cảm biến Độ ẩm đất (GPIO34, ADC chỉ đọc), Module Relay Bơm nước (GPIO26), OLED SSD1306 I2C (SDA: GPIO21, SCL: GPIO22)
 
-#include <LiquidCrystal.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
-#define SOIL_PIN 6
-#define RELAY_PIN 7
-#define LCD_RS 1
-#define LCD_E  2
-#define LCD_D4 8
-#define LCD_D5 9
-#define LCD_D6 10
-#define LCD_D7 13
+#define SOIL_PIN 34
+#define RELAY_PIN 26
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
 
-LiquidCrystal lcd(LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 void setup() {
   Serial.begin(115200);
   pinMode(RELAY_PIN, OUTPUT);
   digitalWrite(RELAY_PIN, LOW);
 
-  lcd.begin(16, 2);
-  lcd.setCursor(0, 0);
-  lcd.print("HE THONG TUOI");
-  lcd.setCursor(0, 1);
-  lcd.print("TUDONG SAN SANG");
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0, 0);
+  display.println("HE THONG TUOI");
+  display.setCursor(0, 20);
+  display.println("TUDONG SAN SANG");
+  display.display();
   delay(1500);
 }
 
@@ -367,30 +373,30 @@ void loop() {
   Serial.print("[DAT] Do am dat: ");
   Serial.println(soilVal);
 
-  lcd.setCursor(0, 0);
-  lcd.print("DoAmDat: ");
-  lcd.print(soilVal);
-  lcd.print("   ");
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.print("DoAmDat: ");
+  display.println(soilVal);
 
+  display.setCursor(0, 20);
   if (soilVal < 400) {
     digitalWrite(RELAY_PIN, HIGH); // Bật máy bơm
     Serial.println("-> DAT KHO! DANG BAT MAY BOM...");
-    lcd.setCursor(0, 1);
-    lcd.print("BOM: DANG TUOI! ");
+    display.println("BOM: DANG TUOI!");
   } else {
     digitalWrite(RELAY_PIN, LOW); // Tắt máy bơm
-    lcd.setCursor(0, 1);
-    lcd.print("BOM: TAT (DU AM)");
+    display.println("BOM: TAT (DU AM)");
   }
+  display.display();
 
   delay(600);
 }`,
-    components: ['ESP32-S3-DevKitC-1', 'Soil Moisture Sensor', 'Module Relay 5V', 'DC Motor/Bơm nước', 'LCD1602A 16 chân (song song)', 'Breadboard'],
+    components: ['ESP32 DevKit V1', 'Soil Moisture Sensor', 'Module Relay 5V', 'DC Motor/Bơm nước', 'OLED SSD1306 0.96" I2C', 'Breadboard'],
     wiring: [
-      'Soil.VCC/GND → Breadboard rail 3V3/GND | Soil.AO → ESP32.GPIO6',
-      'Relay.VCC/GND → Breadboard rail 5V/GND | Relay.IN → ESP32.GPIO7',
+      'Soil.VCC/GND → Breadboard rail 3V3/GND | Soil.AO → ESP32.GPIO34',
+      'Relay.VCC/GND → Breadboard rail 5V/GND | Relay.IN → ESP32.GPIO26',
       'Relay.OUT → Bơm(+) | Bơm(−) → Breadboard rail GND',
-      'LCD1602A.RS → ESP32.GPIO1 | LCD.E → ESP32.GPIO2 | LCD.D4-D7 → ESP32.GPIO8/9/10/13',
+      'OLED.SDA → ESP32.GPIO21 | OLED.SCL → ESP32.GPIO22',
     ],
     practiceHint: 'B2',
   },
@@ -447,40 +453,41 @@ void loop() {
   Khi không khí sạch  → TẮT quạt tiết kiệm điện
 
 🔌 Đấu nối (qua Breadboard):
-  MQ-2.VCC/GND → Breadboard rail 5V/GND | MQ-2.AO → ESP32.GPIO11
-  Buzzer.+ → ESP32.GPIO12 | Buzzer.− → Breadboard rail GND
+  MQ-2.VCC/GND → Breadboard rail 5V/GND | MQ-2.AO → ESP32.GPIO35 (ADC, chỉ đọc)
+  Buzzer.+ → ESP32.GPIO27 | Buzzer.− → Breadboard rail GND
   Relay.IN → ESP32.GPIO14 (điều khiển quạt)
   Relay.OUT → Fan.VCC (quạt bật/tắt qua relay) | Fan.GND → Breadboard rail GND`,
       },
     ],
-    code: `// BUỔI 4: HỆ THỐNG CẢNH BÁO KHÍ ĐỘC (board ESP32-S3-DevKitC-1)
-// Cảm biến Gas MQ-2 (GPIO11), Còi hú (GPIO12), Relay Quạt (GPIO14), LCD1602A 16 chân song song (RS:1, E:2, D4-D7: 8/9/10/13)
-// Lưu ý: GPIO35/GPIO27 dùng trên ESP32 thường KHÔNG tồn tại/bị hạn chế trên ESP32-S3 nên đã đổi sang GPIO11/GPIO12.
+    code: `// BUỔI 4: HỆ THỐNG CẢNH BÁO KHÍ ĐỘC (board ESP32 DevKit V1)
+// Cảm biến Gas MQ-2 (GPIO35, ADC chỉ đọc), Còi hú (GPIO27), Relay Quạt (GPIO14), OLED SSD1306 I2C (SDA: GPIO21, SCL: GPIO22)
 
-#include <LiquidCrystal.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
-#define GAS_PIN 11
-#define BUZZER_PIN 12
+#define GAS_PIN 35
+#define BUZZER_PIN 27
 #define FAN_RELAY_PIN 14
-#define LCD_RS 1
-#define LCD_E  2
-#define LCD_D4 8
-#define LCD_D5 9
-#define LCD_D6 10
-#define LCD_D7 13
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
 
-LiquidCrystal lcd(LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 void setup() {
   Serial.begin(115200);
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(FAN_RELAY_PIN, OUTPUT);
 
-  lcd.begin(16, 2);
-  lcd.setCursor(0, 0);
-  lcd.print("GIAM SAT KHI DOC");
-  lcd.setCursor(0, 1);
-  lcd.print("KHONG KHI KMT");
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0, 0);
+  display.println("GIAM SAT KHI DOC");
+  display.setCursor(0, 20);
+  display.println("KHONG KHI KMT");
+  display.display();
   delay(1500);
 }
 
@@ -490,36 +497,34 @@ void loop() {
   Serial.print(gasPpm);
   Serial.println(" PPM");
 
-  lcd.setCursor(0, 0);
-  lcd.print("Gas PPM: ");
-  lcd.print(gasPpm);
-  lcd.print("   ");
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.print("Gas PPM: ");
+  display.println(gasPpm);
 
+  display.setCursor(0, 20);
   if (gasPpm > 300) {
     digitalWrite(BUZZER_PIN, HIGH);    // Bật còi hú
     digitalWrite(FAN_RELAY_PIN, HIGH); // Bật quạt hút thông gió
     Serial.println("CANH BAO O NHIEM KHI THAI! BAT QUAT THONG GIO!");
-
-    lcd.setCursor(0, 1);
-    lcd.print("DANGER! FAN: ON ");
+    display.println("DANGER! FAN: ON");
   } else {
     digitalWrite(BUZZER_PIN, LOW);     // Tắt hoàn toàn còi hú khi nồng độ an toàn
     noTone(BUZZER_PIN);
     digitalWrite(FAN_RELAY_PIN, LOW); // Tắt quạt hút
-
-    lcd.setCursor(0, 1);
-    lcd.print("Status: AN TOAN ");
+    display.println("Status: AN TOAN");
   }
+  display.display();
 
   delay(600);
 }`,
-    components: ['ESP32-S3-DevKitC-1', 'MQ-2 Gas Sensor', 'Buzzer', 'Module Relay 5V', 'Quạt mini DC', 'LCD1602A 16 chân (song song)', 'Breadboard'],
+    components: ['ESP32 DevKit V1', 'MQ-2 Gas Sensor', 'Buzzer', 'Module Relay 5V', 'Quạt mini DC', 'OLED SSD1306 0.96" I2C', 'Breadboard'],
     wiring: [
-      'MQ-2.VCC/GND → Breadboard rail 5V/GND | MQ-2.AO → ESP32.GPIO11',
-      'Buzzer.+ → ESP32.GPIO12 | Buzzer.− → Breadboard rail GND',
+      'MQ-2.VCC/GND → Breadboard rail 5V/GND | MQ-2.AO → ESP32.GPIO35',
+      'Buzzer.+ → ESP32.GPIO27 | Buzzer.− → Breadboard rail GND',
       'Relay.VCC/GND → Breadboard rail 5V/GND | Relay.IN → ESP32.GPIO14',
       'Relay.OUT → Quạt(+) | Quạt(−) → Breadboard rail GND',
-      'LCD1602A.RS → ESP32.GPIO1 | LCD.E → ESP32.GPIO2 | LCD.D4-D7 → ESP32.GPIO8/9/10/13',
+      'OLED.SDA → ESP32.GPIO21 | OLED.SCL → ESP32.GPIO22',
     ],
     practiceHint: 'B3',
   },
@@ -532,7 +537,7 @@ void loop() {
     accent: '#7C3AED',
     theory: [
       {
-        title: '5.1 Cảm biến DHT11 & Màn hình LCD1602A — Sơ đồ đấu nối song song',
+        title: '5.1 Cảm biến DHT11 & Màn hình OLED SSD1306 — Sơ đồ đấu nối I2C',
         content: `DHT11 là cảm biến tích hợp đo đồng thời Nhiệt độ và Độ ẩm không khí, giao tiếp qua giao thức 1-Wire đơn giản.
 
 📊 Thông số kỹ thuật DHT11:
@@ -546,68 +551,69 @@ void loop() {
   DHT11.DATA → ESP32.GPIO15 (dây vàng)
   DHT11.GND  → Breadboard rail GND (dây đen)
 
-📐 LCD1602A dùng trong khoá học này là bản TRẦN 16 chân song song (KHÔNG phải module I²C) — cần đấu đủ các chân điều khiển thay vì chỉ 2 chân SDA/SCL:
-  VSS/GND, VDD/VCC, V0 (tương phản), RS, RW, E, D4-D7, A/K (đèn nền)
+📐 Màn hình OLED SSD1306 0.96" dùng trong khoá học này giao tiếp qua I²C — chỉ cần 4 chân (VCC, GND, SDA, SCL), đơn giản hơn nhiều so với LCD ký tự song song truyền thống:
+  Độ phân giải: 128×64 pixel (đơn sắc trắng/xanh)
+  Địa chỉ I²C mặc định: 0x3C
 
-🔌 Đấu nối LCD1602A với ESP32 (chế độ 4-bit song song):
-  LCD.VSS, LCD.RW, LCD.V0, LCD.K  → Breadboard rail GND
-  LCD.VDD, LCD.A (đèn nền +)      → Breadboard rail 5V
-  LCD.RS → ESP32.GPIO1 | LCD.E → ESP32.GPIO2
-  LCD.D4-D7 → ESP32.GPIO8 / GPIO9 / GPIO10 / GPIO13
-  (V0 nối GND cho tương phản rõ nhất, RW nối GND vì mạch chỉ GHI không ĐỌC từ LCD)`,
+🔌 Đấu nối OLED với ESP32 (I²C, qua Breadboard):
+  OLED.VCC → Breadboard rail 3V3 (dây đỏ)
+  OLED.GND → Breadboard rail GND (dây đen)
+  OLED.SDA → ESP32.GPIO21 (dây xanh dương)
+  OLED.SCL → ESP32.GPIO22 (dây hồng)`,
       },
       {
-        title: '5.2 Thiết kế giao diện LCD 16x2 tối ưu',
+        title: '5.2 Thiết kế giao diện OLED 128x64 tối ưu',
         image: imgLCD1602,
-        imageCaption: 'Sơ đồ lưới ký tự LCD 16x2 — bố trí thông tin với setCursor() và print() hiệu quả',
-        content: `Với chỉ 32 ký tự (16×2), cần thiết kế bố cục hiển thị thật thông minh để truyền đạt tối đa thông tin.
+        imageCaption: 'Nguyên tắc bố trí thông tin trên màn hình bằng setCursor() và print() — áp dụng chung cho LCD lẫn OLED',
+        content: `Màn hình OLED 128×64 pixel hiển thị được nhiều nội dung hơn LCD ký tự 16×2, nhưng toạ độ setCursor() tính theo PIXEL (không phải theo hàng/cột ký tự) nên cần thiết kế bố cục cẩn thận.
 
-📐 Nguyên tắc thiết kế LCD hiệu quả:
-• Dòng 0: Thông số chính (Nhiệt độ, Độ ẩm)
-• Dòng 1: Thông số phụ hoặc trạng thái hệ thống
+📐 Nguyên tắc thiết kế OLED hiệu quả:
+• Dòng chữ cỡ nhỏ (setTextSize(1)) cao ~8 pixel — mỗi "dòng" cách nhau ~16-20 pixel để dễ đọc
+• Dòng trên: Thông số chính (Nhiệt độ, Độ ẩm)
+• Dòng dưới: Thông số phụ hoặc trạng thái hệ thống
 • Dùng chữ viết tắt: T=Temp, H=Humi, G=Gas
-• Luôn thêm khoảng trắng cuối để xóa ký tự dư
 
 🗂️ Bố cục tối ưu cho trạm môi trường:
-  Hàng 0: "Temp: 28 C     " ← 16 ký tự
-  Hàng 1: "Humi: 65 %     " ← 16 ký tự
+  setCursor(0, 0):  "Temp: 28 C"
+  setCursor(0, 20): "Humi: 65 %"
 
-📍 Tọa độ setCursor(col, row):
-  setCursor(0, 0) → Đầu dòng 1 (góc trên trái)
-  setCursor(8, 0) → Giữa dòng 1
-  setCursor(0, 1) → Đầu dòng 2
-  setCursor(8, 1) → Giữa dòng 2
+📍 Toạ độ setCursor(x, y) — tính bằng PIXEL:
+  setCursor(0, 0)  → Góc trên trái, dòng chữ đầu tiên
+  setCursor(0, 20) → Dòng chữ thứ 2 (cách dòng 1 khoảng 20px)
+  setCursor(0, 40) → Dòng chữ thứ 3 (nếu cần)
 
 ⚠️ Các lỗi phổ biến cần tránh:
-  ❌ Dùng lcd.clear() mỗi vòng loop() → gây nhấp nháy màn hình
-  ❌ Quên delay ≥1000ms giữa hai lần đọc DHT11
-  ❌ Thiếu khoảng trắng cuối lcd.print() → chữ cũ còn sót lại`,
+  ❌ Quên gọi display.display() sau khi print() → màn hình không cập nhật
+  ❌ Quên display.clearDisplay() trước khi vẽ nội dung mới → chữ cũ chồng chữ mới
+  ❌ Quên delay ≥1000ms giữa hai lần đọc DHT11`,
       },
     ],
-    code: `// BUỔI 5: HỆ THỐNG QUAN TRẮC KHÍ HẬU TỰ ĐỘNG (board ESP32-S3-DevKitC-1)
-// Cảm biến DHT11 (Chân GPIO15) & LCD1602A 16 chân song song (RS:1, E:2, D4-D7: 8/9/10/13)
+    code: `// BUỔI 5: HỆ THỐNG QUAN TRẮC KHÍ HẬU TỰ ĐỘNG (board ESP32 DevKit V1)
+// Cảm biến DHT11 (Chân GPIO15) & OLED SSD1306 I2C (SDA: GPIO21, SCL: GPIO22)
 
-#include <LiquidCrystal.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
 #define DHT_PIN 15
-#define LCD_RS 1
-#define LCD_E  2
-#define LCD_D4 8
-#define LCD_D5 9
-#define LCD_D6 10
-#define LCD_D7 13
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
 
-LiquidCrystal lcd(LCD_RS, LCD_E, LCD_D4, LCD_D5, LCD_D6, LCD_D7);
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 void setup() {
   Serial.begin(115200);
   pinMode(DHT_PIN, INPUT);
 
-  lcd.begin(16, 2);
-  lcd.setCursor(0, 0);
-  lcd.print("TRAM QUAN TRAC");
-  lcd.setCursor(0, 1);
-  lcd.print("KHI HAU KMT v1.0");
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0, 0);
+  display.println("TRAM QUAN TRAC");
+  display.setCursor(0, 20);
+  display.println("KHI HAU KMT v1.0");
+  display.display();
   delay(1500);
 }
 
@@ -622,24 +628,25 @@ void loop() {
   Serial.print(humi);
   Serial.println(" %");
 
-  lcd.setCursor(0, 0);
-  lcd.print("Temp: ");
-  lcd.print(temp);
-  lcd.print(" C     ");
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.print("Temp: ");
+  display.print(temp);
+  display.println(" C");
 
-  lcd.setCursor(0, 1);
-  lcd.print("Humi: ");
-  lcd.print(humi);
-  lcd.print(" %     ");
+  display.setCursor(0, 20);
+  display.print("Humi: ");
+  display.print(humi);
+  display.println(" %");
+  display.display();
 
   delay(600);
 }`,
-    components: ['ESP32-S3-DevKitC-1', 'DHT11 (nhiệt ẩm không khí)', 'LCD1602A 16 chân (song song)', 'Breadboard'],
+    components: ['ESP32 DevKit V1', 'DHT11 (nhiệt ẩm không khí)', 'OLED SSD1306 0.96" I2C', 'Breadboard'],
     wiring: [
       'DHT11.VCC/GND → Breadboard rail 5V/GND | DHT11.DATA → ESP32.GPIO15',
-      'LCD1602A.RS → ESP32.GPIO1 | LCD.E → ESP32.GPIO2',
-      'LCD1602A.D4-D7 → ESP32.GPIO8 / GPIO9 / GPIO10 / GPIO13',
-      'LCD.VDD, LCD.A → Breadboard rail 5V | LCD.VSS, LCD.RW, LCD.V0, LCD.K → Breadboard rail GND',
+      'OLED.VCC/GND → Breadboard rail 3V3/GND',
+      'OLED.SDA → ESP32.GPIO21 | OLED.SCL → ESP32.GPIO22',
     ],
     practiceHint: 'B4',
   },
@@ -680,7 +687,7 @@ void loop() {
 │ 2  │ Quan trắc Nước & Ngập  │ HC-SR04, DS18B20    │ < 15 cm              │
 │ 3  │ Tưới cây Tự động       │ Soil, Relay, Bơm    │ < 400 (ADC)          │
 │ 4  │ Cảnh báo Khí độc       │ MQ-2, Còi, Quạt     │ > 300 PPM            │
-│ 5  │ Quan trắc Khí hậu      │ DHT11, LCD1602A     │ (hiển thị liên tục) │
+│ 5  │ Quan trắc Khí hậu      │ DHT11, OLED SSD1306 │ (hiển thị liên tục) │
 └────┴───────────────────────┴────────────────────┴─────────────────────┘
 
 💬 Câu hỏi thảo luận tổng hợp:
@@ -695,7 +702,7 @@ void loop() {
     code: `// VÍ DỤ MỞ RỘNG: KẾT HỢP CẢNH BÁO TỪ 2 HỆ THỐNG (minh hoạ cho phần trình bày)
 // Gợi ý: bật đèn cảnh báo chung khi BẤT KỲ hệ thống nào vượt ngưỡng nguy hiểm
 
-#define GAS_PIN     11
+#define GAS_PIN     35
 #define ALERT_LED   16
 
 void setup() {
