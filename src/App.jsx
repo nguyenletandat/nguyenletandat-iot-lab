@@ -400,7 +400,7 @@ export default function App() {
       const comp = compById[compId];
       const proto = comp && COMPONENT_TYPES[comp.type];
       const port = proto?.ports.find(p => p.id === portId);
-      return (proto?.name || comp?.type || compId) + ' · ' + (port?.name || portId);
+      return { comp: proto?.name || comp?.type || compId, port: port?.name || portId };
     };
     return canvas.wires.map(w => ({
       id: w.id,
@@ -1001,18 +1001,32 @@ export default function App() {
                             Bảng đấu nối chi tiết ({wiringList.length} dây)
                           </span>
                         </div>
-                        <div className="flex flex-col gap-1">
-                          {wiringList.map(w => (
-                            <div key={w.id} className="flex items-start gap-1.5 text-[10.5px] leading-tight">
-                              <span className="w-2 h-2 mt-0.5 rounded-full shrink-0" style={{ backgroundColor: w.color }} />
-                              <span className={`min-w-0 ${ui.isDarkMode ? 'text-gray-300' : 'text-slate-700'}`}>
-                                {w.from}
-                                <ArrowRight className="w-2.5 h-2.5 inline-block mx-1 -mt-0.5 text-slate-400" />
-                                {w.to}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
+                        <table className="w-full table-fixed border-collapse text-[10px]">
+                          <thead>
+                            <tr className={ui.isDarkMode ? 'text-gray-500' : 'text-slate-400'}>
+                              <th className="w-[46%] text-left font-semibold uppercase tracking-wide pb-1">Từ</th>
+                              <th className="w-[8%]"></th>
+                              <th className="w-[46%] text-left font-semibold uppercase tracking-wide pb-1">Đến</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {wiringList.map(w => (
+                              <tr key={w.id} className={`border-t ${ui.isDarkMode ? 'border-white/5' : 'border-slate-200'}`}>
+                                <td className="py-1 pl-1.5 align-top" style={{ borderLeft: `3px solid ${w.color}` }}>
+                                  <div className={`font-semibold leading-tight ${ui.isDarkMode ? 'text-gray-200' : 'text-slate-800'}`}>{w.from.comp}</div>
+                                  <div className={ui.isDarkMode ? 'text-gray-500' : 'text-slate-500'}>{w.from.port}</div>
+                                </td>
+                                <td className="align-top pt-1.5 text-center">
+                                  <ArrowRight className="w-2.5 h-2.5 inline-block text-slate-400" />
+                                </td>
+                                <td className="py-1 pl-1.5 align-top" style={{ borderLeft: `3px solid ${w.color}` }}>
+                                  <div className={`font-semibold leading-tight ${ui.isDarkMode ? 'text-gray-200' : 'text-slate-800'}`}>{w.to.comp}</div>
+                                  <div className={ui.isDarkMode ? 'text-gray-500' : 'text-slate-500'}>{w.to.port}</div>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
                     )}
                   </div>
