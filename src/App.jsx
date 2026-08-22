@@ -400,14 +400,41 @@ export default function App() {
       const comp = compById[compId];
       const proto = comp && COMPONENT_TYPES[comp.type];
       const port = proto?.ports.find(p => p.id === portId);
-      return { comp: proto?.name || comp?.type || compId, port: port?.name || portId };
+      return { comp: proto?.name || comp?.type || compId, port: port?.name || portId, portObj: port };
     };
-    return canvas.wires.map(w => ({
-      id: w.id,
-      from: describe(w.from.componentId, w.from.portId),
-      to: describe(w.to.componentId, w.to.portId),
-      color: w.color || '#94A3B8',
-    }));
+    // Ý nghĩa từng chân — tra theo type chuẩn (power/gnd) trước, sau đó theo id chân
+    // cụ thể (TRIG/ECHO/SDA...). Chân số GPIO trần (D5, GPIO21...) không có ý nghĩa
+    // riêng — ý nghĩa thật nằm ở đầu dây bên kia (chân của cảm biến/thiết bị).
+    const PORT_MEANING = {
+      TRIG: 'Tín hiệu kích phát (Trigger) phát sóng siêu âm',
+      ECHO: 'Tín hiệu phản hồi (Echo) — đo thời gian sóng dội về',
+      DATA: 'Dữ liệu số truyền theo giao thức 1-Wire',
+      AO: 'Tín hiệu Analog — giá trị đo được (đọc qua ADC)',
+      IN: 'Tín hiệu điều khiển đóng/ngắt Relay',
+      OUT: 'Đầu ra tải đã qua Relay (đóng/ngắt nguồn thiết bị)',
+      SDA: 'Dữ liệu I2C (Serial Data)',
+      SCL: 'Xung nhịp đồng bộ I2C (Serial Clock)',
+      POS: 'Cực dương (+) cấp điện / điều khiển',
+      NEG: 'Cực âm (-) — về GND',
+      A: 'Cực Anode (+) — chiều thuận LED',
+      K: 'Cực Cathode (-) — chiều thuận LED',
+      CU: 'Điện cực đồng — cực dương pin sinh học',
+      NAIL: 'Đinh kẽm — cực âm pin sinh học',
+      L: 'Chân trái (không phân cực)',
+      R: 'Chân phải (không phân cực)',
+    };
+    const meaningOf = (port) => {
+      if (!port) return null;
+      if (port.type === 'power') return 'Cấp nguồn dương (+)';
+      if (port.type === 'gnd') return 'Nối đất / GND (-)';
+      return PORT_MEANING[String(port.id || '').toUpperCase()] || null;
+    };
+    return canvas.wires.map(w => {
+      const from = describe(w.from.componentId, w.from.portId);
+      const to = describe(w.to.componentId, w.to.portId);
+      const meaning = meaningOf(from.portObj) || meaningOf(to.portObj) || 'Tín hiệu điều khiển / dữ liệu số';
+      return { id: w.id, from, to, color: w.color || '#94A3B8', meaning };
+    });
   }, [canvas.components, canvas.wires]);
 
   return (
@@ -1004,9 +1031,9 @@ export default function App() {
                         <table className="w-full table-fixed border-collapse text-[10px]">
                           <thead>
                             <tr className={ui.isDarkMode ? 'text-gray-500' : 'text-slate-400'}>
-                              <th className="w-[46%] text-left font-semibold uppercase tracking-wide pb-1">Từ</th>
-                              <th className="w-[8%]"></th>
-                              <th className="w-[46%] text-left font-semibold uppercase tracking-wide pb-1">Đến</th>
+                              <th className="w-[30%] text-left font-semibold uppercase tracking-wide pb-1">Từ</th>
+                              <th className="w-[30%] text-left font-semibold uppercase tracking-wide pb-1">Đến</th>
+                              <th className="w-[40%] text-left font-semibold uppercase tracking-wide pb-1 pl-1.5">Ý nghĩa dây nối</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -1016,12 +1043,15 @@ export default function App() {
                                   <div className={`font-semibold leading-tight ${ui.isDarkMode ? 'text-gray-200' : 'text-slate-800'}`}>{w.from.comp}</div>
                                   <div className={ui.isDarkMode ? 'text-gray-500' : 'text-slate-500'}>{w.from.port}</div>
                                 </td>
-                                <td className="align-top pt-1.5 text-center">
-                                  <ArrowRight className="w-2.5 h-2.5 inline-block text-slate-400" />
-                                </td>
-                                <td className="py-1 pl-1.5 align-top" style={{ borderLeft: `3px solid ${w.color}` }}>
-                                  <div className={`font-semibold leading-tight ${ui.isDarkMode ? 'text-gray-200' : 'text-slate-800'}`}>{w.to.comp}</div>
+                                <td className="py-1 pl-1.5 align-top">
+                                  <div className={`font-semibold leading-tight flex items-start gap-0.5 ${ui.isDarkMode ? 'text-gray-200' : 'text-slate-800'}`}>
+                                    <ArrowRight className="w-2.5 h-2.5 shrink-0 mt-0.5 text-slate-400" />
+                                    <span>{w.to.comp}</span>
+                                  </div>
                                   <div className={ui.isDarkMode ? 'text-gray-500' : 'text-slate-500'}>{w.to.port}</div>
+                                </td>
+                                <td className={`py-1 pl-1.5 align-top leading-tight ${ui.isDarkMode ? 'text-gray-400' : 'text-slate-600'}`}>
+                                  {w.meaning}
                                 </td>
                               </tr>
                             ))}
